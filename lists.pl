@@ -1,8 +1,10 @@
 double(X, R) :- R is X * 2.
+/* TODO: Fix these.
 isEven(N) :- mod(N, 2) =:= 0.
 isEven(N, R) :- R is mod(N, 2) = 0.
 isOdd(N) :- mod(N, 2) =:= 1.
 isOdd(N, R) :- R is mod(N, 2) = 1.
+*/
 
 % When the input list is empty, the output list should be empty.
 maplist(_, [], []).
@@ -35,3 +37,12 @@ sum(List, Sum) :-
     sum(Tail, TailSum),
     % The result is the first number plus that sum.
     Sum is TailSum + Head.
+
+% This is a reimplementation of the builtin "append" rule.
+% Appending an empty list to any list gives the second list.
+list_append([], L, L).
+% Appending two lists is the same as appending
+% the head of the first list (H) to the result of appending
+% the tail of the first list (L1) to the second list (L2).
+list_append([H|L1], L2, [H|L3]) :- list_append(L1, L2, L3).
+

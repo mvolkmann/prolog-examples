@@ -3,7 +3,7 @@
 :- consult(geometry).
 :- begin_tests(geometry).
 
-near(A, B) :- abs(A - B) =< 1e-7.
+near(a, b) :- abs(a - b) =< 1e-7.
 
 test(area) :-
   area(circle, 3, X), near(X, 28.27433388231), !.
