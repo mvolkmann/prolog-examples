@@ -40,6 +40,11 @@ test(same_row) :-
   \+ qca(2-3, 5-7),
   !.
 
+test(pairs_keys_values) :-
+  pairs_keys_values([a-apple, b-banana, c-cherry], Ks, Vs),
+  assertion(Ks = [a, b, c]),
+  assertion(Vs = [apple, banana, cherry]).
+
 test(pairs_keys) :-
   pairs_keys([a-apple, b-banana, c-cherry], Ks),
   assertion(Ks = [a, b, c]).
@@ -47,6 +52,11 @@ test(pairs_keys) :-
 test(pairs_values) :-
   pairs_values([a-apple, b-banana, c-cherry], Ks),
   assertion(Ks = [apple, banana, cherry]).
+
+test(group_pairs_by_key) :-
+  % The pairs must be sorted on their keys.
+  group_pairs_by_key([a-apple, a-ape, b-banana, b-bear], Gs),
+  assertion(Gs = [a-[apple,ape], b-[banana,bear]]).
 
 :- end_tests(pairs).
 :- run_tests.

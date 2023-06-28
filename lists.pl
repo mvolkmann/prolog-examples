@@ -41,6 +41,7 @@ sum(List, Sum) :-
 % This is a reimplementation of the builtin "append" rule.
 % Appending an empty list to any list gives the second list.
 list_append([], L, L).
+
 % Appending two lists is the same as appending
 % the head of the first list (H) to the result of appending
 % the tail of the first list (L1) to the second list (L2).
