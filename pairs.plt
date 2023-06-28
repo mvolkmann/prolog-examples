@@ -50,4 +50,7 @@ test(pairs_values) :-
 
 :- end_tests(pairs).
 :- run_tests.
+
+% This doesn't seem to generate a useful report.
+% :- show_coverage(pairs, [dir(cov)]).
 :- halt.
