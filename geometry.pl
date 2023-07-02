@@ -1,6 +1,5 @@
 :- use_module(library(clpr)).
 
-% area(circle, Radius, X) :- X is pi * Radius^2.
 area(circle, Radius, X) :- Pi is pi, {X = Pi * Radius^2}.
 
 % area(square, Side, X) :- X is Side^2.
@@ -18,4 +17,5 @@ radius_area(R, A) :-
 radius_area(R, A) :-
     ground(A), % tests whether A is not a free variable
     R is sqrt(A / pi).
+
 

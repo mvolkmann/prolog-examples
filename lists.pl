@@ -6,6 +6,32 @@ isOdd(N) :- mod(N, 2) =:= 1.
 isOdd(N, R) :- R is mod(N, 2) = 1.
 */
 
+same_lists :-
+  L1 is [red, green, blue],
+  L2 is [red | [green | [blue | []]]],
+  % L3 is .(red, .(green, .(blue, []))),
+  L1 = L2.
+  % L2 = L3.
+
+same_characters :-
+  L1 is 'abc',
+  L2 is [a, b, c],
+  L1 =:= L2.
+
+print_list_parts(L) :-
+  [H|T] = L,
+  format('head is ~w, tail is ~w', [H, T]).
+
+print_elements([]).
+
+print_elements([H|T]) :-
+  writeln(H),
+  print_elements(T).
+
+print_second(L) :-
+  [_, S] = L,
+  writeln(S).
+
 % When the input list is empty, the output list should be empty.
 maplist(_, [], []).
 
