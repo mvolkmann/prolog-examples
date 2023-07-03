@@ -5,9 +5,14 @@ owns(jeremy, pet(dog, ramsay)).
 
 person(mark, address('123 Some Street', 'Somewhere', 'MO', 12345)).
 
+print_pet(pet(Kind, Name)) :-
+  format("~w is a ~w.~n", [Name, Kind]).
+
 main :-
   owns(tami, A),
   format('pet = ~w~n', A), % pet(dog,comet)
+
+  print_pet(A),
 
   owns(tami, pet(dog, B)),
   format('name = ~w~n', B), % comet
