@@ -57,6 +57,8 @@ print_row([]) :- nl.
 % print the first one followed by a space.
 print_row([H|T]) :- format("~w ", H), print_row(T).
 
+% Each puzzle must contain at least 17 clues.
+
 problem(1, % can solve
   [[_,_,_, _,_,_, _,_,_],
    [_,_,_, _,_,3, _,8,5],
@@ -96,4 +98,4 @@ problem(3, % can solve
    [_,_,9, 8,_,_, _,3,6],
    [_,_,_, 3,_,6, _,9,_]]).
 
-:- problem(2, Rows), sudoku(Rows), print_rows(Rows).
+:- problem(1, Rows), sudoku(Rows), print_rows(Rows).

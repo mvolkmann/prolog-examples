@@ -2,6 +2,8 @@
 % that is derived by removing a given element from another list.
 % This shows how we could implement that.
 
+:- use_module(library(reif)). % for if_
+
 % Removing anything from an empty list matches an empty list.
 list_without([], _, []).
 
@@ -17,3 +19,12 @@ list_without([H|T], E, L) :-
     % Otherwise the result list L is a new list with head H
     % and tail is the same as T with E removed.
     list_without(T, E, L2), L = [H|L2].
+
+  /* Supposedly if_ can be used instead and has advantages.
+     But I can't figure out how to use it.
+  if_(
+    H == E,
+    list_without(T, E, L),
+    (list_without(T, E, L2), L = [H|L2])
+  ).
+  */

@@ -15,7 +15,7 @@ father(clarence, tami).
 father(mark, amanda).
 father(mark, jeremy).
 
-mother(judi, richard).
+mother(judi, mark).
 mother(gerri, tami).
 mother(tami, amanda).
 mother(tami, jeremy).
@@ -24,8 +24,7 @@ mother(tami, jeremy).
 
 grandfather_of(X, Y) :-
   father(X, P),
-  (father(P, Y); mother(P, Y)),
-  !.
+  (father(P, Y); mother(P, Y)).
 
 is_father(X) :- father(X, _), !.
 
