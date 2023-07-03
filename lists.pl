@@ -7,19 +7,18 @@ isOdd(N, R) :- R is mod(N, 2) = 1.
 */
 
 same_lists :-
-  L1 is [red, green, blue],
-  L2 is [red | [green | [blue | []]]],
+  L1 = [red, green, blue],
+  L2 = [red | [green | [blue | []]]],
   % L3 is .(red, .(green, .(blue, []))),
   L1 = L2.
   % L2 = L3.
 
 same_characters :-
-  L1 is 'abc',
-  L2 is [a, b, c],
+  L1 = 'abc',
+  L2 = [a, b, c],
   L1 =:= L2.
 
-print_list_parts(L) :-
-  [H|T] = L,
+print_list_parts([H|T]) :-
   format('head is ~w, tail is ~w', [H, T]).
 
 print_elements([]).
