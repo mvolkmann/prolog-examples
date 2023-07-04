@@ -30,25 +30,28 @@ houses(Hs) :-
   length(Hs, 5),
 
   % The Englishman lives in the red house.
-  member(relation(englishman, red, _, _, _), hs),
+  member(relation(englishman, red, _, _, _), Hs),
 
   % The Spaniard owns the dog.
-  member(relation(spaniard, _, _, _, dog), hs),
+  member(relation(spaniard, _, _, _, dog), Hs),
 
   % Coffee is drunk in the green house.
-  member(relation(_, green, coffee, _, _), hs),
+  member(relation(_, green, coffee, _, _), Hs),
 
   % The Ukrainian drinks tea.
-  member(relation(ukrainian, _, tea, _, _), hs),
+  member(relation(ukrainian, _, tea, _, _), Hs),
 
   % The green house is next to the ivory house.
-  adjacent(relation(_, green, _, _, _), relation(_, ivory, _, _, _)),
+  adjacent(
+    relation(_, green, _, _, _),
+    relation(_, ivory, _, _, _),
+    Hs),
 
   % The Old Gold smoker owns snails.
-  member(relation(_, _, _, old_gold, snails), hs),
+  member(relation(_, _, _, old_gold, snails), Hs),
 
   % Kools are smoked in the yellow house.
-  member(relation(_, yellow, _, kools, _), hs),
+  member(relation(_, yellow, _, kools, _), Hs),
 
   % Milk is drunk in the middle house.
   Hs = [_, _, relation(_, _, milk, _, _), _, _],
@@ -58,25 +61,34 @@ houses(Hs) :-
 
   % The man who smokes Chesterfields lives in
   % the house next to the man with the fox.
-  adjacent(relation(_, _, _, chesterfields, _), relation(_, _, _, _, fox)),
+  adjacent(
+    relation(_, _, _, chesterfields, _),
+    relation(_, _, _, _, fox),
+    Hs),
 
   % Kools are smoked in the house next to the house where the horse is kept.
-  adjacent(relation(_, _, _, kools, _), relation(_, _, _, _, horse)),
+  adjacent(
+    relation(_, _, _, kools, _),
+    relation(_, _, _, _, horse),
+    Hs),
 
   % The Lucky Strike smoker drinks orange juice.
-  member(relation(_, _, orange_juice, lucky_strike, _), hs),
+  member(relation(_, _, orange_juice, lucky_strike, _), Hs),
 
   % The Japanese smokes Parliaments.
-  member(relation(japanese, _, _, parliaments, _), hs),
+  member(relation(japanese, _, _, parliaments, _), Hs),
 
   % The Norwegian lives next to the blue house.
-  adjacent(relation(norwegian, _, _, _, _), relation(_, blue, _, _, _)),
+  adjacent(
+    relation(norwegian, _, _, _, _),
+    relation(_, blue, _, _, _),
+    Hs),
 
   % Someone drinks water.
-  member(relation(_, _, water, _, _), hs),
+  member(relation(_, _, water, _, _), Hs),
 
   % Someone owns a zebra.
-  member(relation(_, _, _, _, zebra), hs).
+  member(relation(_, _, _, _, zebra), Hs).
 
 zebra_owner(Owner) :-
 	houses(Hs),
@@ -86,7 +98,7 @@ water_drinker(Drinker) :-
 	houses(Hs),
 	member(relation(Drinker,_,_,water,_), Hs).
 
-print_houses([]) :- halt.
+print_houses([]).
 
 print_houses([H|T]) :-
   [N, C, D, S, P] = H,
