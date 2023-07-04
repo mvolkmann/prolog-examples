@@ -19,11 +19,15 @@ dog, fox, horse, snails, and zebra.
 
 % relation(Nationality, Color, Drinks, Smokes, Pet).
 
-% Two list elements are adjacent if one of the following holds.
-% Appending something to a list beginning with A,B results in a given list.
-adjacent(A, B, Ls) :- append(_, [A,B|_], Ls).
-% Appending something to a list beginning with B,A results in a given list.
-adjacent(A, B, Ls) :- append(_, [B,A|_], Ls).
+% A list element A is on the left of a list element B if
+% appending something to a list beginning with A,B results in a given list.
+on_left(A, B, Ls) :- append(_, [A,B|_], Ls).
+
+% A list element A is on the right of a list element B if
+% appending something to a list beginning with B,A results in a given list.
+on_right(A, B, Ls) :- append(_, [B,A|_], Ls).
+
+adjacent(A, B, Ls) :- on_left(A, B, Ls); on_right(A, B, Ls).
 
 houses(Hs) :-
   % There are five houses.
@@ -41,8 +45,8 @@ houses(Hs) :-
   % The Ukrainian drinks tea.
   member(relation(ukrainian, _, tea, _, _), Hs),
 
-  % The green house is next to the ivory house.
-  adjacent(
+  % The green house is immediately to the right of the ivory house.
+  on_right(
     relation(_, green, _, _, _),
     relation(_, ivory, _, _, _),
     Hs),
@@ -90,13 +94,13 @@ houses(Hs) :-
   % Someone owns a zebra.
   member(relation(_, _, _, _, zebra), Hs).
 
-zebra_owner(Owner) :-
+zebra_owner(N) :-
 	houses(Hs),
-	member(relation(Owner,zebra,_,_,_), Hs).
+	member(relation(N, zebra, _, _, _), Hs).
 
-water_drinker(Drinker) :-
+water_drinker(N) :-
 	houses(Hs),
-	member(relation(Drinker,_,_,water,_), Hs).
+	member(relation(N, _, _, water, _), Hs).
 
 print_houses([]).
 
