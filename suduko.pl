@@ -72,8 +72,10 @@ problem(1, % can solve
    [_,_,2, _,1,_, _,_,_],
    [_,_,_, _,4,_, _,_,9]]).
 
+% See comments at https://www.youtube.com/watch?v=5KUdEZTu06o.
 problem(2, % cannot solve
-  [[5,_,9, _,_,_, _,_,_],
+  [[5,_,9, _,_,_, _,_,_], % doesn't work
+  % [[5,_,9, _,_,_, _,_,8], % works with this extra clue
    [_,7,_, _,_,6, _,_,1],
    [6,_,_, _,9,_, _,_,4],
 
@@ -98,4 +100,4 @@ problem(3, % can solve
    [_,_,9, 8,_,_, _,3,6],
    [_,_,_, 3,_,6, _,9,_]]).
 
-:- problem(1, Rows), sudoku(Rows), print_rows(Rows).
+:- problem(2, Rows), sudoku(Rows), print_rows(Rows).
