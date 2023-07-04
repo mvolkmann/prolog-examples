@@ -2,12 +2,12 @@
 
 % There are five houses.
 % Each house has a color and a number (1-5).
-house(blue, Bn).
+house(blue, _).
 % The green house is immediately to the right of the ivory house.
 house(green, Gn) :- house(ivory, In), Gn = In + 1.
-house(ivory, In).
-house(red, Rn).
-house(yellow, Yn).
+house(ivory, _).
+house(red, _).
+house(yellow, _).
 
 animal(dog).
 animal(fox).
@@ -36,48 +36,48 @@ smoke(parliaments).
 % relation(nationality, house, drinks, smokes, animal)
 
 % The Englishman lives in the red house.
-relation(englishman, H, D, S, A) :- H = house(red, _).
+relation(englishman, H, _, _, _) :- H = house(red, _).
 
 % The Spaniard owns the dog.
-relation(spaniard, H, D, S, dog).
+relation(spaniard, _, _, _, dog).
 
 % Coffee is drunk in the green house.
-relation(N, H, coffee, S, A) :- H = house(green, _).
+relation(_, H, coffee, _, _) :- H = house(green, _).
 
 % The Ukrainian drinks tea.
-relation(ukrainian, C, tea, S, A).
+relation(ukrainian, _, tea, _, _).
 
 % The Old Gold smoker owns snails.
-relation(N, C, D, old_gold, snails).
+relation(_, _, _, old_gold, snails).
 
 % Kools are smoked in the yellow house.
-relation(N, H, D, kools, A) :- H = house(yellow, _).
+relation(_, H, _, kools, _) :- H = house(yellow, _).
 
 % Milk is drunk in the middle house.
-relation(N, H, milk, S, A) :- H = house(_, 3).
+relation(_, H, milk, _, _) :- H = house(_, 3).
 
 % The Norwegian lives in the first house.
-relation(norwegian, H, D, S, A) :- H = house(_, 1).
+relation(norwegian, H, _, _, _) :- H = house(_, 1).
 
 % The man who smokes Chesterfields lives in
 % the house next to the man with the fox.
-relation(N, house(_, N1), D, chesterfields, A) :-
+relation(_, house(_, N1), _, chesterfields, _) :-
   relation(_, house(_, N2), _, _, fox),
   (N1 = N2 - 1; N1 = N2 + 1).
 
 % Kools are smoked in the house next to the house where the horse is kept.
-relation(N, house(_, N1), D, kools, A) :-
+relation(_, house(_, N1), _, kools, _) :-
   relation(_, house(_, N2), _, _, horse),
   (N1 = N2 - 1; N1 = N2 + 1).
 
 % The Lucky Strike smoker drinks orange juice.
-relation(N, H, orange_juice, lucky_strike, A).
+relation(_, _, orange_juice, lucky_strike, _).
 
 % The Japanese smokes Parliaments.
-relation(japanese, H, D, parliaments, A).
+relation(japanese, _, _, parliaments, _).
 
 % The Norwegian lives next to the blue house.
-relation(norwegian, house(_, N1), D, S, A) :-
+relation(norwegian, house(_, N1), _, _, _) :-
   relation(_, house(blue, N2), _, _, horse),
   (N1 = N2 - 1; N1 = N2 + 1).
 
