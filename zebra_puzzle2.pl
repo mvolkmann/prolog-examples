@@ -109,4 +109,4 @@ print_houses([H|T]) :-
   format("~w ~w ~w ~w ~w~n", [C, N, D, S, P]),
   print_houses(T).
 
-  % :- houses(Hs), print_houses(Hs).
+% :- houses(Hs), print_houses(Hs).
