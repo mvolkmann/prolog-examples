@@ -1,91 +1,96 @@
 /*
-This is Einstein's Riddle.
-
-There are five animals:
-dog, fox, horse, snails, and zebra.
+This solves Einstein's Riddle.
 
 There are five nationalities:
 englishman, japanese, norwegian, spaniard, and ukrainian.
 
+There are five houses colors:
+blue, green, ivory, red, and yellow.
+
 There are five drinks:
 coffee, milk, orange_juice, tea, and water.
 
-There are five cigarettes:
+There are five smokes:
 chesterfields, kools, lucky_strike, old_gold, and parliaments.
 
-There are five houses.
-Each house has a color and a number (1-5).
-
-relation rules have the following arguments:
-nationality, house, drinks, smokes, and animal.
+There are five animals:
+dog, fox, horse, snails, and zebra.
 */
 
-% The green house is immediately to the right of the ivory house.
-house(green, Gn) :- house(ivory, In), Gn = In + 1.
+% relation(Nationality, Color, Drinks, Smokes, Pet).
 
-% The Englishman lives in the red house.
-relation(englishman, H, _, _, _) :- H = house(red, _).
+% Two list elements are adjacent if one of the following holds.
+% Appending something to a list beginning with A,B results in a given list.
+adjacent(A, B, Ls) :- append(_, [A,B|_], Ls).
+% Appending something to a list beginning with B,A results in a given list.
+adjacent(A, B, Ls) :- append(_, [B,A|_], Ls).
 
-% The Spaniard owns the dog.
-relation(spaniard, _, _, _, dog).
+houses(Hs) :-
+  % There are five houses.
+  length(Hs, 5),
 
-% Coffee is drunk in the green house.
-relation(_, H, coffee, _, _) :- H = house(green, _).
+  % The Englishman lives in the red house.
+  member(relation(englishman, red, _, _, _), hs),
 
-% The Ukrainian drinks tea.
-relation(ukrainian, _, tea, _, _).
+  % The Spaniard owns the dog.
+  member(relation(spaniard, _, _, _, dog), hs),
 
-% The Old Gold smoker owns snails.
-relation(_, _, _, old_gold, snails).
+  % Coffee is drunk in the green house.
+  member(relation(_, green, coffee, _, _), hs),
 
-% Kools are smoked in the yellow house.
-relation(_, H, _, kools, _) :- H = house(yellow, _).
+  % The Ukrainian drinks tea.
+  member(relation(ukrainian, _, tea, _, _), hs),
 
-% Milk is drunk in the middle house.
-relation(_, H, milk, _, _) :- H = house(_, 3).
+  % The green house is next to the ivory house.
+  adjacent(relation(_, green, _, _, _), relation(_, ivory, _, _, _)),
 
-% The Norwegian lives in the first house.
-relation(norwegian, H, _, _, _) :- H = house(_, 1).
+  % The Old Gold smoker owns snails.
+  member(relation(_, _, _, old_gold, snails), hs),
 
-% The man who smokes Chesterfields lives in
-% the house next to the man with the fox.
-relation(_, house(_, N1), _, chesterfields, _) :-
-  relation(_, house(_, N2), _, _, fox),
-  (N1 = N2 - 1; N1 = N2 + 1).
+  % Kools are smoked in the yellow house.
+  member(relation(_, yellow, _, kools, _), hs),
 
-% Kools are smoked in the house next to the house where the horse is kept.
-relation(_, house(_, N1), _, kools, _) :-
-  relation(_, house(_, N2), _, _, horse),
-  (N1 = N2 - 1; N1 = N2 + 1).
+  % Milk is drunk in the middle house.
+  Hs = [_, _, relation(_, _, milk, _, _), _, _],
 
-% The Lucky Strike smoker drinks orange juice.
-relation(_, _, orange_juice, lucky_strike, _).
+  % The Norwegian lives in the first house.
+  Hs = [relation(norwegian, _, _, _, _) | _],
 
-% The Japanese smokes Parliaments.
-relation(japanese, _, _, parliaments, _).
+  % The man who smokes Chesterfields lives in
+  % the house next to the man with the fox.
+  adjacent(relation(_, _, _, chesterfields, _), relation(_, _, _, _, fox)),
 
-% The Norwegian lives next to the blue house.
-relation(norwegian, house(_, N1), _, _, _) :-
-  relation(_, house(blue, N2), _, _, _),
-  (N1 = N2 - 1; N1 = N2 + 1).
+  % Kools are smoked in the house next to the house where the horse is kept.
+  adjacent(relation(_, _, _, kools, _), relation(_, _, _, _, horse)),
 
-% Someone drinks water.
-relation(_, _, water, _, _).
+  % The Lucky Strike smoker drinks orange juice.
+  member(relation(_, _, orange_juice, lucky_strike, _), hs),
 
-% Someone owns a zebra.
-relation(_, _, _, _, zebra).
+  % The Japanese smokes Parliaments.
+  member(relation(japanese, _, _, parliaments, _), hs),
 
-% Determine who drinks water and who owns the zebra.
-:- S = "~w ~w ~w ~w ~w~n",
-   relation(N1, house(C1, 1), D1, S1, A1),
-   format(S, [C1, N1, D1, S1, A1]),
-   relation(N2, house(C2, 2), D2, S2, A2),
-   format(S, [C2, N2, D2, S2, A2]),
-   relation(N3, house(C3, 3), D3, S3, A3),
-   format(S, [C3, N3, D3, S3, A3]),
-   relation(N1, house(C1, 1), D1, S1, A1),
-   format(S, [C1, N1, D1, S1, A1]),
-   relation(N5, house(C5, 5), D5, S5, A5),
-   format(S, [C5, N5, D5, S5, A5]),
-   halt.
+  % The Norwegian lives next to the blue house.
+  adjacent(relation(norwegian, _, _, _, _), relation(_, blue, _, _, _)),
 
+  % Someone drinks water.
+  member(relation(_, _, water, _, _), hs),
+
+  % Someone owns a zebra.
+  member(relation(_, _, _, _, zebra), hs).
+
+zebra_owner(Owner) :-
+	houses(Hs),
+	member(relation(Owner,zebra,_,_,_), Hs).
+
+water_drinker(Drinker) :-
+	houses(Hs),
+	member(relation(Drinker,_,_,water,_), Hs).
+
+print_houses([]) :- halt.
+
+print_houses([H|T]) :-
+  [N, C, D, S, P] = H,
+  format("~w ~w ~w ~w ~w~n", [C, N, D, S, P]),
+  print_houses(T).
+
+  % :- houses(Hs), print_houses(Hs).
