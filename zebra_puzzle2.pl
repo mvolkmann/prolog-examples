@@ -1,39 +1,27 @@
-% This is Einstein's Riddle.
+/*
+This is Einstein's Riddle.
 
-% There are five houses.
-% Each house has a color and a number (1-5).
-house(blue, _).
+There are five animals:
+dog, fox, horse, snails, and zebra.
+
+There are five nationalities:
+englishman, japanese, norwegian, spaniard, and ukrainian.
+
+There are five drinks:
+coffee, milk, orange_juice, tea, and water.
+
+There are five cigarettes:
+chesterfields, kools, lucky_strike, old_gold, and parliaments.
+
+There are five houses.
+Each house has a color and a number (1-5).
+
+relation rules have the following arguments:
+nationality, house, drinks, smokes, and animal.
+*/
+
 % The green house is immediately to the right of the ivory house.
 house(green, Gn) :- house(ivory, In), Gn = In + 1.
-house(ivory, _).
-house(red, _).
-house(yellow, _).
-
-animal(dog).
-animal(fox).
-animal(horse).
-animal(snails).
-animal(zebra).
-
-nationality(englishman).
-nationality(japanese).
-nationality(norwegian).
-nationality(spaniard).
-nationality(ukrainian).
-
-drink(coffee).
-drink(milk).
-drink(orange_juice).
-drink(tea).
-drink(water).
-
-smoke(chesterfields).
-smoke(kools).
-smoke(lucky_strike).
-smoke(old_gold).
-smoke(parliaments).
-
-% relation(nationality, house, drinks, smokes, animal)
 
 % The Englishman lives in the red house.
 relation(englishman, H, _, _, _) :- H = house(red, _).
@@ -78,13 +66,26 @@ relation(japanese, _, _, parliaments, _).
 
 % The Norwegian lives next to the blue house.
 relation(norwegian, house(_, N1), _, _, _) :-
-  relation(_, house(blue, N2), _, _, horse),
+  relation(_, house(blue, N2), _, _, _),
   (N1 = N2 - 1; N1 = N2 + 1).
 
+% Someone drinks water.
+relation(_, _, water, _, _).
+
+% Someone owns a zebra.
+relation(_, _, _, _, zebra).
+
 % Determine who drinks water and who owns the zebra.
-:- relation(N1, _, water, _, _),
-   format("The person that drinks water is ~w.~n", N1),
-   relation(N2, _, _, _, zebra),
-   format("The person that owns the zebra is ~w.~n", N2),
+:- S = "~w ~w ~w ~w ~w~n",
+   relation(N1, house(C1, 1), D1, S1, A1),
+   format(S, [C1, N1, D1, S1, A1]),
+   relation(N2, house(C2, 2), D2, S2, A2),
+   format(S, [C2, N2, D2, S2, A2]),
+   relation(N3, house(C3, 3), D3, S3, A3),
+   format(S, [C3, N3, D3, S3, A3]),
+   relation(N1, house(C1, 1), D1, S1, A1),
+   format(S, [C1, N1, D1, S1, A1]),
+   relation(N5, house(C5, 5), D5, S5, A5),
+   format(S, [C5, N5, D5, S5, A5]),
    halt.
 
