@@ -32,6 +32,7 @@ on_right(A, B, Ls) :- on_left(B, A, Ls).
 % if A is on the left or right side of B.
 adjacent(A, B, Ls) :- on_left(A, B, Ls); on_right(A, B, Ls).
 
+% This gets a list of all the houses contain all their details.
 houses(Hs) :-
   % There are five houses.
   length(Hs, 5),
@@ -49,9 +50,9 @@ houses(Hs) :-
   member(relation(ukrainian, _, tea, _, _), Hs),
 
   % The green house is immediately to the right of the ivory house.
-  on_right(
-    relation(_, green, _, _, _),
+  on_left(
     relation(_, ivory, _, _, _),
+    relation(_, green, _, _, _),
     Hs),
 
   % The Old Gold smoker owns snails.
@@ -99,11 +100,13 @@ houses(Hs) :-
 
 zebra_owner(N) :-
 	houses(Hs),
-	member(relation(N, zebra, _, _, _), Hs).
+	member(relation(N, _, _, _, zebra), Hs),
+	!.
 
 water_drinker(N) :-
 	houses(Hs),
-	member(relation(N, _, _, water, _), Hs).
+	member(relation(N, _, water, _, _), Hs),
+	!.
 
 print_houses([]).
 
