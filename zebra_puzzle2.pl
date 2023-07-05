@@ -13,7 +13,7 @@ coffee, milk, orange_juice, tea, and water.
 There are five smokes:
 chesterfields, kools, lucky_strike, old_gold, and parliaments.
 
-There are five animals:
+There are five pets
 dog, fox, horse, snails, and zebra.
 */
 
