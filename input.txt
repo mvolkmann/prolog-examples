@@ -1,0 +1,4 @@
+This is used
+to test reading
+from a file
+in Prolog.
