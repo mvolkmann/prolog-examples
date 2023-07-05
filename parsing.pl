@@ -40,14 +40,3 @@ digit(D) --> [D], { char_type(D, decimal_digit) }.
 assignment(V, I) --> ws, word(V), ws, ":=", ws, integer(I), ws.
 % once(phrase(assignment(V, I), "  gretzky := 99 ")).
 % V = "gretzky", I = 99.
-
-:- use_module(library(pio)). % for phrase_from_file and phrase_to_stream
-/*
-% Get a list of characters from a file.
-:- phrase_from_file(seq(Cs), "input.txt"), % reads from file
-   phrase_to_stream(Cs, user_output). % writes to stdout
-
-:- use_module(library(format)), % for format_ and portray_clause_
-   phrase(format_("~w ~w", [foo, bar]), Line),
-   phrase_to_file(Line, "output.txt").
-*/
