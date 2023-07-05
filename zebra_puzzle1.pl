@@ -55,3 +55,31 @@ solve(K1, H1, A1, K2, H2, A2, K3, H3, A3) :-
    ethan is 10 and dressed as iron_man.
    ali is 8 and dressed as captain_america.
 */
+
+/* Why doesn't this approach work?
+solve(Ks) :-
+  length(Ks, 3),
+
+  % Anya was dressed up as Spiderman.
+  member(relation(anya, spiderman, _), Ks),
+
+  % Ethan was not dressed up as Captain America.
+  member(relation(ethan, H, _), Ks), H \= captain_america,
+
+  % The youngest kid dressed up as Spiderman.
+  member(relation(_, spiderman, 6), Ks),
+
+  % The kid who is 8 years old dressed up as Captain America.
+  member(relation(_, captain_america, 8), Ks),
+
+  % Some kid is named ali.
+  member(relation(ali, _, _), Ks),
+
+  % Some kid dressed as iron_man.
+  member(relation(_, iron_man, _), Ks),
+
+  % Some kid is 10.
+  member(relation(_, _, 10), Ks).
+
+:- solve(Ks).
+*/
