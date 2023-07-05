@@ -17,16 +17,19 @@ There are five animals:
 dog, fox, horse, snails, and zebra.
 */
 
-% relation(Nationality, Color, Drinks, Smokes, Pet).
+% The relation arguments are Nationality, Color, Drinks, Smokes, and Pet.
 
-% A list element A is on the left of a list element B if
-% appending something to a list beginning with A,B results in a given list.
+% List element A is on the left of list element B
+% if appending $ something onto a list
+% beginning with A,B results in a given list.
 on_left(A, B, Ls) :- append(_, [A,B|_], Ls).
 
-% A list element A is on the right of a list element B if
-% appending something to a list beginning with B,A results in a given list.
-on_right(A, B, Ls) :- append(_, [B,A|_], Ls).
+% List element A is on the right of list element B
+% if B is on the left of A.
+on_right(A, B, Ls) :- on_left(B, A, Ls).
 
+% List elements A and B are adjacent
+% if A is on the left or right side of B.
 adjacent(A, B, Ls) :- on_left(A, B, Ls); on_right(A, B, Ls).
 
 houses(Hs) :-
