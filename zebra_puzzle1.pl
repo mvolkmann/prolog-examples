@@ -2,6 +2,7 @@
 % This is the "zebra puzzle", also referred to as "Einstein's Riddle".
 % See https://www.101computing.net/solving-a-zebra-puzzle-using-prolog/.
 
+/*
 % The names of the three kids are Ethan, Ali and Anya.
 kid(ethan).
 kid(ali).
@@ -49,6 +50,7 @@ solve(K1, H1, A1, K2, H2, A2, K3, H3, A3) :-
    format(S, [K2, A2, H2]),
    format(S, [K3, A3, H3]),
    halt.
+*/
 
 /* The output is:
    anya is 6 and dressed as spiderman.
@@ -56,7 +58,8 @@ solve(K1, H1, A1, K2, H2, A2, K3, H3, A3) :-
    ali is 8 and dressed as captain_america.
 */
 
-/* Why doesn't this approach work?
+% This is an alternate strategy that is
+% similar to that used in zebra_puzzle2.pl.
 solve(Ks) :-
   length(Ks, 3),
 
@@ -64,7 +67,11 @@ solve(Ks) :-
   member(relation(anya, spiderman, _), Ks),
 
   % Ethan was not dressed up as Captain America.
-  member(relation(ethan, H, _), Ks), H \= captain_america,
+  % The freeze predicate delays execution of a goal
+  % until a given variable is bound.
+  % member(relation(ethan, H, _), Ks), freeze(H, H \= captain_america),
+  % The dif predicate removes the need for freeze.
+  member(relation(ethan, H, _), Ks), dif(H, captain_america),
 
   % The youngest kid dressed up as Spiderman.
   member(relation(_, spiderman, 6), Ks),
@@ -81,5 +88,7 @@ solve(Ks) :-
   % Some kid is 10.
   member(relation(_, _, 10), Ks).
 
-:- solve(Ks).
-*/
+print_kid(relation(Name, Hero, Age)) :-
+   format("~w is ~w and dressed as ~w.~n", [Name, Hero, Age]).
+
+:- solve(Ks), maplist(print_kid, Ks), halt.
