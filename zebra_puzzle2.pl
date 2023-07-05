@@ -105,8 +105,12 @@ water_drinker(N) :-
 print_houses([]).
 
 print_houses([H|T]) :-
-  [N, C, D, S, P] = H,
-  format("~w ~w ~w ~w ~w~n", [C, N, D, S, P]),
+  relation(N, C, D, S, P) = H,
+  %S = "The ~w lives in the ~w house, drinks ~w, smokes ~w, and owns a ~w.~n",
+  %format(S, [N, C, D, S, P]),
+  format(
+    "The ~w lives in the ~w house, drinks ~w, smokes ~w, and owns a ~w.~n",
+    [N, C, D, S, P]),
   print_houses(T).
 
-% :- houses(Hs), print_houses(Hs).
+:- houses(Hs), print_houses(Hs).
