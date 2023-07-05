@@ -1,3 +1,4 @@
+% This was only tested in Scryer Prolog.
 :- use_module(library(charsio)). % for char_type
 
 /*
@@ -24,3 +25,17 @@ ws --> [W], { char_type(W, whitespace) }, ws | [].
 % once(phrase(words(Ws), "The quick brown fox jumps over the lazy dog")).
 % This does not terminate if the string contains
 % characters that are not alphabetic or whitespace such as a period.
+
+integer(I) --> digits(Ds), { number_chars(I, Ds) }.
+
+digits([H|T]) --> digit(H), digits_remaining(T).
+digits_remaining([H|T]) --> digit(H), digits_remaining(T).
+digits_remaining([]) --> [].
+
+digit(D) --> [D], { char_type(D, decimal_digit) }.
+
+% phrase((ws, integer(I), ws), "  1961 ").
+
+assignment(V, I) --> ws, word(V), ws, ":=", ws, integer(I), ws.
+% once(phrase(assignment(V, I), "  gretzky := 99 ")).
+% V = "gretzky", I = 99.
