@@ -2,8 +2,7 @@
 :- use_module(library(http/http_open)). % for http_open
 
 indent_write(Indent, V) :-
-  (between(1, Indent, _), write(' '), false);
-  writeln(V).
+  format('~*|~t~w~n', [Indent, V]).
 
 % This is used if 2nd argument is an element structure.
 % element structure components are Tag, Attributes, and Children.
