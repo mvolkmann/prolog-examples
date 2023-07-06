@@ -3,7 +3,6 @@ const swipl = require('swipl');
 function loadFile(directory, fileName) {
   swipl.call(`working_directory(_, '${directory}')`);
   swipl.call(`consult(${fileName})`)
-
 }
 
 function printSolution(goal, solution) {
