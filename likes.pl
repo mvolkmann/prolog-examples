@@ -2,5 +2,5 @@
 :- dynamic(likes/2).
 likes(mark, books).
 likes(mark, running).
-likes(foo).
+likes(tami, bikes).
 
