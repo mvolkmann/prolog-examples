@@ -100,4 +100,8 @@ problem(3, % can solve
    [_,_,9, 8,_,_, _,3,6],
    [_,_,_, 3,_,6, _,9,_]]).
 
-:- problem(2, Rows), sudoku(Rows), print_rows(Rows).
+:- initialization
+  problem(1, Rows),
+  sudoku(Rows),
+  print_rows(Rows),
+  halt.
