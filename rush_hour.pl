@@ -1,3 +1,7 @@
+% See https://github.com/nablaa/rushhour-solver-prolog/blob/master/car.pl
+% and the issue I created there.
+% This solution was created in 2011, so it's quite old.
+
 % is the car vertical
 is_vertical(car(_, Start, End)) :-
 	(X0, _) = Start,
