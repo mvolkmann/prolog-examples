@@ -10,7 +10,7 @@ repeat(N, A, S) :-
 
 % This is used if 2nd argument is an element structure.
 % element structure components are Tag, Attributes, and Children.
-print_tag(Level, element(Tag, _, Children)) :-  %
+print_tag(Level, element(Tag, _, Children)) :-
   Indent is Level * 2,
   repeat(Indent, 32, Spaces),
   write(Spaces), write(Tag), nl,

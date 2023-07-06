@@ -1,0 +1,19 @@
+{
+  "name": "node-swipl-server",
+  "version": "1.0.0",
+  "description": "A Node.js server that interacts with SWI-Prolog",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "Node",
+    "Prolog",
+    "SWI"
+  ],
+  "author": "R. Mark Volkmann",
+  "license": "MIT",
+  "dependencies": {
+    "swipl": "^1.0.6"
+  }
+}
