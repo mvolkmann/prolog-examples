@@ -25,9 +25,10 @@ process(In) :-
 
 shutdown(In) :- close(In), halt.
 
-:- setup_call_cleanup(
-     % Must use single, not double quotes around URL!
-     http_open('https://mvolkmann.github.io', In, []),
-     process(In),
-     shutdown(In)).
+:- initialization
+  setup_call_cleanup(
+    % Must use single, not double quotes around URL!
+    http_open('https://mvolkmann.github.io', In, []),
+    process(In),
+    shutdown(In)).
 
