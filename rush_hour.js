@@ -30,15 +30,33 @@ const catalog = {
 // Column values range from 0 (top) to 5 (bottom).
 // The X car is always horizontal on row 2
 // because the exit is on the right side of row 2.
-const cars = {
-  A: { row: 0, currentColumn: 0 },
-  B: { column: 0, currentRow: 4 },
-  C: { row: 4, currentColumn: 4 },
-  O: { column: 5, currentRow: 0 },
-  P: { column: 0, currentRow: 1 },
-  Q: { column: 3, currentRow: 1 },
-  R: { row: 5, currentColumn: 2 },
-  X: { row: 2, currentColumn: 1 },
+
+const puzzles = {
+  p1: {
+    A: { row: 0, currentColumn: 0 },
+    B: { column: 0, currentRow: 4 },
+    C: { row: 4, currentColumn: 4 },
+    O: { column: 5, currentRow: 0 },
+    P: { column: 0, currentRow: 1 },
+    Q: { column: 3, currentRow: 1 },
+    R: { row: 5, currentColumn: 2 },
+    X: { row: 2, currentColumn: 1 },
+  },
+  p40: {
+    A: { row: 0, currentColumn: 1 },
+    B: { column: 4, currentRow: 0 },
+    C: { column: 1, currentRow: 1 },
+    D: { column: 2, currentRow: 1 },
+    E: { column: 3, currentRow: 3 },
+    F: { column: 2, currentRow: 4 },
+    G: { row: 4, currentColumn: 4 },
+    H: { row: 5, currentColumn: 0 },
+    I: { row: 5, currentColumn: 3 },
+    O: { column: 0, currentRow: 0 },
+    P: { column: 5, currentRow: 1 },
+    Q: { row: 3, currentColumn: 0 },
+    X: { row: 2, currentColumn: 3 },
+  },
 };
 
 // This holds objects with cars and board properties
@@ -143,12 +161,11 @@ function copyCars(cars) {
   return copy;
 }
 
-function getBoard() {
+function getBoard(cars) {
   const occupiedRows = [];
 
   // Create an empty board.
   for (let row = 0; row < size; row++) {
-    // TODO: Maybe occupiedColumns should be a 6-char string instead of array.
     const occupiedColumns = Array(size).fill(space);
     occupiedRows.push(occupiedColumns);
   }
@@ -235,13 +252,19 @@ function printMoves(lastState) {
   }
 }
 
-function solve() {
-  addPending(getBoard(), cars);
+function solve(cars) {
+  const board = getBoard(cars);
+  console.log("Starting board:");
+  printBoard(board);
+  addPending(board, cars);
 
   let lastState;
 
   while (pending.length > 0) {
+    // TODO: Maybe use a heuristic to choose which pending state to try next.
+    // TODO: For example, the one with the fewest cars blocking the exit.
     const pendingState = pending.shift();
+
     const { board, cars } = pendingState;
 
     if (isGoalReached(board, cars)) {
@@ -270,4 +293,4 @@ function solve() {
 
 // ----------------------------------------------------------------------------
 
-solve();
+solve(puzzles.p1);
