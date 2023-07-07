@@ -81,6 +81,17 @@ function getBoard() {
   return occupiedRows;
 }
 
+// This returns a string that uniquely describes a board position,
+// but only for the current puzzle.
+function getPositionId(cars) {
+  return Object.values(cars)
+    .map(car => car.currentColumn === undefined ?
+      car.currentRow :
+      car.currentColumn
+    )
+    .join('');
+}
+
 function getValidMoves(carLetter) {
 
 }
@@ -113,3 +124,4 @@ function printBoard(board) {
 const board = getBoard();
 printBoard(board);
 console.log('Goal reached?', isGoalReached());
+console.log('position id =', getPositionId(cars));
