@@ -1,4 +1,5 @@
 const size = 6; // # of rows and columns on board
+const space = ' ';
 
 // This object holds static information about all the possible cars.
 const catalog = {
@@ -40,6 +41,99 @@ const cars = {
   X: { row: 2, currentColumn: 1 }
 }
 
+// This holds objects with cars and board properties
+// that still need to be evaluated.
+const pending = [];
+
+// This updates the pending array.
+function addMoves(carLetter) {
+  const car = cars[carLetter];
+  if (isHorizontal(car)) {
+    const { row } = car;
+    const startColumn = car.currentColumn;
+    const endColumn = startColumn + catalog[carLetter].length - 1;
+    const occupiedRow = board[row];
+
+    // TODO: Maybe occupiedRow arrays should be strings.
+    const canMoveLeft =
+      startColumn > 0 && occupiedRow[startColumn - 1] === space;
+    if (canMoveLeft) {
+      const newCars = copyCars(cars);
+      newCars[carLetter] = { row, currentColumn: startColumn - 1 };
+
+      const newBoard = copyBoard(board);
+      const newOccupiedRow = newBoard[row];
+      newOccupiedRow[startColumn - 1] = carLetter;
+      newOccupiedRow[endColumn] = space;
+
+      pending.push({ board: newBoard, cars: newCars });
+    }
+
+    const canMoveRight =
+      endColumn < size - 1 && occupiedRow[endColumn + 1] === space;
+    if (canMoveRight) {
+      const newCars = copyCars(cars);
+      newCars[carLetter] = { row, currentColumn: endColumn + 1 };
+
+      const newBoard = copyBoard(board);
+      const newOccupiedRow = newBoard[row];
+      newOccupiedRow[endColumn + 1] = carLetter;
+      newOccupiedRow[startColumn] = space;
+
+      pending.push({ board: newBoard, cars: newCars });
+    }
+  } else { // car is vertical
+    const { column } = car;
+    const startRow = car.currentRow;
+    const endRow = startRow + catalog[carLetter].length - 1;
+
+    const canMoveUp =
+      startRow > 0 && board[startRow - 1][column] === space;
+    if (canMoveUp) {
+      const newCars = copyCars(cars);
+      newCars[carLetter] = { column, currentRow: startRow - 1 };
+
+      const newBoard = copyBoard(board);
+      newBoard[startRow - 1][column] = carLetter;
+      newBoard[endRow][column] = space;
+
+      pending.push({ board: newBoard, cars: newCars });
+    }
+
+    const canMoveDown =
+      endRow < size - 1 && board[endRow + 1][column] === space;
+    if (canMoveDown) {
+      const newCars = copyCars(cars);
+      newCars[carLetter] = { column, currentRow: endRow + 1 };
+
+      const newBoard = copyBoard(board);
+      newBoard[endRow + 1][column] = carLetter;
+      newBoard[startRow][column] = space;
+
+      pending.push({ board: newBoard, cars: newCars });
+    }
+  }
+}
+
+// This makes a deep copy of a board aray.
+function copyBoard(board) {
+  const copy = [];
+  for (const row of board) {
+    copy.push([...row]);
+  }
+  return copy;
+}
+
+// This makes a deep copy of a cars object.
+function copyCars(cars) {
+  const copy = { ...cars };
+  for (const carLetter of Object.keys(cars)) {
+    const car = cars[carLetter];
+    copy[carLetter] = { ...car };
+  }
+  return copy;
+}
+
 // TODO: Is this needed?
 function getCarEndPosition(carLetter) {
   const car = cars[carLetter];
@@ -53,7 +147,7 @@ function getBoard() {
 
   // Create an empty board.
   for (let row = 0; row < size; row++) {
-    const occupiedColumns = Array(size).fill(' ');
+    const occupiedColumns = Array(size).fill(space);
     occupiedRows.push(occupiedColumns);
   }
 
@@ -92,10 +186,6 @@ function getPositionId(cars) {
     .join('');
 }
 
-function getValidMoves(carLetter) {
-
-}
-
 // The goal is reached when there are no cars blocking the X car from the exit.
 function isGoalReached() {
   // Get the column after the end of the X car.
@@ -107,7 +197,7 @@ function isGoalReached() {
 
   // Check for cars blocking the exit.
   for (let column = startColumn; column < size; column++) {
-    if (row[column] !== ' ') return false;
+    if (row[column] !== space) return false;
   }
   return true;
 }
@@ -115,8 +205,8 @@ function isGoalReached() {
 const isHorizontal = car => car.row !== undefined;
 
 function printBoard(board) {
-  for (let occupiedRow of board) {
-    console.log(occupiedRow.join(' '));
+  for (const row of board) {
+    console.log(row.join(space));
   }
 }
 
@@ -125,3 +215,10 @@ const board = getBoard();
 printBoard(board);
 console.log('Goal reached?', isGoalReached());
 console.log('position id =', getPositionId(cars));
+
+addMoves('Q');
+for (const p of pending) {
+  // console.log('p.board =', p.board);
+  console.log("Pending Board");
+  printBoard(p.board);
+}
