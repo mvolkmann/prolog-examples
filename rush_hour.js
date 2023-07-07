@@ -68,6 +68,11 @@ function addMoves(carLetter, board, cars) {
       newOccupiedRow[startColumn - 1] = carLetter;
       newOccupiedRow[endColumn] = space;
 
+      console.log(`moving ${carLetter} left; current board:`);
+      printBoard(board);
+      console.log('new board:');
+      printBoard(newBoard);
+
       addPending(newBoard, newCars, `moved ${carLetter} left`);
     }
 
@@ -75,12 +80,17 @@ function addMoves(carLetter, board, cars) {
       endColumn < size - 1 && occupiedRow[endColumn + 1] === space;
     if (canMoveRight) {
       const newCars = copyCars(cars);
-      newCars[carLetter] = { row, currentColumn: endColumn + 1 };
+      newCars[carLetter] = { row, currentColumn: startColumn + 1 };
 
       const newBoard = copyBoard(board);
       const newOccupiedRow = newBoard[row];
       newOccupiedRow[endColumn + 1] = carLetter;
       newOccupiedRow[startColumn] = space;
+
+      console.log(`moving ${carLetter} right; current board:`);
+      printBoard(board);
+      console.log('new board:');
+      printBoard(newBoard);
 
       addPending(newBoard, newCars, `moved ${carLetter} right`);
     }
@@ -99,6 +109,11 @@ function addMoves(carLetter, board, cars) {
       newBoard[startRow - 1][column] = carLetter;
       newBoard[endRow][column] = space;
 
+      console.log(`moving ${carLetter} up; current board:`);
+      printBoard(board);
+      console.log('new board:');
+      printBoard(newBoard);
+
       addPending(newBoard, newCars, `moved ${carLetter} up`);
     }
 
@@ -106,11 +121,16 @@ function addMoves(carLetter, board, cars) {
       endRow < size - 1 && board[endRow + 1][column] === space;
     if (canMoveDown) {
       const newCars = copyCars(cars);
-      newCars[carLetter] = { column, currentRow: endRow + 1 };
+      newCars[carLetter] = { column, currentRow: startRow + 1 };
 
       const newBoard = copyBoard(board);
       newBoard[endRow + 1][column] = carLetter;
       newBoard[startRow][column] = space;
+
+      console.log(`moving ${carLetter} down; current board:`);
+      printBoard(board);
+      console.log('new board:');
+      printBoard(newBoard);
 
       addPending(newBoard, newCars, `moved ${carLetter} down`);
     }
@@ -121,7 +141,7 @@ function addPending(board, cars, move) {
   pending.push({ board, cars, move });
 }
 
-// This makes a deep copy of a board aray.
+// This makes a deep copy of a board array.
 function copyBoard(board) {
   const copy = [];
   for (const row of board) {
@@ -215,22 +235,20 @@ function solve() {
   addPending(getBoard(), cars);
 
   let solved = false;
-  let count = 0;
 
   while (pending.length > 0) {
     const { board, cars, move } = pending.shift();
 
-    printBoard(board, move);
+    // printBoard(board, move);
 
     if (isGoalReached(board, cars)) {
+      printBoard(board);
       solved = true;
       break;
     }
 
     const id = getPositionId(cars);
     if (!visited.has(id)) {
-      count += 1;
-      if (count >= 428) break;
       visited.add(id);
       for (const carLetter of Object.keys(cars)) {
         addMoves(carLetter, board, cars);
