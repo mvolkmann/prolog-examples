@@ -1,4 +1,4 @@
-const size = 6; // # of rows and columns on board
+const size = 6; // # of rows and c, board, carsolumns on board
 const space = ' ';
 
 // This object holds static information about all the possible cars.
@@ -45,8 +45,11 @@ const cars = {
 // that still need to be evaluated.
 const pending = [];
 
+// This holds position ids that have already been evaluated.
+const visited = new Set();
+
 // This updates the pending array.
-function addMoves(carLetter) {
+function addMoves(carLetter, board, cars) {
   const car = cars[carLetter];
   if (isHorizontal(car)) {
     const { row } = car;
@@ -54,7 +57,6 @@ function addMoves(carLetter) {
     const endColumn = startColumn + catalog[carLetter].length - 1;
     const occupiedRow = board[row];
 
-    // TODO: Maybe occupiedRow arrays should be strings.
     const canMoveLeft =
       startColumn > 0 && occupiedRow[startColumn - 1] === space;
     if (canMoveLeft) {
@@ -66,7 +68,7 @@ function addMoves(carLetter) {
       newOccupiedRow[startColumn - 1] = carLetter;
       newOccupiedRow[endColumn] = space;
 
-      pending.push({ board: newBoard, cars: newCars });
+      addPending(newBoard, newCars, `moved ${carLetter} left`);
     }
 
     const canMoveRight =
@@ -80,7 +82,7 @@ function addMoves(carLetter) {
       newOccupiedRow[endColumn + 1] = carLetter;
       newOccupiedRow[startColumn] = space;
 
-      pending.push({ board: newBoard, cars: newCars });
+      addPending(newBoard, newCars, `moved ${carLetter} right`);
     }
   } else { // car is vertical
     const { column } = car;
@@ -97,7 +99,7 @@ function addMoves(carLetter) {
       newBoard[startRow - 1][column] = carLetter;
       newBoard[endRow][column] = space;
 
-      pending.push({ board: newBoard, cars: newCars });
+      addPending(newBoard, newCars, `moved ${carLetter} up`);
     }
 
     const canMoveDown =
@@ -110,9 +112,13 @@ function addMoves(carLetter) {
       newBoard[endRow + 1][column] = carLetter;
       newBoard[startRow][column] = space;
 
-      pending.push({ board: newBoard, cars: newCars });
+      addPending(newBoard, newCars, `moved ${carLetter} down`);
     }
   }
+}
+
+function addPending(board, cars, move) {
+  pending.push({ board, cars, move });
 }
 
 // This makes a deep copy of a board aray.
@@ -134,19 +140,12 @@ function copyCars(cars) {
   return copy;
 }
 
-// TODO: Is this needed?
-function getCarEndPosition(carLetter) {
-  const car = cars[carLetter];
-  const start = isHorizontal(car) ? car.currentColumn : car.currentRow;
-  const { length } = catalog[carLetter];
-  return start + length - 1;
-}
-
 function getBoard() {
   const occupiedRows = [];
 
   // Create an empty board.
   for (let row = 0; row < size; row++) {
+    // TODO: Maybe occupiedColumns should be a 6-char string instead of array.
     const occupiedColumns = Array(size).fill(space);
     occupiedRows.push(occupiedColumns);
   }
@@ -187,7 +186,7 @@ function getPositionId(cars) {
 }
 
 // The goal is reached when there are no cars blocking the X car from the exit.
-function isGoalReached() {
+function isGoalReached(board, cars) {
   // Get the column after the end of the X car.
   // This assumes the X car length is 2.
   const startColumn = cars.X.currentColumn + 2;
@@ -204,21 +203,48 @@ function isGoalReached() {
 
 const isHorizontal = car => car.row !== undefined;
 
-function printBoard(board) {
+function printBoard(board, move) {
+  if (move) console.log(move);
   for (const row of board) {
     console.log(row.join(space));
   }
+  console.log(); // blank line
 }
 
-// This is a two dimensional array that represents the current board.
-const board = getBoard();
-printBoard(board);
-console.log('Goal reached?', isGoalReached());
-console.log('position id =', getPositionId(cars));
+function solve() {
+  addPending(getBoard(), cars);
 
-addMoves('Q');
-for (const p of pending) {
-  // console.log('p.board =', p.board);
-  console.log("Pending Board");
-  printBoard(p.board);
+  let solved = false;
+  let count = 0;
+
+  while (pending.length > 0) {
+    const { board, cars, move } = pending.shift();
+
+    printBoard(board, move);
+
+    if (isGoalReached(board, cars)) {
+      solved = true;
+      break;
+    }
+
+    const id = getPositionId(cars);
+    if (!visited.has(id)) {
+      count += 1;
+      if (count >= 428) break;
+      visited.add(id);
+      for (const carLetter of Object.keys(cars)) {
+        addMoves(carLetter, board, cars);
+      }
+    }
+  }
+
+  if (solved) {
+    console.log("Solution found! :-)");
+  } else {
+    console.log("No solution was found. :-(");
+  }
 }
+
+// ----------------------------------------------------------------------------
+
+solve();
