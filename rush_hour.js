@@ -1,7 +1,8 @@
-const size = 6; // # of rows and c, board, carsolumns on board
-const space = " ";
+// This is using default Prettier settings.
+const SIZE = 6; // # of rows and columns on board
+const SPACE = " ";
 
-// This object holds static information about all the possible cars.
+// This object holds static information about all possible cars.
 const catalog = {
   X: { color: "red", length: 2 },
   A: { color: "mint", length: 2 },
@@ -42,6 +43,18 @@ const puzzles = {
     R: { row: 5, currentColumn: 2 },
     X: { row: 2, currentColumn: 1 },
   },
+  p30: {
+    A: { column: 2, currentRow: 0 },
+    B: { column: 3, currentRow: 1 },
+    C: { row: 3, currentColumn: 0 },
+    D: { row: 3, currentColumn: 2 },
+    E: { row: 5, currentColumn: 0 },
+    F: { row: 5, currentColumn: 2 },
+    O: { column: 0, currentRow: 0 },
+    P: { row: 0, currentColumn: 3 },
+    Q: { column: 5, currentRow: 3 },
+    X: { row: 2, currentColumn: 1 },
+  },
   p40: {
     A: { row: 0, currentColumn: 1 },
     B: { column: 4, currentRow: 0 },
@@ -67,72 +80,74 @@ const pending = [];
 const visited = new Set();
 
 // This updates the pending array.
-function addMoves(carLetter, currentState) {
+// TODO: Change this to generate all possible moves,
+// TODO: not just those with a distance of one.
+function addMoves(letter, currentState) {
   const { board, cars } = currentState;
 
-  const car = cars[carLetter];
+  const car = cars[letter];
   if (isHorizontal(car)) {
     const { row } = car;
     const startColumn = car.currentColumn;
-    const endColumn = startColumn + catalog[carLetter].length - 1;
+    const endColumn = startColumn + catalog[letter].length - 1;
     const occupiedRow = board[row];
 
     const canMoveLeft =
-      startColumn > 0 && occupiedRow[startColumn - 1] === space;
+      startColumn > 0 && occupiedRow[startColumn - 1] === SPACE;
     if (canMoveLeft) {
       const newCars = copyCars(cars);
-      newCars[carLetter] = { row, currentColumn: startColumn - 1 };
+      newCars[letter] = { row, currentColumn: startColumn - 1 };
 
       const newBoard = copyBoard(board);
       const newOccupiedRow = newBoard[row];
-      newOccupiedRow[startColumn - 1] = carLetter;
-      newOccupiedRow[endColumn] = space;
+      newOccupiedRow[startColumn - 1] = letter;
+      newOccupiedRow[endColumn] = SPACE;
 
-      addPending(newBoard, newCars, `${carLetter} left`, currentState);
+      addPending(newBoard, newCars, `${letter} left`, currentState);
     }
 
     const canMoveRight =
-      endColumn < size - 1 && occupiedRow[endColumn + 1] === space;
+      endColumn < SIZE - 1 && occupiedRow[endColumn + 1] === SPACE;
     if (canMoveRight) {
       const newCars = copyCars(cars);
-      newCars[carLetter] = { row, currentColumn: startColumn + 1 };
+      newCars[letter] = { row, currentColumn: startColumn + 1 };
 
       const newBoard = copyBoard(board);
       const newOccupiedRow = newBoard[row];
-      newOccupiedRow[endColumn + 1] = carLetter;
-      newOccupiedRow[startColumn] = space;
+      newOccupiedRow[endColumn + 1] = letter;
+      newOccupiedRow[startColumn] = SPACE;
 
-      addPending(newBoard, newCars, `${carLetter} right`, currentState);
+      addPending(newBoard, newCars, `${letter} right`, currentState);
     }
   } else {
     // car is vertical
     const { column } = car;
     const startRow = car.currentRow;
-    const endRow = startRow + catalog[carLetter].length - 1;
+    const endRow = startRow + catalog[letter].length - 1;
 
-    const canMoveUp = startRow > 0 && board[startRow - 1][column] === space;
+    const canMoveUp = startRow > 0 && board[startRow - 1][column] === SPACE;
     if (canMoveUp) {
       const newCars = copyCars(cars);
-      newCars[carLetter] = { column, currentRow: startRow - 1 };
+      newCars[letter] = { column, currentRow: startRow - 1 };
 
       const newBoard = copyBoard(board);
-      newBoard[startRow - 1][column] = carLetter;
-      newBoard[endRow][column] = space;
+      newBoard[startRow - 1][column] = letter;
+      newBoard[endRow][column] = SPACE;
 
-      addPending(newBoard, newCars, `${carLetter} up`, currentState);
+      addPending(newBoard, newCars, `${letter} up`, currentState);
     }
 
     const canMoveDown =
-      endRow < size - 1 && board[endRow + 1][column] === space;
+      endRow < SIZE - 1 && board[endRow + 1][column] === SPACE;
     if (canMoveDown) {
       const newCars = copyCars(cars);
-      newCars[carLetter] = { column, currentRow: startRow + 1 };
+      newCars[letter] = { column, currentRow: startRow + 1 };
 
       const newBoard = copyBoard(board);
-      newBoard[endRow + 1][column] = carLetter;
-      newBoard[startRow][column] = space;
+      newBoard[endRow + 1][column] = letter;
+      newBoard[startRow][column] = SPACE;
 
-      addPending(newBoard, newCars, `${carLetter} down`, currentState);
+      addPending(newBoard, newCars, `${letter} down`, currentState);
     }
   }
 }
@@ -154,40 +169,50 @@ function copyBoard(board) {
 // This makes a deep copy of a cars object.
 function copyCars(cars) {
   const copy = { ...cars };
-  for (const carLetter of Object.keys(cars)) {
-    const car = cars[carLetter];
-    copy[carLetter] = { ...car };
+  for (const letter of Object.keys(cars)) {
+    const car = cars[letter];
+    copy[letter] = { ...car };
   }
   return copy;
 }
 
 function getBoard(cars) {
+  if (!cars.X) {
+    console.error("Puzzle is missing car X!");
+    process.exit(1);
+  }
+
   const occupiedRows = [];
 
   // Create an empty board.
-  for (let row = 0; row < size; row++) {
-    const occupiedColumns = Array(size).fill(space);
+  for (let row = 0; row < SIZE; row++) {
+    const occupiedColumns = Array(SIZE).fill(SPACE);
     occupiedRows.push(occupiedColumns);
   }
 
   // Add cars to the board.
-  for (const carLetter of Object.keys(cars)) {
-    const car = cars[carLetter];
+  for (const letter of Object.keys(cars)) {
+    const car = cars[letter];
     if (isHorizontal(car)) {
       const start = car.currentColumn;
-      const end = start + catalog[carLetter].length;
+      const end = start + catalog[letter].length;
       const occupiedRow = occupiedRows[car.row];
       for (let column = start; column < end; column++) {
-        occupiedRow[column] = carLetter;
+        const existing = occupiedRow[column];
+        if (existing !== SPACE) {
+          console.error(`Car ${letter} overlaps car {existing}!`);
+          process.exit(2);
+        }
+        occupiedRow[column] = letter;
       }
     } else {
       // car is vertical
       const { column } = car;
       const start = car.currentRow;
-      const end = start + catalog[carLetter].length;
+      const end = start + catalog[letter].length;
       for (let row = start; row < end; row++) {
         const occupiedRow = occupiedRows[row];
-        occupiedRow[column] = carLetter;
+        occupiedRow[column] = letter;
       }
     }
   }
@@ -215,8 +240,8 @@ function isGoalReached(board, cars) {
   const row = board[2];
 
   // Check for cars blocking the exit.
-  for (let column = startColumn; column < size; column++) {
-    if (row[column] !== space) return false;
+  for (let column = startColumn; column < SIZE; column++) {
+    if (row[column] !== SPACE) return false;
   }
   return true;
 }
@@ -226,7 +251,7 @@ const isHorizontal = (car) => car.row !== undefined;
 function printBoard(board, move) {
   if (move) console.log(move);
   for (const row of board) {
-    console.log(row.join(space));
+    console.log(row.join(SPACE));
   }
   console.log(); // blank line
 }
@@ -275,8 +300,8 @@ function solve(cars) {
     const id = getPositionId(cars);
     if (!visited.has(id)) {
       visited.add(id);
-      for (const carLetter of Object.keys(cars)) {
-        addMoves(carLetter, pendingState);
+      for (const letter of Object.keys(cars)) {
+        addMoves(letter, pendingState);
       }
     }
   }
@@ -293,4 +318,4 @@ function solve(cars) {
 
 // ----------------------------------------------------------------------------
 
-solve(puzzles.p1);
+solve(puzzles.p30);
