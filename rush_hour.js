@@ -1,27 +1,33 @@
+// TODO: Try to generalized this code toward handling any puzzle game.
 // This is using default Prettier settings.
+const EXIT_ROW = 2;
 const SIZE = 6; // # of rows and columns on board
 const SPACE = " ";
 
-// This object holds static information about all possible cars.
-const catalog = {
-  X: { color: "red", length: 2 },
-  A: { color: "mint", length: 2 },
-  B: { color: "orange", length: 2 },
-  C: { color: "cyan", length: 2 },
-  D: { color: "pink", length: 2 },
-  E: { color: "purple", length: 2 },
-  F: { color: "green", length: 2 },
-  G: { color: "gray", length: 2 },
-  H: { color: "tan", length: 2 },
-  I: { color: "lemon", length: 2 },
-  J: { color: "brown", length: 2 },
-  K: { color: "olive", length: 2 },
-  O: { color: "yellow", length: 3 },
-  P: { color: "mauve", length: 3 },
-  Q: { color: "blue", length: 3 },
-  R: { color: "teal", length: 3 },
-  X: { color: "red", length: 2 },
+// TODO: This isn't currently used, but could be in a web app.
+/*
+const carColor = {
+  X: "red",
+  A: "mint",
+  B: "orange",
+  C: "cyan",
+  D: "pink",
+  E: "purple",
+  F: "green",
+  G: "gray",
+  H: "tan",
+  I: "lemon",
+  J: "brown",
+  K: "olive",
+  O: "yellow",
+  P: "mauve",
+  Q: "blue",
+  R: "teal",
+  X: "red",
 };
+*/
+
+const carLength = (letter) => ("OPQR".includes(letter) ? 3 : 2);
 
 // This object holds information about the cars in a given puzzle.
 // Horizontal cars have a row property and
@@ -41,7 +47,7 @@ const puzzles = {
     P: { column: 0, currentRow: 1 },
     Q: { column: 3, currentRow: 1 },
     R: { row: 5, currentColumn: 2 },
-    X: { row: 2, currentColumn: 1 },
+    X: { row: EXIT_ROW, currentColumn: 1 },
   },
   p30: {
     A: { column: 2, currentRow: 0 },
@@ -53,7 +59,7 @@ const puzzles = {
     O: { column: 0, currentRow: 0 },
     P: { row: 0, currentColumn: 3 },
     Q: { column: 5, currentRow: 3 },
-    X: { row: 2, currentColumn: 1 },
+    X: { row: EXIT_ROW, currentColumn: 1 },
   },
   p40: {
     A: { row: 0, currentColumn: 1 },
@@ -68,7 +74,7 @@ const puzzles = {
     O: { column: 0, currentRow: 0 },
     P: { column: 5, currentRow: 1 },
     Q: { row: 3, currentColumn: 0 },
-    X: { row: 2, currentColumn: 3 },
+    X: { row: EXIT_ROW, currentColumn: 3 },
   },
 };
 
@@ -86,10 +92,12 @@ function addMoves(letter, currentState) {
   const { board, cars } = currentState;
 
   const car = cars[letter];
+  const length = carLength(letter);
+
   if (isHorizontal(car)) {
     const { row } = car;
     const startColumn = car.currentColumn;
-    const endColumn = startColumn + catalog[letter].length - 1;
+    const endColumn = startColumn + length - 1;
     const occupiedRow = board[row];
 
     const canMoveLeft =
@@ -103,7 +111,7 @@ function addMoves(letter, currentState) {
       newOccupiedRow[startColumn - 1] = letter;
       newOccupiedRow[endColumn] = SPACE;
 
-      addPending(newBoard, newCars, `${letter} left`, currentState);
+      addPendingState(newBoard, newCars, `${letter} left`, currentState);
     }
 
     const canMoveRight =
@@ -117,13 +125,13 @@ function addMoves(letter, currentState) {
       newOccupiedRow[endColumn + 1] = letter;
       newOccupiedRow[startColumn] = SPACE;
 
-      addPending(newBoard, newCars, `${letter} right`, currentState);
+      addPendingState(newBoard, newCars, `${letter} right`, currentState);
     }
   } else {
     // car is vertical
     const { column } = car;
     const startRow = car.currentRow;
-    const endRow = startRow + catalog[letter].length - 1;
+    const endRow = startRow + length - 1;
 
     const canMoveUp = startRow > 0 && board[startRow - 1][column] === SPACE;
     if (canMoveUp) {
@@ -134,7 +142,7 @@ function addMoves(letter, currentState) {
       newBoard[startRow - 1][column] = letter;
       newBoard[endRow][column] = SPACE;
 
-      addPending(newBoard, newCars, `${letter} up`, currentState);
+      addPendingState(newBoard, newCars, `${letter} up`, currentState);
     }
 
     const canMoveDown =
@@ -147,12 +155,12 @@ function addMoves(letter, currentState) {
       newBoard[endRow + 1][column] = letter;
       newBoard[startRow][column] = SPACE;
 
-      addPending(newBoard, newCars, `${letter} down`, currentState);
+      addPendingState(newBoard, newCars, `${letter} down`, currentState);
     }
   }
 }
 
-function addPending(board, cars, move, currentState) {
+function addPendingState(board, cars, move, currentState) {
   const newState = { previousState: currentState, board, cars, move };
   pending.push(newState);
 }
@@ -193,9 +201,11 @@ function getBoard(cars) {
   // Add cars to the board.
   for (const letter of Object.keys(cars)) {
     const car = cars[letter];
+    const length = carLength(letter);
+
     if (isHorizontal(car)) {
       const start = car.currentColumn;
-      const end = start + catalog[letter].length;
+      const end = start + length;
       const occupiedRow = occupiedRows[car.row];
       for (let column = start; column < end; column++) {
         const existing = occupiedRow[column];
@@ -209,7 +219,7 @@ function getBoard(cars) {
       // car is vertical
       const { column } = car;
       const start = car.currentRow;
-      const end = start + catalog[letter].length;
+      const end = start + length;
       for (let row = start; row < end; row++) {
         const occupiedRow = occupiedRows[row];
         occupiedRow[column] = letter;
@@ -236,24 +246,25 @@ function isGoalReached(board, cars) {
   // This assumes the X car length is 2.
   const startColumn = cars.X.currentColumn + 2;
 
-  // Get the row of exit which is always row 2.
-  const row = board[2];
+  const exitRow = board[EXIT_ROW];
 
   // Check for cars blocking the exit.
   for (let column = startColumn; column < SIZE; column++) {
-    if (row[column] !== SPACE) return false;
+    if (exitRow[column] !== SPACE) return false;
   }
   return true;
 }
 
 const isHorizontal = (car) => car.row !== undefined;
 
-function printBoard(board, move) {
-  if (move) console.log(move);
-  for (const row of board) {
-    console.log(row.join(SPACE));
-  }
-  console.log(); // blank line
+function printBoard(board) {
+  console.log("+-----------+");
+  board.forEach((row, index) => {
+    let s = "|" + row.join(SPACE);
+    if (index !== EXIT_ROW) s += "|";
+    console.log(s);
+  });
+  console.log("+-----------+");
 }
 
 function printMoves(lastState) {
@@ -281,7 +292,9 @@ function solve(cars) {
   const board = getBoard(cars);
   console.log("Starting board:");
   printBoard(board);
-  addPending(board, cars);
+  console.log(); // blank line
+
+  addPendingState(board, cars);
 
   let lastState;
 
