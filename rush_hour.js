@@ -1,6 +1,7 @@
 const size = 6; // # of rows and columns on board
 
-const cars = {
+// This object holds static information about all the possible cars.
+const catalog = {
   X: { color: 'red', length: 2 },
   A: { color: 'mint', length: 2 },
   B: { color: 'orange', length: 2 },
@@ -20,6 +21,7 @@ const cars = {
   X: { color: 'red', length: 2 }
 }
 
+// This object holds information about the cars in a given puzzle.
 // Horizontal cars have a row property and
 // vertical cars have a column property.
 // The "current" properties give the starting position of the car.
@@ -27,7 +29,7 @@ const cars = {
 // Column values range from 0 (top) to 5 (bottom).
 // The X car is always horizontal on row 2
 // because the exit is on the right side of row 2.
-const board = {
+const cars = {
   A: { row: 0, currentColumn: 0 },
   B: { column: 0, currentRow: 4 },
   C: { row: 4, currentColumn: 4 },
@@ -38,27 +40,29 @@ const board = {
   X: { row: 2, currentColumn: 1 }
 }
 
-function getCarEndPosition(board, carLetter) {
-  const car = board[carLetter];
+// TODO: Is this needed?
+function getCarEndPosition(carLetter) {
+  const car = cars[carLetter];
   const start = isHorizontal(car) ? car.currentColumn : car.currentRow;
-  const { length } = cars[carLetter];
+  const { length } = catalog[carLetter];
   return start + length - 1;
 }
 
-const isHorizontal = car => car.row !== undefined;
-
-function printBoard(board) {
+function getBoard() {
   const occupiedRows = [];
+
+  // Create an empty board.
   for (let row = 0; row < size; row++) {
     const occupiedColumns = Array(size).fill(' ');
     occupiedRows.push(occupiedColumns);
   }
 
-  for (const carLetter of Object.keys(board)) {
-    const car = board[carLetter];
+  // Add cars to the board.
+  for (const carLetter of Object.keys(cars)) {
+    const car = cars[carLetter];
     if (isHorizontal(car)) {
       const start = car.currentColumn;
-      const end = start + cars[carLetter].length;
+      const end = start + catalog[carLetter].length;
       const occupiedRow = occupiedRows[car.row];
       for (let column = start; column < end; column++) {
         occupiedRow[column] = carLetter;
@@ -66,7 +70,7 @@ function printBoard(board) {
     } else { // car is vertical
       const { column } = car;
       const start = car.currentRow;
-      const end = start + cars[carLetter].length;
+      const end = start + catalog[carLetter].length;
       for (let row = start; row < end; row++) {
         const occupiedRow = occupiedRows[row];
         occupiedRow[column] = carLetter;
@@ -74,9 +78,38 @@ function printBoard(board) {
     }
   }
 
-  for (let occupiedRow of occupiedRows) {
+  return occupiedRows;
+}
+
+function getValidMoves(carLetter) {
+
+}
+
+// The goal is reached when there are no cars blocking the X car from the exit.
+function isGoalReached() {
+  // Get the column after the end of the X car.
+  // This assumes the X car length is 2.
+  const startColumn = cars.X.currentColumn + 2;
+
+  // Get the row of exit which is always row 2.
+  const row = board[2];
+
+  // Check for cars blocking the exit.
+  for (let column = startColumn; column < size; column++) {
+    if (row[column] !== ' ') return false;
+  }
+  return true;
+}
+
+const isHorizontal = car => car.row !== undefined;
+
+function printBoard(board) {
+  for (let occupiedRow of board) {
     console.log(occupiedRow.join(' '));
   }
 }
 
+// This is a two dimensional array that represents the current board.
+const board = getBoard();
 printBoard(board);
+console.log('Goal reached?', isGoalReached());
