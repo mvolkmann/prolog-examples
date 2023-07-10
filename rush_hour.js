@@ -106,14 +106,13 @@ function addHorizontalMoves({
     const newBoard = copyBoard(state.board);
     const newBoardRow = newBoard[row];
     // Remove car being moved.
-    setRow(newBoardRow, startColumn, length, SPACE);
+    setRow(newBoardRow, SPACE, currentColumn, length);
     // Add car being moved in new location.
-    setRow(newBoardRow, column, length, letter);
+    setRow(newBoardRow, letter, column, length);
 
     const distance = Math.abs(column - currentColumn);
     const direction = delta === -1 ? "right" : "left";
     const move = `${letter} ${direction} ${distance}`;
-    console.log("addHorizontalMoves: move =", move);
     addPendingState(newBoard, newCars, move, state);
 
     if (column === endColumn) break;
@@ -134,14 +133,13 @@ function addVerticalMoves({ state, letter, column, startRow, endRow, delta }) {
     // Make a copy of the board where the car being moved is updated.
     const newBoard = copyBoard(state.board);
     // Remove car being moved.
-    setColumn(newBoard, column, startRow, length, SPACE);
+    setColumn(newBoard, SPACE, column, currentRow, length);
     // Add car being moved in new location.
-    setColumn(newBoard, column, row, length, letter);
+    setColumn(newBoard, letter, column, row, length);
 
     const distance = Math.abs(row - currentRow);
     const direction = delta === -1 ? "down" : "up";
     const move = `${letter} ${direction} ${distance}`;
-    console.log("addVerticalMoves: move =", move);
     addPendingState(newBoard, newCars, move, state);
 
     if (row === endRow) break;
@@ -158,14 +156,6 @@ function addMoves(letter, state) {
   const car = cars[letter];
 
   if (isHorizontal(car)) {
-    /*
-    console.log(
-      "generating horizontal moves for car",
-      letter,
-      "at column",
-      car.currentColumn
-    );
-    */
     const { row } = car;
     const boardRow = board[row];
 
@@ -207,14 +197,6 @@ function addMoves(letter, state) {
     }
   } else {
     // car is vertical
-    /*
-    console.log(
-      "generating vertical moves for car",
-      letter,
-      "at row",
-      car.currentRow
-    );
-    */
     const { column } = car;
 
     // Generate moves up from largest to smallest distance.
@@ -369,28 +351,23 @@ function printMoves(lastState) {
   let state = lastState;
   while (state) {
     const { move } = state;
-    const previousMove = moves[0];
-    if (previousMove?.startsWith(move)) {
-      const count = parseInt(previousMove.substring(move.length + 1));
-      moves[0] = move + " " + (count + 1);
-    } else if (move) {
-      moves.unshift(move + " 1");
-    }
+    if (move) moves.push(move);
     state = state.previousState;
   }
 
+  moves.reverse();
   for (const move of moves) {
     console.log(move);
   }
 }
 
-function setColumn(board, column, startRow, length, letter) {
+function setColumn(board, letter, column, startRow, length) {
   for (let r = startRow; r < startRow + length; r++) {
     board[r][column] = letter;
   }
 }
 
-function setRow(boardRow, startColumn, length, letter) {
+function setRow(boardRow, letter, startColumn, length) {
   for (let c = startColumn; c < startColumn + length; c++) {
     boardRow[c] = letter;
   }
