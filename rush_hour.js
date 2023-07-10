@@ -58,6 +58,7 @@ const PUZZLES = {
 };
 
 // This holds all the car letters used in the current puzzle.
+// It is set in the solve function.
 let letters = [];
 
 // This holds objects with the properties
