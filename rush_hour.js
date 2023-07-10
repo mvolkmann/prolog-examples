@@ -265,7 +265,7 @@ function copyCars(cars) {
 function getBoard(cars) {
   if (!cars.X) {
     console.error("Puzzle is missing car X!");
-    process.exit(1);
+    process.exit(2);
   }
 
   const boardRows = [];
@@ -289,7 +289,7 @@ function getBoard(cars) {
         const existing = boardRow[column];
         if (existing !== SPACE) {
           console.error(`Car ${letter} overlaps car {existing}!`);
-          process.exit(2);
+          process.exit(3);
         }
         boardRow[column] = letter;
       }
@@ -374,6 +374,11 @@ function setRow(boardRow, letter, startColumn, length) {
 }
 
 function solve(cars) {
+  if (!cars) {
+    console.error("Puzzle not found!");
+    process.exit(1);
+  }
+
   const board = getBoard(cars);
   console.log("Starting board:");
   printBoard(board);
@@ -416,4 +421,4 @@ function solve(cars) {
 
 // ----------------------------------------------------------------------------
 
-solve(puzzles.p1);
+solve(puzzles.p40);
