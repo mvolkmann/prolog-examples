@@ -1,44 +1,24 @@
-// TODO: Try to generalized this code toward handling any puzzle game.
-// This is using default Prettier settings.
+// This solves Rush Hour puzzles.
+// See https://en.wikipedia.org/wiki/Rush_Hour_(puzzle).
+// It uses a search strategy that is similar to A*
+// (https://en.wikipedia.org/wiki/A*_search_algorithm), but
+// doesn't use a heuristic to select the next node to evaluate.
+//
+// This code is formatted using default Prettier settings.
 const EXIT_ROW = 2;
 const SIZE = 6; // # of rows and columns on board
 const SPACE = " ";
-
-// TODO: This isn't currently used, but could be in a web app.
-/*
-const carColor = {
-  X: "red",
-  A: "mint",
-  B: "orange",
-  C: "cyan",
-  D: "pink",
-  E: "purple",
-  F: "green",
-  G: "gray",
-  H: "tan",
-  I: "lemon",
-  J: "brown",
-  K: "olive",
-  O: "yellow",
-  P: "mauve",
-  Q: "blue",
-  R: "teal",
-  X: "red",
-};
-*/
-
-const carLength = (letter) => ("OPQR".includes(letter) ? 3 : 2);
 
 // This object holds information about the cars in a given puzzle.
 // Horizontal cars have a row property and
 // vertical cars have a column property.
 // The "current" properties give the starting position of the car.
-// Row range from 0 (left) to 5 (right).
-// Column values range from 0 (top) to 5 (bottom).
+// Rows range from 0 (left) to 5 (right).
+// Columns range from 0 (top) to 5 (bottom).
 // The X car is always horizontal on row 2
 // because the exit is on the right side of row 2.
 
-const puzzles = {
+const PUZZLES = {
   p1: {
     A: { row: 0, currentColumn: 0 },
     B: { column: 0, currentRow: 4 },
@@ -78,8 +58,11 @@ const puzzles = {
   },
 };
 
-// This holds objects with cars and board properties
-// that still need to be evaluated.
+// This holds objects with the properties
+// "move", "cars", "board", and "previousState".
+// These objects describe states still need to be evaluated
+// and will not necessarily be part of the solutions.
+// This is key to implementing a breadth-first search.
 const pending = [];
 
 // This holds position ids that have already been evaluated.
@@ -242,6 +225,8 @@ function addPendingState(board, cars, move, state) {
   const newState = { previousState: state, board, cars, move };
   pending.push(newState);
 }
+
+const carLength = (letter) => ("OPQR".includes(letter) ? 3 : 2);
 
 // This makes a deep copy of a board array.
 function copyBoard(board) {
@@ -421,4 +406,4 @@ function solve(cars) {
 
 // ----------------------------------------------------------------------------
 
-solve(puzzles.p40);
+solve(PUZZLES.p40);
