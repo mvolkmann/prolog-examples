@@ -17,7 +17,6 @@ const SPACE = " ";
 // Columns range from 0 (top) to 5 (bottom).
 // The X car is always horizontal on row 2
 // because the exit is on the right side of row 2.
-
 const PUZZLES = {
   p1: {
     A: { row: 0, currentColumn: 0 },
@@ -63,7 +62,7 @@ const PUZZLES = {
 // These objects describe states still need to be evaluated
 // and will not necessarily be part of the solutions.
 // This is key to implementing a breadth-first search.
-const pending = [];
+const pendingStates = [];
 
 // This holds position ids that have already been evaluated.
 const visited = new Set();
@@ -76,17 +75,18 @@ function addHorizontalMoves({
   endColumn,
   delta,
 }) {
+  const { board, cars } = state;
+  const { currentColumn } = cars[letter];
   const length = carLength(letter);
-  const { currentColumn } = state.cars[letter];
 
   let column = startColumn;
   while (true) {
     // Make a copy of the cars objects where the car being moved is updated.
-    const newCars = copyCars(state.cars);
+    const newCars = copyCars(cars);
     newCars[letter] = { row, currentColumn: column };
 
     // Make a copy of the board where the car being moved is updated.
-    const newBoard = copyBoard(state.board);
+    const newBoard = copyBoard(board);
     const newBoardRow = newBoard[row];
     // Remove car being moved.
     setRow(newBoardRow, SPACE, currentColumn, length);
@@ -104,17 +104,18 @@ function addHorizontalMoves({
 }
 
 function addVerticalMoves({ state, letter, column, startRow, endRow, delta }) {
+  const { board, cars } = state;
+  const { currentRow } = cars[letter];
   const length = carLength(letter);
-  const { currentRow } = state.cars[letter];
 
   let row = startRow;
   while (true) {
     // Make a copy of the cars objects where the car being moved is updated.
-    const newCars = copyCars(state.cars);
+    const newCars = copyCars(cars);
     newCars[letter] = { column, currentRow: row };
 
     // Make a copy of the board where the car being moved is updated.
-    const newBoard = copyBoard(state.board);
+    const newBoard = copyBoard(board);
     // Remove car being moved.
     setColumn(newBoard, SPACE, column, currentRow, length);
     // Add car being moved in new location.
@@ -223,7 +224,7 @@ function addMoves(letter, state) {
 
 function addPendingState(board, cars, move, state) {
   const newState = { previousState: state, board, cars, move };
-  pending.push(newState);
+  pendingStates.push(newState);
 }
 
 const carLength = (letter) => ("OPQR".includes(letter) ? 3 : 2);
@@ -373,10 +374,10 @@ function solve(cars) {
 
   let lastState;
 
-  while (pending.length > 0) {
+  while (pendingStates.length > 0) {
     // TODO: Maybe use a heuristic to choose which pending state to try next.
     // TODO: For example, the one with the fewest cars blocking the exit.
-    const pendingState = pending.shift();
+    const pendingState = pendingStates.shift();
 
     const { board, cars } = pendingState;
 
