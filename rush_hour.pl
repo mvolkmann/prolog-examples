@@ -25,6 +25,7 @@
 % - q for blue 3
 % - r for green 3
 
+/*
 car_at(X, Y, car(C, (X1, Y1), (X2, Y2))) :-
   between(X1, X2, X),
   between(Y1, Y2, Y).
@@ -35,11 +36,43 @@ car_at(X, Y, [H|T]) :-
   
 board_character(Row, Column, Cars, Char) :-
   car_at(Row, Column, Cars) -> 
+*/
 
-print(board(Size, Size, Exit, Cars)) :-
-  
+printRow_([H]) :- format('~w|~n', [H]), !.
+printRow_([H|T]) :-
+  write(H),
+  write(' '),
+  printRow_(T).
+printRow(L) :-
+  write('|'),
+  printRow_(L).
+
+printBoard(Board) :-
+  length(Board, Size),
+  Count is Size * 2 - 1,
+  repeat('-', Count, Dashes),
+  atomics_to_string(['+', Dashes, '+'], Border),
+  writeln(Border),
+  maplist(printRow, Board),
+  writeln(Border).
+
+% print(board(Size, Size, Exit, Cars)) :-
+
+repeat_(_, 0, []) :- !.
+repeat_(Char, N, [Char|T]) :-
+  N2 is N - 1,
+  repeat_(Char, N2, T).
+% repeat("*", 3, S). 
+
+% The first two arguments must be instantiated (ground).
+repeat(Char, N, S) :-
+  ground(Char),
+  ground(N),
+  repeat_(Char, N, L),
+  atomics_to_string(L, S).
 
 :- initialization
+  /*
   % This is the set for puzzle #1.
   Cars = [
     car(a, (0, 0), (1, 0)), % light green 2
@@ -51,8 +84,18 @@ print(board(Size, Size, Exit, Cars)) :-
     car(r, (2, 5), (4, 5)), % green 3
     car(o, (5, 0), (5, 2))  % yellow 3
   ],
-  Exit = (5, 2),
+  ExitRow = 2,
   Size = 6,
   Board = board(Size, Size, Exit, Cars),
-  print(Board),
+  */
+
+  Board = [
+    ['A', ' ', ' ', ' ', ' ', ' '],
+    [' ', 'B', ' ', ' ', ' ', ' '],
+    [' ', ' ', 'C', ' ', ' ', ' '],
+    [' ', ' ', ' ', 'D', ' ', ' '],
+    [' ', ' ', ' ', ' ', 'E', ' '],
+    [' ', ' ', ' ', ' ', ' ', 'F']
+  ],
+  printBoard(Board),
   halt.
