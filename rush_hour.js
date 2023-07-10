@@ -5,8 +5,10 @@
 // doesn't use a heuristic to select the next node to evaluate.
 //
 // This code is formatted using default Prettier settings.
+
 const EXIT_ROW = 2;
 const SIZE = 6; // # of rows and columns on board
+const BORDER = "+" + "-".repeat(SIZE * 2 - 1) + "+";
 const SPACE = " ";
 
 // This object holds information about the cars in a given puzzle.
@@ -68,8 +70,9 @@ let letters = [];
 // This is key to implementing a breadth-first search.
 const pendingStates = [];
 
-// This holds position ids that have already been evaluated.
-const visited = new Set();
+// This holds state ids that have already been evaluated.
+// It is used to avoid evaluating a board state multiple times.
+const visitedIds = new Set();
 
 function addHorizontalMoves({
   state,
@@ -232,8 +235,8 @@ function addMoves(letter, state) {
   }
 }
 
-function addPendingState(board, cars, move, state) {
-  const newState = { previousState: state, board, cars, move };
+function addPendingState(board, cars, move, previousState) {
+  const newState = { previousState, board, cars, move };
   pendingStates.push(newState);
 }
 
@@ -257,6 +260,7 @@ function copyCars(cars) {
   return copy;
 }
 
+// This creates a 2D array of car letters for a given puzzle.
 function getBoard(cars) {
   if (!cars.X) {
     console.error("Puzzle is missing car X!");
@@ -267,8 +271,8 @@ function getBoard(cars) {
 
   // Create an empty board.
   for (let row = 0; row < SIZE; row++) {
-    const occupiedColumns = Array(SIZE).fill(SPACE);
-    boardRows.push(occupiedColumns);
+    const boardRow = Array(SIZE).fill(SPACE);
+    boardRows.push(boardRow);
   }
 
   // Add cars to the board.
@@ -281,20 +285,32 @@ function getBoard(cars) {
       const end = start + length;
       const boardRow = boardRows[car.row];
       for (let column = start; column < end; column++) {
+        // Check if another car already occupies this cell.
+        // If so then there is a error in the puzzle description.
         const existing = boardRow[column];
         if (existing !== SPACE) {
           console.error(`Car ${letter} overlaps car {existing}!`);
           process.exit(3);
         }
+
         boardRow[column] = letter;
       }
     } else {
-      // car is vertical
+      // The car is vertical.
       const { column } = car;
       const start = car.currentRow;
       const end = start + length;
       for (let row = start; row < end; row++) {
         const boardRow = boardRows[row];
+
+        // Check if another car already occupies this cell.
+        // If so then there is a error in the puzzle description.
+        const existing = boardRow[column];
+        if (existing !== SPACE) {
+          console.error(`Car ${letter} overlaps car {existing}!`);
+          process.exit(3);
+        }
+
         boardRow[column] = letter;
       }
     }
@@ -303,9 +319,12 @@ function getBoard(cars) {
   return boardRows;
 }
 
-// This returns a string that uniquely describes a board position,
+// This returns a string that uniquely describes a board state,
 // but only for the current puzzle.
-function getPositionId(cars) {
+// We only need the current row or column for each car
+// as a string of numbers from 0 to 5.
+function getStateId(cars) {
+  // This assumes that the order of the cars returned never changes.
   return Object.values(cars)
     .map((car) =>
       car.currentColumn === undefined ? car.currentRow : car.currentColumn
@@ -328,46 +347,52 @@ function isGoalReached(board, cars) {
   return true;
 }
 
+// A car is horizontal if it has a "row" property.
 const isHorizontal = (car) => car.row !== undefined;
 
 function printBoard(board) {
-  console.log("+-----------+");
+  console.log(BORDER);
+  // We need to use forEach instead of a "for of" loop
+  // so we have the index at each iteration.
   board.forEach((row, index) => {
     let s = "|" + row.join(SPACE);
     if (index !== EXIT_ROW) s += "|";
     console.log(s);
   });
-  console.log("+-----------+");
+  console.log(BORDER);
 }
 
 function printMoves(lastState) {
-  // Get the moves.
+  // Get the solution moves by walk backwards from the final state.
   const moves = [];
   let state = lastState;
-  while (state) {
-    const { move } = state;
-    if (move) moves.push(move);
+  // This first state doesn't have a "move" property.
+  while (state.move) {
+    moves.push(state.move);
     state = state.previousState;
   }
 
-  moves.reverse();
-  for (const move of moves) {
-    console.log(move);
+  // The moves are in reverse order, so print them from the last to the first.
+  for (let i = moves.length - 1; i >= 0; i--) {
+    console.log(moves[i]);
   }
 }
 
+// This sets the board letter used in a range of rows for a given column.
 function setColumn(board, letter, column, startRow, length) {
   for (let r = startRow; r < startRow + length; r++) {
     board[r][column] = letter;
   }
 }
 
+// This sets the board letter used in a range of columns for a given row.
 function setRow(boardRow, letter, startColumn, length) {
   for (let c = startColumn; c < startColumn + length; c++) {
     boardRow[c] = letter;
   }
 }
 
+// This solves a given puzzle.
 function solve(cars) {
   if (!cars) {
     console.error("Puzzle not found!");
@@ -381,25 +406,36 @@ function solve(cars) {
   printBoard(board);
   console.log(); // blank line
 
+  // This is no move or previous state for the first state to be evaluated.
   addPendingState(board, cars);
 
+  // This is set when a solution is found.
   let lastState;
 
+  // While there are more states to evaluate ...
   while (pendingStates.length > 0) {
-    // TODO: Maybe use a heuristic to choose which pending state to try next.
-    // TODO: For example, the one with the fewest cars blocking the exit.
+    // Get the next state to evaluate.
+    // We could use a heuristic to choose which pending state to try next.
+    // For example, we could select the state
+    // with the fewest cars blocking the exit.
+    // But I suspect the time saved would be not be as much
+    // as the time required to compute the heuristic.
     const pendingState = pendingStates.shift();
 
     const { board, cars } = pendingState;
 
     if (isGoalReached(board, cars)) {
       lastState = pendingState;
-      break;
+      break; // finished searching for a solution
     }
 
-    const id = getPositionId(cars);
-    if (!visited.has(id)) {
-      visited.add(id);
+    // Ensure that we won't evaluate this same state again.
+    const id = getStateId(cars);
+    if (!visitedIds.has(id)) {
+      visitedIds.add(id);
+
+      // Find all moves that can be made in the current state and
+      // save them in pendingStates for possible evaluation later.
       for (const letter of letters) {
         addMoves(letter, pendingState);
       }
