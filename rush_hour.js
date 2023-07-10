@@ -1,8 +1,8 @@
 // This solves Rush Hour puzzles.
 // See https://en.wikipedia.org/wiki/Rush_Hour_(puzzle).
 // It uses a search strategy that is similar to A*
-// (https://en.wikipedia.org/wiki/A*_search_algorithm), but
-// doesn't use a heuristic to select the next node to evaluate.
+// (https://en.wikipedia.org/wiki/A*_search_algorithm), but doesn't
+// use a heuristic function to select the next node to evaluate.
 //
 // This code is formatted using default Prettier settings.
 
@@ -420,6 +420,8 @@ function solve(cars) {
     // with the fewest cars blocking the exit.
     // But I suspect the time saved would be not be as much
     // as the time required to compute the heuristic.
+    // The only kind of heuristic currently used is to
+    // evaluate longer moves before shorter ones.
     const pendingState = pendingStates.shift();
 
     const { board, cars } = pendingState;
