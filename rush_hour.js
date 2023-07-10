@@ -57,6 +57,9 @@ const PUZZLES = {
   },
 };
 
+// This holds all the car letters used in the current puzzle.
+let letters = [];
+
 // This holds objects with the properties
 // "move", "cars", "board", and "previousState".
 // These objects describe states still need to be evaluated
@@ -131,9 +134,7 @@ function addVerticalMoves({ state, letter, column, startRow, endRow, delta }) {
   }
 }
 
-// This updates the pending array.
-// TODO: Change this to generate all possible moves,
-// TODO: not just those with a distance of one.
+// This adds states to be evaluated to the pendingStates array.
 function addMoves(letter, state) {
   const { board, cars } = state;
   const length = carLength(letter);
@@ -142,14 +143,16 @@ function addMoves(letter, state) {
   if (isHorizontal(car)) {
     const { row } = car;
     const boardRow = board[row];
-
-    // Generate moves to left from largest to smallest distance.
     const { currentColumn } = car;
+
+    // Find the largest distance this car can be moved left.
     let startColumn = currentColumn;
     while (startColumn > 0 && boardRow[startColumn - 1] == SPACE) {
       startColumn--;
     }
+
     if (startColumn < currentColumn) {
+      // Generate moves to left from largest to smallest distance.
       addHorizontalMoves({
         state,
         letter,
@@ -160,7 +163,7 @@ function addMoves(letter, state) {
       });
     }
 
-    // Generate moves to right from largest to smallest distance.
+    // Find the largest distance this car can be moved right.
     startColumn = car.currentColumn;
     const lastAllowed = SIZE - length;
     while (
@@ -169,7 +172,9 @@ function addMoves(letter, state) {
     ) {
       startColumn++;
     }
+
     if (startColumn > currentColumn) {
+      // Generate moves to right from largest to smallest distance.
       addHorizontalMoves({
         state,
         letter,
@@ -180,16 +185,18 @@ function addMoves(letter, state) {
       });
     }
   } else {
-    // car is vertical
+    // The car is vertical.
     const { column } = car;
-
-    // Generate moves up from largest to smallest distance.
     const { currentRow } = car;
+
+    // Find the largest distance this car can be moved up.
     let startRow = currentRow;
     while (startRow > 0 && board[startRow - 1][column] == SPACE) {
       startRow--;
     }
+
     if (startRow < currentRow) {
+      // Generate moves up from largest to smallest distance.
       addVerticalMoves({
         state,
         letter,
@@ -200,7 +207,7 @@ function addMoves(letter, state) {
       });
     }
 
-    // Generate moves down from largest to smallest distance.
+    // Find the largest distance this car can be moved up.
     startRow = car.currentRow;
     const lastAllowed = SIZE - length;
     while (
@@ -209,7 +216,9 @@ function addMoves(letter, state) {
     ) {
       startRow++;
     }
+
     if (startRow > currentRow) {
+      // Generate moves down from largest to smallest distance.
       addVerticalMoves({
         state,
         letter,
@@ -240,10 +249,9 @@ function copyBoard(board) {
 
 // This makes a deep copy of a cars object.
 function copyCars(cars) {
-  const copy = { ...cars };
-  for (const letter of Object.keys(cars)) {
-    const car = cars[letter];
-    copy[letter] = { ...car };
+  const copy = {};
+  for (const letter of letters) {
+    copy[letter] = { ...cars[letter] };
   }
   return copy;
 }
@@ -263,7 +271,7 @@ function getBoard(cars) {
   }
 
   // Add cars to the board.
-  for (const letter of Object.keys(cars)) {
+  for (const letter of letters) {
     const car = cars[letter];
     const length = carLength(letter);
 
@@ -365,6 +373,8 @@ function solve(cars) {
     process.exit(1);
   }
 
+  letters = Object.keys(cars);
+
   const board = getBoard(cars);
   console.log("Starting board:");
   printBoard(board);
@@ -389,7 +399,7 @@ function solve(cars) {
     const id = getPositionId(cars);
     if (!visited.has(id)) {
       visited.add(id);
-      for (const letter of Object.keys(cars)) {
+      for (const letter of letters) {
         addMoves(letter, pendingState);
       }
     }
