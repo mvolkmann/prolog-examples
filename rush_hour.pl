@@ -28,13 +28,24 @@ exit_row(2).
 size(6).
 
 board_row_string_([H], S) :-
-  format(string(S), '~w|~n', [H]), !.
+  format(string(S), '~w|', [H]), !.
 board_row_string_([H|T], S) :-
   board_row_string_(T, S2),
   format(string(S), '~w ~w', [H, S2]).
 board_row_string(L, S) :-
   board_row_string_(L, S2),
   format(string(S), '|~w', [S2]).
+
+board_string(Board, S) :-
+  length(Board, Size),
+  Count is Size * 2 - 1,
+  repeat('-', Count, Dashes),
+  atomics_to_string(['+', Dashes, '+'], Border),
+  maplist(board_row_string, Board, RowStrings),
+  Lines = Size + 2, % for top and bottom border
+  repeat('~w~n', Lines, Format),
+  flatten([Border, RowStrings, Border], Args),
+  format(string(S), Format, Args).
 
 car_length(Letter, Length) :-
   member(Letter, "opqr") -> Length = 3; Length = 2.
@@ -56,15 +67,6 @@ empty_board(Board) :-
   length(Rows, Size),
   maplist(empty_board_row, Rows, Board).
 
-printRow_([H]) :- format('~w|~n', [H]), !.
-printRow_([H|T]) :-
-  write(H),
-  write(' '),
-  printRow_(T).
-printRow(L) :-
-  write('|'),
-  printRow_(L).
-
 printBoard(Board) :-
   length(Board, Size),
   Count is Size * 2 - 1,
@@ -73,6 +75,19 @@ printBoard(Board) :-
   writeln(Border),
   maplist(printRow, Board),
   writeln(Border).
+
+repeat_(_, 0, []) :- !.
+repeat_(Char, N, [Char|T]) :-
+  N2 is N - 1,
+  repeat_(Char, N2, T).
+% repeat("*", 3, S). 
+
+% The first two arguments must be instantiated (ground).
+repeat(Char, N, S) :-
+  ground(Char),
+  ground(N),
+  repeat_(Char, N, L),
+  atomics_to_string(L, S).
 
 /*
 % This relates a car (C) to whether it is horizontal (H).
@@ -163,19 +178,6 @@ row_board(CB, Letter, Row, StartColumn, Length, NB) :-
   return boardRows;
 
 % print(board(Size, Size, Exit, Cars)) :-
-
-repeat_(_, 0, []) :- !.
-repeat_(Char, N, [Char|T]) :-
-  N2 is N - 1,
-  repeat_(Char, N2, T).
-% repeat("*", 3, S). 
-
-% The first two arguments must be instantiated (ground).
-repeat(Char, N, S) :-
-  ground(Char),
-  ground(N),
-  repeat_(Char, N, L),
-  atomics_to_string(L, S).
 
 :- initialization
   ExitRow = 2,

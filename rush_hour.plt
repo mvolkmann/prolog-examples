@@ -8,7 +8,20 @@
 
 test(board_row_string) :-
   board_row_string(['A', 'B', 'C', 'D', 'E', 'F'], S),
-  assertion(S == "|A B C D E F|\n").
+  assertion(S == "|A B C D E F|").
+
+test(board_string) :-
+  Board = [
+    [a, a,   ' ', ' ', ' ', o  ],
+    [p, ' ', ' ', q,   ' ', o  ],
+    [p, x,   x,   q,   ' ', o  ],
+    [p, ' ', ' ', q,   ' ', ' '],
+    [b, ' ', ' ', ' ', c,   c  ],
+    [b, ' ', r,   r,   r,   ' ']
+  ],
+  Expected = "+-----------+\n|a a       o|\n|p     q   o|\n|p x x q   o|\n|p     q    |\n|b       c c|\n|b   r r r  |\n+-----------+\n",
+  board_string(Board, S),
+  assertion(S == Expected).
 
 test(car_length) :-
   car_length(a, LengthA),
@@ -30,6 +43,11 @@ test(empty_board) :-
   size(Size),
   length(Board, Size),
   maplist(validate_board_row, Board).
+
+test(repeat) :-
+  repeat(x, 0, ""),
+  repeat(x, 1, "x"),
+  repeat(x, 3, "xxx").
 
 :- end_tests(rush_hour).
 :- run_tests.
