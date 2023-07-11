@@ -68,15 +68,15 @@ empty_board(Board) :-
   length(Rows, Size),
   maplist(empty_board_row, Rows, Board).
 
-letter_index(L, I) :-
-  char_code(L, CodeL),
-  char_code(a, CodeA),
-  I is CodeL - CodeA.
-
 index_letter(I, L) :-
   char_code(a, CodeA),
   CodeL is I + CodeA,
   char_code(L, CodeL).
+
+letter_index(L, I) :-
+  char_code(L, CodeL),
+  char_code(a, CodeA),
+  I is CodeL - CodeA.
 
 printBoard(Board) :-
   length(Board, Size),
