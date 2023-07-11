@@ -12,9 +12,10 @@ const BORDER = "+" + "-".repeat(SIZE * 2 - 1) + "+";
 const SPACE = " ";
 
 // This object holds information about the cars in a given puzzle.
-// Horizontal cars have a row property and
-// vertical cars have a column property.
-// The "current" properties give the starting position of the car.
+// The "fixed" properties give the row for horizontal cars
+// and the column for vertical cars.
+// The "variable" properties give the starting column for horizontal cars
+// and the starting row for vertical cars.
 // Rows range from 0 (left) to 5 (right).
 // Columns range from 0 (top) to 5 (bottom).
 // The X car is always horizontal on row 2
@@ -67,12 +68,11 @@ let fixedPositions = [];
 
 // This holds all the car letters used in the current puzzle.
 // It is set in the solve function.
-// TODO: Is this still needed?
 let letters = [];
 
 // This holds objects with the properties
 // "move", "variablePositions", "board", and "previousState".
-// These objects describe states still need to be evaluated
+// These objects describe states that still need to be evaluated
 // and will not necessarily be part of the solutions.
 // This is key to implementing a breadth-first search.
 const pendingStates = [];
@@ -80,6 +80,20 @@ const pendingStates = [];
 // This holds state ids that have already been evaluated.
 // It is used to avoid evaluating a board state multiple times.
 const visitedIds = new Set();
+
+// These functions translate between
+// car letters and their indexes in arrays.
+const aAscii = 'A'.charCodeAt(0);
+const letterToIndex = letter => letter.charCodeAt(0) - aAscii;
+const indexToLetter = index => String.fromCharCode(index + aAscii);
+
+// This gets the length of a car from its index.
+// Cars O, P, Q, and R have a length of 3.
+// All other cars have a length of 2.
+const oIndex = 'O'.charCodeAt(0) - aAscii;
+const rIndex = 'R'.charCodeAt(0) - aAscii;
+const xIndex = letterToIndex('X'); // used in isGoalReached function
+const carLength = index => oIndex <= index && index <= rIndex ? 3 : 2;
 
 function addHorizontalMoves({
   state,
@@ -109,8 +123,8 @@ function addHorizontalMoves({
     setRow(newBoardRow, letter, column, length);
     // printBoard(newBoard);
 
-    const distance = Math.abs(column - currentColumn);
     const direction = delta === -1 ? "right" : "left";
+    const distance = Math.abs(column - currentColumn);
     const move = `${letter} ${direction} ${distance}`;
     addPendingState(newBoard, newPositions, move, state);
 
@@ -138,8 +152,8 @@ function addVerticalMoves({ state, letter, column, startRow, endRow, delta }) {
     // Add car being moved in new location.
     setColumn(newBoard, letter, column, row, length);
 
-    const distance = Math.abs(row - currentRow);
     const direction = delta === -1 ? "down" : "up";
+    const distance = Math.abs(row - currentRow);
     const move = `${letter} ${direction} ${distance}`;
     addPendingState(newBoard, newPositions, move, state);
 
@@ -259,15 +273,6 @@ function copyBoard(board) {
   return copy;
 }
 
-// This makes a deep copy of a cars object.
-function copyCars(cars) {
-  const copy = {};
-  for (const letter of letters) {
-    copy[letter] = { ...cars[letter] };
-  }
-  return copy;
-}
-
 // This creates a 2D array of car letters for a given puzzle.
 function getBoard(variablePositions) {
   const boardRows = [];
@@ -331,7 +336,6 @@ const getStateId = positions => positions.filter(p => p !== null).join('');
 function isGoalReached(board, variablePositions) {
   // Get the column after the end of the X car.
   // This assumes the X car length is 2.
-  const xIndex = letterToIndex('X'); // TODO: Hard-code this!
   const startColumn = variablePositions[xIndex] + 2;
 
   const exitRow = board[EXIT_ROW];
@@ -342,13 +346,6 @@ function isGoalReached(board, variablePositions) {
   }
   return true;
 }
-
-const aAscii = 'A'.charCodeAt(0);
-const oIndex = 'O'.charCodeAt(0) - aAscii;
-const rIndex = 'R'.charCodeAt(0) - aAscii;
-const letterToIndex = letter => letter.charCodeAt(0) - aAscii;
-const indexToLetter = index => String.fromCharCode(index + aAscii);
-const carLength = index => oIndex <= index && index <= rIndex ? 3 : 2;
 
 function printBoard(board) {
   console.log(BORDER);

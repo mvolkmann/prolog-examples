@@ -65,7 +65,7 @@ let letters = [];
 
 // This holds objects with the properties
 // "move", "cars", "board", and "previousState".
-// These objects describe states still need to be evaluated
+// These objects describe states that still need to be evaluated
 // and will not necessarily be part of the solutions.
 // This is key to implementing a breadth-first search.
 const pendingStates = [];
@@ -100,8 +100,8 @@ function addHorizontalMoves({
     // Add car being moved in new location.
     setRow(newBoardRow, letter, column, length);
 
-    const distance = Math.abs(column - currentColumn);
     const direction = delta === -1 ? "right" : "left";
+    const distance = Math.abs(column - currentColumn);
     const move = `${letter} ${direction} ${distance}`;
     addPendingState(newBoard, newCars, move, state);
 
@@ -128,8 +128,8 @@ function addVerticalMoves({ state, letter, column, startRow, endRow, delta }) {
     // Add car being moved in new location.
     setColumn(newBoard, letter, column, row, length);
 
-    const distance = Math.abs(row - currentRow);
     const direction = delta === -1 ? "down" : "up";
+    const distance = Math.abs(row - currentRow);
     const move = `${letter} ${direction} ${distance}`;
     addPendingState(newBoard, newCars, move, state);
 
