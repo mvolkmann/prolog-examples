@@ -1,29 +1,15 @@
-% This finds solutions to Rush Hour puzzles.
-% The board is a 6x6 grid.
-% The cars have a color, start position, and end position.
-% Each position is represented by an (X, Y) structure.
-% X values go left to right from 0 to 5.
-% Y values go top to bottom from 0 to 5.
-% Each car is represented by a car(Color, Start, End) structure.
-% Each color is a single letter code so the board can be printed nicely.
-% The official color codes are as follows
-% where the number is the car length:
-% - x for red 2
-% - a for light green 2
-% - b for orange 2
-% - c for blue 2
-% - d for pink 2
-% - e for purple 2
-% - f for green 2
-% - g for gray 2
-% - h for tan 2
-% - i for yellow 2
-% - j for brown 2
-% - k for olive 2
-% - o for yellow 3
-% - p for purple 3
-% - q for blue 3
-% - r for green 3
+/*
+This finds solutions to Rush Hour puzzles.
+The board is a 6x6 grid.
+The cars have a color, start position, and end position.
+Each position is represented by an (X, Y) structure.
+X values go left to right from 0 to 5.
+Y values go top to bottom from 0 to 5.
+Each car is represented by a car(Color, Start, End) structure.
+Each color is a single letter code so the board can be printed nicely.
+*/
+
+:- set_prolog_flag(double_quotes, chars).
 
 /*
 car_at(X, Y, car(C, (X1, Y1), (X2, Y2))) :-
@@ -38,10 +24,24 @@ board_character(Row, Column, Cars, Char) :-
   car_at(Row, Column, Cars) -> 
 */
 
+exit_row(2).
 size(6).
 
-car_length(C, L) :-
-  member(C.letter, "opqr") -> 3; 2.
+board_row_string_([H], S) :-
+  format(string(S), '~w|~n', [H]), !.
+board_row_string_([H|T], S) :-
+  board_row_string_(T, S2),
+  format(string(S), '~w ~w', [H, S2]).
+board_row_string(L, S) :-
+  board_row_string_(L, S2),
+  format(string(S), '|~w', [S2]).
+
+car_length(Letter, Length) :-
+  member(Letter, "opqr") -> Length = 3; Length = 2.
+
+:- initialization
+  T = member(r, "opqr"),
+  writeln(T).
 
 empty_board_row(Row) :-
   size(Size),
@@ -56,6 +56,25 @@ empty_board(Board) :-
   length(Rows, Size),
   maplist(empty_board_row, Rows, Board).
 
+printRow_([H]) :- format('~w|~n', [H]), !.
+printRow_([H|T]) :-
+  write(H),
+  write(' '),
+  printRow_(T).
+printRow(L) :-
+  write('|'),
+  printRow_(L).
+
+printBoard(Board) :-
+  length(Board, Size),
+  Count is Size * 2 - 1,
+  repeat('-', Count, Dashes),
+  atomics_to_string(['+', Dashes, '+'], Border),
+  writeln(Border),
+  maplist(printRow, Board),
+  writeln(Border).
+
+/*
 % This relates a car (C) to whether it is horizontal (H).
 horizontal_car(C, H) :-
   _ = C.get(row) -> H = true; H = false.
@@ -92,7 +111,6 @@ column_board(CB, Letter, Column, StartRow, Length, NB) :-
 row_board(CB, Letter, Row, StartColumn, Length, NB) :-
   TODO: Finish this.
 
-  /*
   const boardRows = [];
 
   // Create an empty board.
@@ -143,25 +161,6 @@ row_board(CB, Letter, Row, StartColumn, Length, NB) :-
   }
 
   return boardRows;
-  */
-
-printRow_([H]) :- format('~w|~n', [H]), !.
-printRow_([H|T]) :-
-  write(H),
-  write(' '),
-  printRow_(T).
-printRow(L) :-
-  write('|'),
-  printRow_(L).
-
-printBoard(Board) :-
-  length(Board, Size),
-  Count is Size * 2 - 1,
-  repeat('-', Count, Dashes),
-  atomics_to_string(['+', Dashes, '+'], Border),
-  writeln(Border),
-  maplist(printRow, Board),
-  writeln(Border).
 
 % print(board(Size, Size, Exit, Cars)) :-
 
@@ -221,7 +220,6 @@ repeat(Char, N, S) :-
     }
   },
 
-  /*
   Board = [
     ['A', ' ', ' ', ' ', ' ', ' '],
     [' ', 'B', ' ', ' ', ' ', ' '],
@@ -230,8 +228,8 @@ repeat(Char, N, S) :-
     [' ', ' ', ' ', ' ', 'E', ' '],
     [' ', ' ', ' ', ' ', ' ', 'F']
   ],
-  */
   
   cars_board(Puzzles.p1, Board),
   printBoard(Board).
   % halt.
+*/
