@@ -52,8 +52,10 @@ border(B) :-
   repeat('-', Count, Dashes),
   atomics_to_string(['+', Dashes, '+'], B).
 
-car_length(Letter, Length) :-
-  member(Letter, "opqr") -> Length = 3; Length = 2.
+car_length(Index, Length) :-
+  letter_index(o, IndexO),
+  letter_index(r, IndexR),
+  between(IndexO, IndexR, Index) -> Length = 3; Length = 2.
 
 empty_board_row(Row) :-
   size(Size),

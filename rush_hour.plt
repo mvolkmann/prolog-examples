@@ -28,9 +28,11 @@ test(board_string) :-
   assertion(S == Expected).
 
 test(car_length) :-
-  car_length(a, LengthA),
+  letter_index(a, IndexA),
+  car_length(IndexA, LengthA),
   assertion(LengthA == 2),
-  car_length(r, LengthR),
+  letter_index(r, IndexR),
+  car_length(IndexR, LengthR),
   assertion(LengthR == 3).
 
 validate_board_row(Row) :-
