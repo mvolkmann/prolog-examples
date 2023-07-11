@@ -54,10 +54,6 @@ border(B) :-
 car_length(Letter, Length) :-
   member(Letter, "opqr") -> Length = 3; Length = 2.
 
-:- initialization
-  T = member(r, "opqr"),
-  writeln(T).
-
 empty_board_row(Row) :-
   size(Size),
   length(Row, Size),
@@ -79,6 +75,47 @@ printBoard(Board) :-
   writeln(Border),
   maplist(printRow, Board),
   writeln(Border).
+
+puzzles(P) :-
+  P = puzzles{
+    p1: {
+      A: { fixed: 0, variable: 0, horizontal: true },
+      B: { fixed: 0, variable: 4 },
+      C: { fixed: 4, variable: 4, horizontal: true },
+      O: { fixed: 5, variable: 0 },
+      P: { fixed: 0, variable: 1 },
+      Q: { fixed: 3, variable: 1 },
+      R: { fixed: 5, variable: 2, horizontal: true },
+      X: { fixed: EXIT_ROW, variable: 1, horizontal: true }
+    },
+    p30: {
+      A: { fixed: 2, variable: 0 },
+      B: { fixed: 3, variable: 1 },
+      C: { fixed: 3, variable: 0, horizontal: true },
+      D: { fixed: 3, variable: 2, horizontal: true },
+      E: { fixed: 5, variable: 0, horizontal: true },
+      F: { fixed: 5, variable: 2, horizontal: true },
+      O: { fixed: 0, variable: 0 },
+      P: { fixed: 0, variable: 3, horizontal: true },
+      Q: { fixed: 5, variable: 3 },
+      X: { fixed: EXIT_ROW, variable: 1, horizontal: true }
+    },
+    p40: {
+      A: { fixed: 0, variable: 1, horizontal: true },
+      B: { fixed: 4, variable: 0 },
+      C: { fixed: 1, variable: 1 },
+      D: { fixed: 2, variable: 1 },
+      E: { fixed: 3, variable: 3 },
+      F: { fixed: 2, variable: 4 },
+      G: { fixed: 4, variable: 4, horizontal: true },
+      H: { fixed: 5, variable: 0, horizontal: true },
+      I: { fixed: 5, variable: 3, horizontal: true },
+      O: { fixed: 0, variable: 0 },
+      P: { fixed: 5, variable: 1 },
+      Q: { fixed: 3, variable: 0, horizontal: true },
+      X: { fixed: EXIT_ROW, variable: 3, horizontal: true }
+    }
+  }.
 
 repeat_(_, 0, []) :- !.
 repeat_(Char, N, [Char|T]) :-

@@ -1,6 +1,10 @@
 % To run these tests, enter `swipl rush_hour.plt`
 
+% Suppresss warnings about singleton varibles.
+:-style_check(-singleton).
+
 :- consult(rush_hour).
+
 :- begin_tests(rush_hour).
 
 % Suppress warnings about unused variables.
