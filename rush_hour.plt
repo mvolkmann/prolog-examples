@@ -48,6 +48,14 @@ test(empty_board) :-
   length(Board, Size),
   maplist(validate_board_row, Board).
 
+test(index_letter) :-
+  index_letter(0, a),
+  index_letter(1, b).
+
+test(letter_index) :-
+  letter_index(a, 0),
+  letter_index(b, 1).
+
 test(repeat) :-
   repeat(x, 0, ""),
   repeat(x, 1, "x"),

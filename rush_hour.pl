@@ -24,6 +24,7 @@ board_character(Row, Column, Cars, Char) :-
   car_at(Row, Column, Cars) -> 
 */
 
+% Constants
 exit_row(2).
 size(6).
 
@@ -66,6 +67,16 @@ empty_board(Board) :-
   size(Size),
   length(Rows, Size),
   maplist(empty_board_row, Rows, Board).
+
+letter_index(L, I) :-
+  char_code(L, CodeL),
+  char_code(a, CodeA),
+  I is CodeL - CodeA.
+
+index_letter(I, L) :-
+  char_code(a, CodeA),
+  CodeL is I + CodeA,
+  char_code(L, CodeL).
 
 printBoard(Board) :-
   length(Board, Size),
