@@ -38,6 +38,113 @@ board_character(Row, Column, Cars, Char) :-
   car_at(Row, Column, Cars) -> 
 */
 
+size(6).
+
+car_length(C, L) :-
+  member(C.letter, "opqr") -> 3; 2.
+
+empty_board_row(Row) :-
+  size(Size),
+  length(Row, Size),
+  maplist(=(' '), Row).
+
+empty_board_row(_, Row) :-
+  empty_board_row(Row).
+
+empty_board(Board) :-
+  size(Size),
+  length(Rows, Size),
+  maplist(empty_board_row, Rows, Board).
+
+% This relates a car (C) to whether it is horizontal (H).
+horizontal_car(C, H) :-
+  _ = C.get(row) -> H = true; H = false.
+
+% This relates a current board (CB) and a car to a new board (NB).
+% TODO: TEST THIS!
+% TODO: Still need to write set_column and set_row.
+car_board(CB, Letter, Car, NB) :-
+  car_length(Car, Length),
+  horizontal_car(Car, H),
+  H -> 
+    % Handle horizontal car.
+    Row = Car.get(row),
+    StartColumn = Car.get(currentColumn),
+    set_row(CB, Letter, StartColumn, Length, NB);
+    % Handle vertical car.
+    Column = Car.get(column),
+    StartRow = Car.get(currentRow),
+    set_column(CB, Letter, StartRow, Length, NB).
+
+% This creates a 2D array of car letters for a given puzzle.
+cars_board(Cars, Board) :-
+  (X = Cars.get(x) ->
+    writeln('Found car x.');
+    writeln("Puzzle is missing car X!"),halt
+  ),
+  empty_board(Board).
+
+% This is equivalent to the setColumn function in rush_hour.js.
+column_board(CB, Letter, Column, StartRow, Length, NB) :-
+  TODO: Finish this.
+
+% This is equivalent to the setRow function in rush_hour.js.
+row_board(CB, Letter, Row, StartColumn, Length, NB) :-
+  TODO: Finish this.
+
+  /*
+  const boardRows = [];
+
+  // Create an empty board.
+  for (let row = 0; row < SIZE; row++) {
+    const boardRow = Array(SIZE).fill(SPACE);
+    boardRows.push(boardRow);
+  }
+
+  // Add cars to the board.
+  for (const letter of letters) {
+    const car = cars[letter];
+    const length = carLength(letter);
+
+    if (isHorizontal(car)) {
+      const start = car.currentColumn;
+      const end = start + length;
+      const boardRow = boardRows[car.row];
+      for (let column = start; column < end; column++) {
+        // Check if another car already occupies this cell.
+        // If so then there is a error in the puzzle description.
+        const existing = boardRow[column];
+        if (existing !== SPACE) {
+          console.error(`Car ${letter} overlaps car {existing}!`);
+          process.exit(3);
+        }
+
+        boardRow[column] = letter;
+      }
+    } else {
+      // The car is vertical.
+      const { column } = car;
+      const start = car.currentRow;
+      const end = start + length;
+      for (let row = start; row < end; row++) {
+        const boardRow = boardRows[row];
+
+        // Check if another car already occupies this cell.
+        // If so then there is a error in the puzzle description.
+        const existing = boardRow[column];
+        if (existing !== SPACE) {
+          console.error(`Car ${letter} overlaps car {existing}!`);
+          process.exit(3);
+        }
+
+        boardRow[column] = letter;
+      }
+    }
+  }
+
+  return boardRows;
+  */
+
 printRow_([H]) :- format('~w|~n', [H]), !.
 printRow_([H|T]) :-
   write(H),
@@ -72,23 +179,49 @@ repeat(Char, N, S) :-
   atomics_to_string(L, S).
 
 :- initialization
-  /*
-  % This is the set for puzzle #1.
-  Cars = [
-    car(a, (0, 0), (1, 0)), % light green 2
-    car(p, (0, 1), (0, 3)), % purple 3
-    car(x, (1, 2), (2, 2)), % red 2
-    car(b, (0, 4), (0, 5)), % orange 2
-    car(q, (3, 1), (3, 3)), % blue 3
-    car(c, (4, 4), (5, 4)), % blue 2
-    car(r, (2, 5), (4, 5)), % green 3
-    car(o, (5, 0), (5, 2))  % yellow 3
-  ],
   ExitRow = 2,
   Size = 6,
-  Board = board(Size, Size, Exit, Cars),
-  */
+  Puzzles = puzzleDict{
+    p1: cars{
+      a: car{ row: 0, currentColumn: 0 },
+      b: car{ column: 0, currentRow: 4 },
+      c: car{ row: 4, currentColumn: 4 },
+      o: car{ column: 5, currentRow: 0 },
+      p: car{ column: 0, currentRow: 1 },
+      q: car{ column: 3, currentRow: 1 },
+      r: car{ row: 5, currentColumn: 2 },
+      x: car{ row: ExitRow, currentColumn: 1 }
+    },
+    p30: cars{
+      a: car{ column: 2, currentRow: 0 },
+      b: car{ column: 3, currentRow: 1 },
+      c: car{ row: 3, currentColumn: 0 },
+      d: car{ row: 3, currentColumn: 2 },
+      e: car{ row: 5, currentColumn: 0 },
+      f: car{ row: 5, currentColumn: 2 },
+      o: car{ column: 0, currentRow: 0 },
+      p: car{ row: 0, currentColumn: 3 },
+      q: car{ column: 5, currentRow: 3 },
+      x: car{ row: ExitRow, currentColumn: 1 }
+    },
+    p40: cars{
+      a: car{ row: 0, currentColumn: 1 },
+      b: car{ column: 4, currentRow: 0 },
+      c: car{ column: 1, currentRow: 1 },
+      d: car{ column: 2, currentRow: 1 },
+      e: car{ column: 3, currentRow: 3 },
+      f: car{ column: 2, currentRow: 4 },
+      g: car{ row: 4, currentColumn: 4 },
+      h: car{ row: 5, currentColumn: 0 },
+      i: car{ row: 5, currentColumn: 3 },
+      o: car{ column: 0, currentRow: 0 },
+      p: car{ column: 5, currentRow: 1 },
+      q: car{ row: 3, currentColumn: 0 },
+      x: car{ row: ExitRow, currentColumn: 3 }
+    }
+  },
 
+  /*
   Board = [
     ['A', ' ', ' ', ' ', ' ', ' '],
     [' ', 'B', ' ', ' ', ' ', ' '],
@@ -97,5 +230,8 @@ repeat(Char, N, S) :-
     [' ', ' ', ' ', ' ', 'E', ' '],
     [' ', ' ', ' ', ' ', ' ', 'F']
   ],
-  printBoard(Board),
-  halt.
+  */
+  
+  cars_board(Puzzles.p1, Board),
+  printBoard(Board).
+  % halt.

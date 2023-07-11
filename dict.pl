@@ -1,7 +1,10 @@
 report(P) :-
   format('Hello, ~w ~w!~n', [P.first, P.last]),
   format('I see you are ~w years old.~n', P.age),
-  format('Your zip is ~w.~n', P.address.zip).
+  format('Your zip is ~w.~n', P.address.zip),
+  Key = age,
+  Value = P.get(Key, 0),
+  format('key ~w = ~w~n', [Key, Value]).
 
 :- initialization
   P = person{
