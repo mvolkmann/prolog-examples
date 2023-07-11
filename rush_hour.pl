@@ -28,8 +28,11 @@ board_character(Row, Column, Cars, Char) :-
 exit_row(2).
 size(6).
 
-pending_state_added(NewState, OldStates, NewStates) :-
-  append(OldStates, [NewState], NewStates).
+% You don't need a rule to make a deep copy of a board nested list.
+% Just use the copy_term(In, Out) predicate.
+
+% TODO: Finish this (getBoard in rush_hour.js).
+% board(Positions) :-
 
 board_row_string_([H], S) :-
   format(string(S), '~w|', [H]), !.
@@ -82,6 +85,9 @@ letter_index(L, I) :-
   char_code(L, CodeL),
   char_code(a, CodeA),
   I is CodeL - CodeA.
+
+pending_state_added(NewState, OldStates, NewStates) :-
+  append(OldStates, [NewState], NewStates).
 
 printBoard(Board) :-
   length(Board, Size),
@@ -145,6 +151,11 @@ repeat(Char, N, S) :-
   ground(N),
   repeat_(Char, N, L),
   atomics_to_string(L, S).
+
+% positions.filter(p => p !== null).join('');
+state_id(Positions, Id) :-
+  exclude(=([]), Positions, Used),
+  atomics_to_string(Used, Id).
 
 /*
 % This relates a car (C) to whether it is horizontal (H).
@@ -237,8 +248,6 @@ row_board(CB, Letter, Row, StartColumn, Length, NB) :-
 % print(board(Size, Size, Exit, Cars)) :-
 
 :- initialization
-  ExitRow = 2,
-  Size = 6,
   Puzzles = puzzleDict{
     p1: cars{
       a: car{ row: 0, currentColumn: 0 },

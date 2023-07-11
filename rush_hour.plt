@@ -77,6 +77,11 @@ test(repeat) :-
   repeat(x, 1, "x"),
   repeat(x, 3, "xxx").
 
+test(state_id) :-
+  Positions = [1, 2, [], 3, [], [], 4, []],
+  state_id(Positions, Id),
+  assertion(Id == "1234").
+
 :- end_tests(rush_hour).
 :- run_tests.
 :- halt.
