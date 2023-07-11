@@ -28,6 +28,9 @@ board_character(Row, Column, Cars, Char) :-
 exit_row(2).
 size(6).
 
+pending_state_added(NewState, OldStates, NewStates) :-
+  append(OldStates, [NewState], NewStates).
+
 board_row_string_([H], S) :-
   format(string(S), '~w|', [H]), !.
 board_row_string_([H|T], S) :-

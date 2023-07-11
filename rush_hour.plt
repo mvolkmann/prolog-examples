@@ -58,6 +58,20 @@ test(letter_index) :-
   letter_index(a, 0),
   letter_index(b, 1).
 
+test(pending_state_added) :-
+  OldStates = [],
+  NewState = state{
+    board: 'some value',
+    variablePositions: [],
+    move: 'some move',
+    previousState: []
+  },
+  pending_state_added(NewState, OldStates, NewStates),
+  length(NewStates, 1),
+  [H|T] = NewStates,
+  assertion(H == NewState),
+  length(T, 0).
+
 test(repeat) :-
   repeat(x, 0, ""),
   repeat(x, 1, "x"),
