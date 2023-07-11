@@ -37,15 +37,19 @@ board_row_string(L, S) :-
   format(string(S), '|~w', [S2]).
 
 board_string(Board, S) :-
-  length(Board, Size),
-  Count is Size * 2 - 1,
-  repeat('-', Count, Dashes),
-  atomics_to_string(['+', Dashes, '+'], Border),
   maplist(board_row_string, Board, RowStrings),
+  size(Size),
   Lines = Size + 2, % for top and bottom border
   repeat('~w~n', Lines, Format),
+  border(Border),
   flatten([Border, RowStrings, Border], Args),
   format(string(S), Format, Args).
+
+border(B) :-
+  size(Size),
+  Count is Size * 2 - 1,
+  repeat('-', Count, Dashes),
+  atomics_to_string(['+', Dashes, '+'], B).
 
 car_length(Letter, Length) :-
   member(Letter, "opqr") -> Length = 3; Length = 2.
