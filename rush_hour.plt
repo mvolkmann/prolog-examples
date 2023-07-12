@@ -50,6 +50,12 @@ test(empty_board) :-
   length(Board, Size),
   maplist(validate_board_row, Board).
 
+test(goal_reached) :-
+  B1 = [[], [], [x, x, ' ', ' ', ' ', ' '], [], [], []],
+  goal_reached(B1), % reached
+  B2 = [[], [], [x, x, ' ', 'a', ' ', ' '], [], [], []],
+  \+ goal_reached(B2). % not reached
+
 test(index_letter) :-
   index_letter(0, a),
   index_letter(1, b).
@@ -57,13 +63,6 @@ test(index_letter) :-
 test(letter_index) :-
   letter_index(a, 0),
   letter_index(b, 1).
-
-test(linked_list) :-
-  N1 = node{value: 'alpha', next: nil},
-  N2 = node{value: 'beta', next: N1},
-  N3 = node{value: 'gamma', next: N2},
-  linked_list(N3, L),
-  assertion(L == [alpha, beta, gamma]).
 
 test(moves) :-
   State0 = state{
@@ -105,6 +104,10 @@ test(state_id) :-
   Positions = [1, 2, [], 3, [], [], 4, []],
   state_id(Positions, Id),
   assertion(Id == "1234").
+
+test(tail_after_last) :-
+  tail_after_last(x, [a, b, x, c, x, d, e], T),
+  T =@= [d, e]. % structurally equivalent
 
 :- end_tests(rush_hour).
 :- run_tests.

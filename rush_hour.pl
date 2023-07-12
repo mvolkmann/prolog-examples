@@ -76,6 +76,12 @@ empty_board(Board) :-
   length(Rows, Size),
   maplist(empty_board_row, Rows, Board).
 
+% This determines if there are any cars blocking the x car exit.
+goal_reached(Board) :-
+  [_, _, Row2 | _] = Board,
+  tail_after_last(x, Row2, T),
+  maplist(=(' '), T).
+
 index_letter(I, L) :-
   char_code(a, CodeA),
   CodeL is I + CodeA,
@@ -85,11 +91,6 @@ letter_index(L, I) :-
   char_code(L, CodeL),
   char_code(a, CodeA),
   I is CodeL - CodeA.
-
-linked_list(nil, []) :- !.
-linked_list(Node, L) :-
-  linked_list(Node.next, L2),
-  append(L2, [Node.value], L).
 
 moves(nil, []) :- !.
 moves(State, L) :-
@@ -166,6 +167,14 @@ repeat(Char, N, S) :-
 state_id(Positions, Id) :-
   exclude(=([]), Positions, Used),
   atomics_to_string(Used, Id).
+
+% This gets the tail of a list that follows
+% the last occurrence of a given element.
+tail_after_last(_, [], []) :- !.
+tail_after_last(E, L, A) :-
+  member(E, L) ->
+    [_|T] = L, tail_after_last(E, T, A);
+    A = L.
 
 /*
 % This relates a car (C) to whether it is horizontal (H).
