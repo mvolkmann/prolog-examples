@@ -34,23 +34,8 @@ size(6).
 % TODO: Finish this (getBoard in rush_hour.js).
 % board(Positions) :-
 
-board_row_string_([H], S) :-
-  format(string(S), '~w|', [H]), !.
-board_row_string_([H|T], S) :-
-  board_row_string_(T, S2),
-  format(string(S), '~w ~w', [H, S2]).
-board_row_string(L, S) :-
-  board_row_string_(L, S2),
-  format(string(S), '|~w', [S2]).
-
-board_string(Board, S) :-
-  maplist(board_row_string, Board, RowStrings),
-  size(Size),
-  Lines = Size + 2, % for top and bottom border
-  repeat('~w~n', Lines, Format),
-  border(Border),
-  flatten([Border, RowStrings, Border], Args),
-  format(string(S), Format, Args).
+% TODO: FINISH THIS!
+% add_horizontal_moves() :-
 
 % Gets a border string used when printing a board.
 border(B) :-
@@ -84,6 +69,13 @@ empty_board(Board) :-
   size(Size),
   length(Rows, Size),
   maplist(empty_board_row, Rows, Board).
+
+% This creates a list containing N copies of E.
+fill(0, _, []) :- !.
+fill(N, E, L) :-
+  N2 is N - 1,
+  fill(N2, E, L2),
+  L = [E | L2].
 
 % This determines if there are any cars blocking the x car exit.
 goal_reached(Board) :-
@@ -253,6 +245,27 @@ tail_after_last(E, L, A) :-
   member(E, L) ->
     [_|T] = L, tail_after_last(E, T, A);
     A = L.
+
+write_board_row(Stream, Row) :-
+  format(Stream, '|', []),
+  size(Size),
+  fill(Size, '~w', Parts),
+  atomics_to_string(Parts, ' ', Format),
+  format(Stream, Format, Row),
+  format(Stream, '|\n', []).
+
+write_board_rows(_, []) :- !.
+write_board_rows(Stream, [H|T]) :-
+  format('H = ~w~n', [H]),
+  write_board_row(Stream, H),
+  format('T = ~w~n', [T]),
+  write_board_rows(Stream, T).
+
+write_board(Board, Stream) :-
+  border(Border),
+  format(Stream, Border, []),
+  write_board_rows(Board, Stream),
+  format(Stream, Border, []).
 
 /*
 % This relates a car (C) to whether it is horizontal (H).

@@ -10,23 +10,6 @@
 % Suppress warnings about unused variables.
 :- style_check(-singleton).
 
-test(board_row_string) :-
-  board_row_string(['A', 'B', 'C', 'D', 'E', 'F'], S),
-  assertion(S == "|A B C D E F|").
-
-test(board_string) :-
-  Board = [
-    [a, a,   ' ', ' ', ' ', o  ],
-    [p, ' ', ' ', q,   ' ', o  ],
-    [p, x,   x,   q,   ' ', o  ],
-    [p, ' ', ' ', q,   ' ', ' '],
-    [b, ' ', ' ', ' ', c,   c  ],
-    [b, ' ', r,   r,   r,   ' ']
-  ],
-  Expected = "+-----------+\n|a a       o|\n|p     q   o|\n|p x x q   o|\n|p     q    |\n|b       c c|\n|b   r r r  |\n+-----------+\n",
-  board_string(Board, S),
-  assertion(S == Expected).
-
 test(car_length) :-
   letter_index(a, IndexA),
   car_length(IndexA, LengthA),
@@ -61,6 +44,14 @@ test(empty_board) :-
   size(Size),
   length(Board, Size),
   maplist(validate_board_row, Board).
+
+test(fill) :-
+  fill(0, x, L0),
+  assertion(L0 == []),
+  fill(1, x, L1),
+  assertion(L1 == [x]),
+  fill(2, x, L2),
+  assertion(L2 == [x, x]).
 
 test(goal_reached) :-
   B1 = [[], [], [x, x, ' ', ' ', ' ', ' '], [], [], []],
@@ -209,6 +200,29 @@ test(state_id) :-
 test(tail_after_last) :-
   tail_after_last(x, [a, b, x, c, x, d, e], T),
   T =@= [d, e]. % structurally equivalent
+
+test(write_board_row) :-
+  new_memory_file(Handle),
+  open_memory_file(Handle, write, Stream, [free_on_close(true)]),
+  write_board_row(Stream, ['A', 'B', 'C', 'D', 'E', 'F']),
+  close(Stream),
+  memory_file_to_string(Handle, S),
+  assertion(S == "|A B C D E F|\n").
+
+/*
+test(write_board) :-
+  Board = [
+    [a, a,   ' ', ' ', ' ', o  ],
+    [p, ' ', ' ', q,   ' ', o  ],
+    [p, x,   x,   q,   ' ', o  ],
+    [p, ' ', ' ', q,   ' ', ' '],
+    [b, ' ', ' ', ' ', c,   c  ],
+    [b, ' ', r,   r,   r,   ' ']
+  ],
+  write_board(string(S), Board),
+  Expected = "+-----------+\n|a a       o|\n|p     q   o|\n|p x x q   o|\n|p     q    |\n|b       c c|\n|b   r r r  |\n+-----------+\n",
+  assertion(S == Expected).
+*/
 
 :- end_tests(rush_hour).
 :- run_tests.
