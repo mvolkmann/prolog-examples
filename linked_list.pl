@@ -13,7 +13,6 @@ linked_list(Node, L) :-
   % append([Node.value], L2, L).
   % This appends in reverse order.
   append(L2, [Node.value], L).
-  
 
 :- initialization
   N1 = node{value: 'alpha', next: nil},

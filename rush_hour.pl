@@ -86,16 +86,16 @@ letter_index(L, I) :-
   char_code(a, CodeA),
   I is CodeL - CodeA.
 
-moves_string(nil, '').
-moves_string(State, S) :-
-  format('~nState = ~w~n', [State]),
-  PS = State.previousState,
-  format('PS = ~w~n', [PS]),
-  moves_string(PS, S2),
-  format('S2 = ~w~n', [S2]),
-  M = State.get(move),
-  format('M = ~w~n', [M]),
-  atomics_to_string([M, '\n', S2], S).
+linked_list(nil, []) :- !.
+linked_list(Node, L) :-
+  linked_list(Node.next, L2),
+  append(L2, [Node.value], L).
+
+moves(nil, []) :- !.
+moves(State, L) :-
+  moves(State.previousState, L2),
+  Move = State.get(move, ''),
+  append(L2, [Move], L).
 
 pending_state_added(NewState, OldStates, NewStates) :-
   append(OldStates, [NewState], NewStates).

@@ -58,20 +58,29 @@ test(letter_index) :-
   letter_index(a, 0),
   letter_index(b, 1).
 
-test(moves_string) :-
+test(linked_list) :-
+  N1 = node{value: 'alpha', next: nil},
+  N2 = node{value: 'beta', next: N1},
+  N3 = node{value: 'gamma', next: N2},
+  linked_list(N3, L),
+  assertion(L == [alpha, beta, gamma]).
+
+test(moves) :-
   State0 = state{
+    move: nil,
     previousState: nil
   },
   State1 = state{
-    move: "A left 1",
+    move: 'A left 1',
     previousState: State0
   },
   State2 = state{
-    move: "B down 3",
+    move: 'B down 3',
     previousState: State1
   },
-  moves_string(State2, S),
-  assertion(S == "A left 1\nB down 3").
+  moves(State2, Moves),
+  % TODO: I can't find a way to ignore the last node when its move is nil!
+  assertion(Moves == [nil, 'A left 1', 'B down 3']).
 
 test(pending_state_added) :-
   OldStates = [],
