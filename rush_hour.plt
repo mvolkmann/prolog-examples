@@ -100,6 +100,11 @@ test(repeat) :-
   repeat(x, 1, "x"),
   repeat(x, 3, "xxx").
 
+test(replace) :-
+  replace([], 0, x, []),
+  replace([a, b, c], 0, d, [d, b, c]),
+  replace([a, b, c], 1, d, [a, d, c]).
+
 test(state_id) :-
   Positions = [1, 2, [], 3, [], [], 4, []],
   state_id(Positions, Id),

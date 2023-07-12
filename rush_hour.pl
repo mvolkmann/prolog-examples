@@ -78,7 +78,7 @@ empty_board(Board) :-
 
 % This determines if there are any cars blocking the x car exit.
 goal_reached(Board) :-
-  [_, _, Row2 | _] = Board,
+  nth0(2, Board, Row2),
   tail_after_last(x, Row2, T),
   maplist(=(' '), T).
 
@@ -162,6 +162,19 @@ repeat(Char, N, S) :-
   ground(N),
   repeat_(Char, N, L),
   atomics_to_string(L, S).
+
+% This replaces a list element at a given zero-based index.
+% For example, replace([a, b, c], 1, d, L) sets L to [a, d, c].
+replace([], _, _, []).
+replace([_|T], 0, X, [X|T]) :- !.
+replace([H|T], I, X, [H|R]):- I > 0, I1 is I-1, replace(T, I1, X, R).
+
+% This sets the board letter used in a range of rows for a given column.
+% set_column(Board, Letter, Column, StartRow, Length, NewBoard) :-
+
+% This sets the board letter used in a range of columns for a given row.
+%set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
+%  nth0(Row, Board, ),
 
 % positions.filter(p => p !== null).join('');
 state_id(Positions, Id) :-
