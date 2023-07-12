@@ -247,12 +247,14 @@ tail_after_last(E, L, A) :-
     A = L.
 
 write_board_row(Stream, Row) :-
+  /* For now I'm hard-coding to format string to make this faster.
   format(Stream, '|', []),
   size(Size),
   fill(Size, '~w', Parts),
   atomics_to_string(Parts, ' ', Format),
-  format(Stream, Format, Row),
-  format(Stream, '|\n', []).
+  */
+  format(Stream, '|~w ~w ~w ~w ~w ~w|\n', Row).
+  % format(Stream, '|\n', []).
 
 write_board_rows(_, []) :- !.
 write_board_rows(Stream, [H|T]) :-
