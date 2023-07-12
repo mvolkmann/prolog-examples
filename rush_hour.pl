@@ -115,7 +115,7 @@ print_moves(State) :-
 
 puzzles(P) :-
   P = puzzles{
-    p1: {
+    p1: puzzle{
       a: { fixed: 0, variable: 0, horizontal: true },
       b: { fixed: 0, variable: 4 },
       c: { fixed: 4, variable: 4, horizontal: true },
@@ -125,7 +125,7 @@ puzzles(P) :-
       r: { fixed: 5, variable: 2, horizontal: true },
       x: { fixed: EXIT_ROW, variable: 1, horizontal: true }
     },
-    p30: {
+    p30: puzzle{
       a: { fixed: 2, variable: 0 },
       b: { fixed: 3, variable: 1 },
       c: { fixed: 3, variable: 0, horizontal: true },
@@ -137,7 +137,7 @@ puzzles(P) :-
       q: { fixed: 5, variable: 3 },
       x: { fixed: EXIT_ROW, variable: 1, horizontal: true }
     },
-    p40: {
+    p40: puzzle{
       a: { fixed: 0, variable: 1, horizontal: true },
       b: { fixed: 4, variable: 0 },
       c: { fixed: 1, variable: 1 },
@@ -196,14 +196,13 @@ set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
   L is Length - 1,
   set_row(Board3, Letter, Row, S, L, NewBoard).
 
-/*
 solve(Puzzle) :-
   (X = Puzzle.get(x) ->
     writeln('Found car x.');
-    writeln("Puzzle is missing car X!"),fail
+    writeln('Puzzle is missing car X!')
   ),
   empty_board(Board).
-*/
+  TODO: CONTINUE ADDING CODE HERE!
 
 % Gets number of empty spaces to left of a given board row column.
 space_row_left(BoardRow, 0, 0).
