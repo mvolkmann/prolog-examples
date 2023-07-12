@@ -86,17 +86,27 @@ letter_index(L, I) :-
   char_code(a, CodeA),
   I is CodeL - CodeA.
 
+moves_string(nil, '').
+moves_string(State, S) :-
+  format('~nState = ~w~n', [State]),
+  PS = State.previousState,
+  format('PS = ~w~n', [PS]),
+  moves_string(PS, S2),
+  format('S2 = ~w~n', [S2]),
+  M = State.get(move),
+  format('M = ~w~n', [M]),
+  atomics_to_string([M, '\n', S2], S).
+
 pending_state_added(NewState, OldStates, NewStates) :-
   append(OldStates, [NewState], NewStates).
 
-printBoard(Board) :-
-  length(Board, Size),
-  Count is Size * 2 - 1,
-  repeat('-', Count, Dashes),
-  atomics_to_string(['+', Dashes, '+'], Border),
-  writeln(Border),
-  maplist(printRow, Board),
-  writeln(Border).
+print_board(Board) :-
+  board_string(Board, S),
+  write(S).
+
+print_moves(State) :-
+  moves_string(State, S),
+  write(S).
 
 puzzles(P) :-
   P = puzzles{

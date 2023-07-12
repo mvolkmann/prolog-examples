@@ -58,6 +58,21 @@ test(letter_index) :-
   letter_index(a, 0),
   letter_index(b, 1).
 
+test(moves_string) :-
+  State0 = state{
+    previousState: nil
+  },
+  State1 = state{
+    move: "A left 1",
+    previousState: State0
+  },
+  State2 = state{
+    move: "B down 3",
+    previousState: State1
+  },
+  moves_string(State2, S),
+  assertion(S == "A left 1\nB down 3").
+
 test(pending_state_added) :-
   OldStates = [],
   NewState = state{

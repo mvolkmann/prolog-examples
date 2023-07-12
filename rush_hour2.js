@@ -360,7 +360,7 @@ function printBoard(board) {
 }
 
 function printMoves(lastState) {
-  // Get the solution moves by walk backwards from the final state.
+  // Get the solution moves by walking backwards from the final state.
   const moves = [];
   let state = lastState;
   // This first state doesn't have a "move" property.
