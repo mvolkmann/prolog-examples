@@ -35,6 +35,18 @@ test(car_length) :-
   car_length(IndexR, LengthR),
   assertion(LengthR == 3).
 
+test(column) :-
+  Board = [
+    [' ', ' ', a,   ' ', ' ', ' '],
+    [' ', ' ', b,   ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', x,   ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ']
+  ],
+  column(2, Board, Column),
+  assertion(Column == [a, b, ' ', ' ', x, ' ']).
+
 validate_board_row(Row) :-
   size(Size),
   length(Row, Size),
@@ -159,6 +171,20 @@ test(space_right) :-
   Row = 1,
   Column = 1,
   space_right(Board, Row, Column, Space),
+  assertion(Space == 2).
+
+test(space_up) :-
+  Board = [
+    [' ', ' ', a,   ' ', ' ', ' '],
+    [' ', ' ', b,   ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', x,   ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ']
+  ],
+  Row = 4,
+  Column = 2,
+  space_up(Board, Row, Column, Space),
   assertion(Space == 2).
 
 test(state_id) :-

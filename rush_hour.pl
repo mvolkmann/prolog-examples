@@ -52,6 +52,7 @@ board_string(Board, S) :-
   flatten([Border, RowStrings, Border], Args),
   format(string(S), Format, Args).
 
+% Gets a border string used when printing a board.
 border(B) :-
   size(Size),
   Count is Size * 2 - 1,
@@ -62,6 +63,14 @@ car_length(Index, Length) :-
   letter_index(o, IndexO),
   letter_index(r, IndexR),
   between(IndexO, IndexR, Index) -> Length = 3; Length = 2.
+
+% Gets a column of values from a 2D list.
+column(_, [], []) :- !.
+column(N, Board, Column) :-
+  [Row|Rest] = Board,
+  nth0(N, Row, Element),
+  column(N, Rest, Column2),
+  Column = [Element | Column2].
 
 empty_board_row(Row) :-
   size(Size),
@@ -219,6 +228,12 @@ space_left(Board, Row, Column, Space) :-
 space_right(Board, Row, Column, Space) :-
   nth0(Row, Board, BoardRow),
   space_row_right(BoardRow, Column, Space).
+
+% Gets number of empty spaces above a given board cell.
+space_up(Board, Row, Column, Space) :-
+  % Slice is a list of values in Column.
+  column(Column, Board, Slice),
+  space_row_left(Slice, Row, Space).
 
 % positions.filter(p => p !== null).join('');
 state_id(Positions, Id) :-
