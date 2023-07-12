@@ -31,11 +31,14 @@ size(6).
 % You don't need a rule to make a deep copy of a board nested list.
 % Just use the copy_term(In, Out) predicate.
 
-% TODO: Finish this (see getBoard in rush_hour.js).
-% board(Positions) :-
-
 % TODO: FINISH THIS!
 % add_horizontal_moves() :-
+
+% TODO: FINISH THIS!
+% add_vertical_moves() :-
+
+% TODO: Finish this (see getBoard in rush_hour.js).
+% board(Positions) :-
 
 % Gets a border string used when printing a board.
 border(B) :-
@@ -113,41 +116,41 @@ print_moves(State) :-
 puzzles(P) :-
   P = puzzles{
     p1: {
-      A: { fixed: 0, variable: 0, horizontal: true },
-      B: { fixed: 0, variable: 4 },
-      C: { fixed: 4, variable: 4, horizontal: true },
-      O: { fixed: 5, variable: 0 },
-      P: { fixed: 0, variable: 1 },
-      Q: { fixed: 3, variable: 1 },
-      R: { fixed: 5, variable: 2, horizontal: true },
-      X: { fixed: EXIT_ROW, variable: 1, horizontal: true }
+      a: { fixed: 0, variable: 0, horizontal: true },
+      b: { fixed: 0, variable: 4 },
+      c: { fixed: 4, variable: 4, horizontal: true },
+      o: { fixed: 5, variable: 0 },
+      p: { fixed: 0, variable: 1 },
+      q: { fixed: 3, variable: 1 },
+      r: { fixed: 5, variable: 2, horizontal: true },
+      x: { fixed: EXIT_ROW, variable: 1, horizontal: true }
     },
     p30: {
-      A: { fixed: 2, variable: 0 },
-      B: { fixed: 3, variable: 1 },
-      C: { fixed: 3, variable: 0, horizontal: true },
-      D: { fixed: 3, variable: 2, horizontal: true },
-      E: { fixed: 5, variable: 0, horizontal: true },
-      F: { fixed: 5, variable: 2, horizontal: true },
-      O: { fixed: 0, variable: 0 },
-      P: { fixed: 0, variable: 3, horizontal: true },
-      Q: { fixed: 5, variable: 3 },
-      X: { fixed: EXIT_ROW, variable: 1, horizontal: true }
+      a: { fixed: 2, variable: 0 },
+      b: { fixed: 3, variable: 1 },
+      c: { fixed: 3, variable: 0, horizontal: true },
+      d: { fixed: 3, variable: 2, horizontal: true },
+      e: { fixed: 5, variable: 0, horizontal: true },
+      f: { fixed: 5, variable: 2, horizontal: true },
+      o: { fixed: 0, variable: 0 },
+      p: { fixed: 0, variable: 3, horizontal: true },
+      q: { fixed: 5, variable: 3 },
+      x: { fixed: EXIT_ROW, variable: 1, horizontal: true }
     },
     p40: {
-      A: { fixed: 0, variable: 1, horizontal: true },
-      B: { fixed: 4, variable: 0 },
-      C: { fixed: 1, variable: 1 },
-      D: { fixed: 2, variable: 1 },
-      E: { fixed: 3, variable: 3 },
-      F: { fixed: 2, variable: 4 },
-      G: { fixed: 4, variable: 4, horizontal: true },
-      H: { fixed: 5, variable: 0, horizontal: true },
-      I: { fixed: 5, variable: 3, horizontal: true },
-      O: { fixed: 0, variable: 0 },
-      P: { fixed: 5, variable: 1 },
-      Q: { fixed: 3, variable: 0, horizontal: true },
-      X: { fixed: EXIT_ROW, variable: 3, horizontal: true }
+      a: { fixed: 0, variable: 1, horizontal: true },
+      b: { fixed: 4, variable: 0 },
+      c: { fixed: 1, variable: 1 },
+      d: { fixed: 2, variable: 1 },
+      e: { fixed: 3, variable: 3 },
+      f: { fixed: 2, variable: 4 },
+      g: { fixed: 4, variable: 4, horizontal: true },
+      h: { fixed: 5, variable: 0, horizontal: true },
+      i: { fixed: 5, variable: 3, horizontal: true },
+      o: { fixed: 0, variable: 0 },
+      p: { fixed: 5, variable: 1 },
+      q: { fixed: 3, variable: 0, horizontal: true },
+      x: { fixed: EXIT_ROW, variable: 3, horizontal: true }
     }
   }.
 
@@ -192,6 +195,15 @@ set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
   S is StartColumn + 1,
   L is Length - 1,
   set_row(Board3, Letter, Row, S, L, NewBoard).
+
+/*
+solve(Puzzle) :-
+  (X = Puzzle.get(x) ->
+    writeln('Found car x.');
+    writeln("Puzzle is missing car X!"),fail
+  ),
+  empty_board(Board).
+*/
 
 % Gets number of empty spaces to left of a given board row column.
 space_row_left(BoardRow, 0, 0).
@@ -285,11 +297,6 @@ car_board(CB, Letter, Car, NB) :-
 
 % This creates a 2D array of car letters for a given puzzle.
 cars_board(Cars, Board) :-
-  (X = Cars.get(x) ->
-    writeln('Found car x.');
-    writeln("Puzzle is missing car X!"),halt
-  ),
-  empty_board(Board).
 
 :- initialization
   % halt.
