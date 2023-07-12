@@ -209,7 +209,6 @@ test(write_board_row) :-
   memory_file_to_string(Handle, S),
   assertion(S == "|A B C D E F|\n").
 
-/*
 test(write_board) :-
   Board = [
     [a, a,   ' ', ' ', ' ', o  ],
@@ -219,10 +218,13 @@ test(write_board) :-
     [b, ' ', ' ', ' ', c,   c  ],
     [b, ' ', r,   r,   r,   ' ']
   ],
-  write_board(string(S), Board),
+  new_memory_file(Handle),
+  open_memory_file(Handle, write, Stream, [free_on_close(true)]),
+  write_board(Stream, Board),
+  close(Stream),
+  memory_file_to_string(Handle, S),
   Expected = "+-----------+\n|a a       o|\n|p     q   o|\n|p x x q   o|\n|p     q    |\n|b       c c|\n|b   r r r  |\n+-----------+\n",
   assertion(S == Expected).
-*/
 
 :- end_tests(rush_hour).
 :- run_tests.

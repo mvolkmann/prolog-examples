@@ -258,16 +258,14 @@ write_board_row(Stream, Row) :-
 
 write_board_rows(_, []) :- !.
 write_board_rows(Stream, [H|T]) :-
-  format('H = ~w~n', [H]),
   write_board_row(Stream, H),
-  format('T = ~w~n', [T]),
   write_board_rows(Stream, T).
 
-write_board(Board, Stream) :-
+write_board(Stream, Board) :-
   border(Border),
-  format(Stream, Border, []),
-  write_board_rows(Board, Stream),
-  format(Stream, Border, []).
+  writeln(Stream, Border),
+  write_board_rows(Stream, Board),
+  writeln(Stream, Border).
 
 /*
 % This relates a car (C) to whether it is horizontal (H).
