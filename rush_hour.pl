@@ -192,6 +192,34 @@ set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
   L is Length - 1,
   set_row(Board3, Letter, Row, S, L, NewBoard).
 
+% Gets number of empty spaces to left of a given board row column.
+space_row_left(BoardRow, 0, 0).
+space_row_left(BoardRow, Column, Space) :-
+  Left is Column - 1,
+  nth0(Left, BoardRow, Value),
+  Value =@= ' ' ->
+    space_row_left(BoardRow, Left, S), Space is 1 + S;
+    Space is 0.
+
+% Gets number of empty spaces to right of a given board row column.
+space_row_right(BoardRow, 0, 0).
+space_row_right(BoardRow, Column, Space) :-
+  Right is Column + 1,
+  nth0(Right, BoardRow, Value),
+  Value =@= ' ' ->
+    space_row_right(BoardRow, Right, S), Space is 1 + S;
+    Space is 0.
+
+% Gets number of empty spaces to left of a given board cell.
+space_left(Board, Row, Column, Space) :-
+  nth0(Row, Board, BoardRow),
+  space_row_left(BoardRow, Column, Space).
+
+% Gets number of empty spaces to right of a given board cell.
+space_right(Board, Row, Column, Space) :-
+  nth0(Row, Board, BoardRow),
+  space_row_right(BoardRow, Column, Space).
+
 % positions.filter(p => p !== null).join('');
 state_id(Positions, Id) :-
   exclude(=([]), Positions, Used),

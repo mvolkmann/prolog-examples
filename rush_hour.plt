@@ -133,6 +133,34 @@ test(set_row) :-
   nth0(Row, NewBoard, BoardRow),
   assertion(BoardRow =@= [' ', x, x, ' ', ' ', ' ']).
 
+test(space_left) :-
+  Board = [
+    [],
+    [a, b, ' ', ' ', x, ' '],
+    [],
+    [],
+    [],
+    []
+  ],
+  Row = 1,
+  Column = 4,
+  space_left(Board, Row, Column, Space),
+  assertion(Space == 2).
+
+test(space_right) :-
+  Board = [
+    [],
+    [a, b, ' ', ' ', x, ' '],
+    [],
+    [],
+    [],
+    []
+  ],
+  Row = 1,
+  Column = 1,
+  space_right(Board, Row, Column, Space),
+  assertion(Space == 2).
+
 test(state_id) :-
   Positions = [1, 2, [], 3, [], [], 4, []],
   state_id(Positions, Id),
