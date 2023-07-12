@@ -170,7 +170,15 @@ replace([_|T], 0, X, [X|T]) :- !.
 replace([H|T], I, X, [H|R]):- I > 0, I1 is I-1, replace(T, I1, X, R).
 
 % This sets the board letter used in a range of rows for a given column.
-% set_column(Board, Letter, Column, StartRow, Length, NewBoard) :-
+set_column(Board, _, _, _, 0, Board) :- !.
+set_column(Board, Letter, Column, StartRow, Length, NewBoard) :-
+  nth0(StartRow, Board, BoardRow),
+  replace(BoardRow, Column, Letter, NewBoardRow),
+  copy_term(Board, Board2),
+  replace(Board2, StartRow, NewBoardRow, Board3),
+  S is StartRow + 1,
+  L is Length - 1,
+  set_column(Board3, Letter, Column, S, L, NewBoard).
 
 % This sets the board letter used in a range of columns for a given row.
 % If the length is zero, the board remains unchanged.

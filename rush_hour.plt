@@ -105,6 +105,27 @@ test(replace) :-
   replace([a, b, c], 0, d, [d, b, c]),
   replace([a, b, c], 1, d, [a, d, c]).
 
+test(set_column) :-
+  Board = [
+    [],
+    [' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' '],
+    [],
+    [],
+    []
+  ],
+  Column = 2,
+  set_column(Board, x, Column, 1, 2, NewBoard),
+  Expected = [
+    [],
+    [' ', ' ', x, ' ', ' ', ' '],
+    [' ', ' ', x, ' ', ' ', ' '],
+    [],
+    [],
+    []
+  ],
+  assertion(NewBoard =@= Expected).
+
 test(set_row) :-
   Board = [[], [], [' ', ' ', ' ', ' ', ' ', ' '], [], [], []],
   Row = 2,
