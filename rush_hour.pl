@@ -219,6 +219,12 @@ space_row_right(BoardRow, Column, Space) :-
     space_row_right(BoardRow, Right, S), Space is 1 + S;
     Space is 0.
 
+% Gets number of empty spaces below a given board cell.
+space_down(Board, Row, Column, Space) :-
+  % Slice is a list of values in Column.
+  column(Column, Board, Slice),
+  space_row_right(Slice, Row, Space).
+
 % Gets number of empty spaces to left of a given board cell.
 space_left(Board, Row, Column, Space) :-
   nth0(Row, Board, BoardRow),

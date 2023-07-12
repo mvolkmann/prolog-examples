@@ -145,6 +145,20 @@ test(set_row) :-
   nth0(Row, NewBoard, BoardRow),
   assertion(BoardRow =@= [' ', x, x, ' ', ' ', ' ']).
 
+test(space_down) :-
+  Board = [
+    [' ', ' ', a,   ' ', ' ', ' '],
+    [' ', ' ', b,   ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', x,   ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ']
+  ],
+  Row = 1,
+  Column = 2,
+  space_down(Board, Row, Column, Space),
+  assertion(Space == 2).
+
 test(space_left) :-
   Board = [
     [],
