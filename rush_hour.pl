@@ -173,8 +173,16 @@ replace([H|T], I, X, [H|R]):- I > 0, I1 is I-1, replace(T, I1, X, R).
 % set_column(Board, Letter, Column, StartRow, Length, NewBoard) :-
 
 % This sets the board letter used in a range of columns for a given row.
-%set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
-%  nth0(Row, Board, ),
+% If the length is zero, the board remains unchanged.
+set_row(Board, _, _, _, 0, Board) :- !.
+set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
+  nth0(Row, Board, BoardRow),
+  replace(BoardRow, StartColumn, Letter, NewBoardRow),
+  copy_term(Board, Board2),
+  replace(Board2, Row, NewBoardRow, Board3),
+  S is StartColumn + 1,
+  L is Length - 1,
+  set_row(Board3, Letter, Row, S, L, NewBoard).
 
 % positions.filter(p => p !== null).join('');
 state_id(Positions, Id) :-

@@ -105,6 +105,13 @@ test(replace) :-
   replace([a, b, c], 0, d, [d, b, c]),
   replace([a, b, c], 1, d, [a, d, c]).
 
+test(set_row) :-
+  Board = [[], [], [' ', ' ', ' ', ' ', ' ', ' '], [], [], []],
+  Row = 2,
+  set_row(Board, x, Row, 1, 2, NewBoard),
+  nth0(Row, NewBoard, BoardRow),
+  assertion(BoardRow =@= [' ', x, x, ' ', ' ', ' ']).
+
 test(state_id) :-
   Positions = [1, 2, [], 3, [], [], 4, []],
   state_id(Positions, Id),
