@@ -89,47 +89,48 @@ print_moves(State) :-
 puzzles(P) :-
   P = puzzles{
     p1: puzzle{
-      a: { fixed: 0, variable: 0, horizontal: true },
-      b: { fixed: 0, variable: 4 },
-      c: { fixed: 4, variable: 4, horizontal: true },
-      o: { fixed: 5, variable: 0 },
-      p: { fixed: 0, variable: 1 },
-      q: { fixed: 3, variable: 1 },
-      r: { fixed: 5, variable: 2, horizontal: true },
-      x: { fixed: EXIT_ROW, variable: 1, horizontal: true }
+      a: car{ fixed: 0, variable: 0, horizontal: true },
+      b: car{ fixed: 0, variable: 4 },
+      c: car{ fixed: 4, variable: 4, horizontal: true },
+      o: car{ fixed: 5, variable: 0 },
+      p: car{ fixed: 0, variable: 1 },
+      q: car{ fixed: 3, variable: 1 },
+      r: car{ fixed: 5, variable: 2, horizontal: true },
+      x: car{ fixed: EXIT_ROW, variable: 1, horizontal: true }
     },
     p30: puzzle{
-      a: { fixed: 2, variable: 0 },
-      b: { fixed: 3, variable: 1 },
-      c: { fixed: 3, variable: 0, horizontal: true },
-      d: { fixed: 3, variable: 2, horizontal: true },
-      e: { fixed: 5, variable: 0, horizontal: true },
-      f: { fixed: 5, variable: 2, horizontal: true },
-      o: { fixed: 0, variable: 0 },
-      p: { fixed: 0, variable: 3, horizontal: true },
-      q: { fixed: 5, variable: 3 },
-      x: { fixed: EXIT_ROW, variable: 1, horizontal: true }
+      a: car{ fixed: 2, variable: 0 },
+      b: car{ fixed: 3, variable: 1 },
+      c: car{ fixed: 3, variable: 0, horizontal: true },
+      d: car{ fixed: 3, variable: 2, horizontal: true },
+      e: car{ fixed: 5, variable: 0, horizontal: true },
+      f: car{ fixed: 5, variable: 2, horizontal: true },
+      o: car{ fixed: 0, variable: 0 },
+      p: car{ fixed: 0, variable: 3, horizontal: true },
+      q: car{ fixed: 5, variable: 3 },
+      x: car{ fixed: EXIT_ROW, variable: 1, horizontal: true }
     },
     p40: puzzle{
-      a: { fixed: 0, variable: 1, horizontal: true },
-      b: { fixed: 4, variable: 0 },
-      c: { fixed: 1, variable: 1 },
-      d: { fixed: 2, variable: 1 },
-      e: { fixed: 3, variable: 3 },
-      f: { fixed: 2, variable: 4 },
-      g: { fixed: 4, variable: 4, horizontal: true },
-      h: { fixed: 5, variable: 0, horizontal: true },
-      i: { fixed: 5, variable: 3, horizontal: true },
-      o: { fixed: 0, variable: 0 },
-      p: { fixed: 5, variable: 1 },
-      q: { fixed: 3, variable: 0, horizontal: true },
-      x: { fixed: EXIT_ROW, variable: 3, horizontal: true }
+      a: car{ fixed: 0, variable: 1, horizontal: true },
+      b: car{ fixed: 4, variable: 0 },
+      c: car{ fixed: 1, variable: 1 },
+      d: car{ fixed: 2, variable: 1 },
+      e: car{ fixed: 3, variable: 3 },
+      f: car{ fixed: 2, variable: 4 },
+      g: car{ fixed: 4, variable: 4, horizontal: true },
+      h: car{ fixed: 5, variable: 0, horizontal: true },
+      i: car{ fixed: 5, variable: 3, horizontal: true },
+      o: car{ fixed: 0, variable: 0 },
+      p: car{ fixed: 5, variable: 1 },
+      q: car{ fixed: 3, variable: 0, horizontal: true },
+      x: car{ fixed: EXIT_ROW, variable: 3, horizontal: true }
     }
   }.
 
 % This sets the board letter used in a range of rows for a given column.
 set_column(Board, _, _, _, 0, Board) :- !.
 set_column(Board, Letter, Column, StartRow, Length, NewBoard) :-
+  format('set_column: Letter = ~w~n', [Letter]),
   nth0(StartRow, Board, BoardRow),
   replace(BoardRow, Column, Letter, NewBoardRow),
   copy_term(Board, Board2),
@@ -142,6 +143,7 @@ set_column(Board, Letter, Column, StartRow, Length, NewBoard) :-
 % If the length is zero, the board remains unchanged.
 set_row(Board, _, _, _, 0, Board) :- !.
 set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
+  format('set_row: Letter=~w, Length=~w~n', [Letter, Length]),
   nth0(Row, Board, BoardRow),
   replace(BoardRow, StartColumn, Letter, NewBoardRow),
   copy_term(Board, Board2),
@@ -150,6 +152,22 @@ set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
   L is Length - 1,
   set_row(Board3, Letter, Row, S, L, NewBoard).
 
+add_car(Puzzle, Board, Letter, NewBoard) :-
+  format('add_car: Letter = ~w~n', [Letter]),
+  Car = Puzzle.get(Letter),
+  format('add_car: Car = ~w~n', [Car]),
+  letter_index(Letter, Index),
+  format('add_car: Index = ~w~n', [Index]),
+  car_length(Index, Length),
+  format('add_car: Length = ~w~n', [Length]),
+  H = Car.get(horizontal, false),
+  format('add_car: H = ~w~n', [H]),
+  format('add_car: fixed = ~w~n', [Car.fixed]),
+  format('add_car: variable = ~w~n', [Car.variable]),
+  H == true ->
+    set_row(Board, Letter, Car.fixed, Car.variable, Length, NewBoard);
+    set_column(Board, Letter, Car.fixed, Car.variable, Length, NewBoard).
+
 solve(Puzzle) :-
   (X = Puzzle.get(x) ->
     writeln('Found car x.');
@@ -157,8 +175,7 @@ solve(Puzzle) :-
   ),
   empty_board(Board),
   dict_keys(Puzzle, Keys),
-  format('Keys = ~w~n', [Keys]),
-  maplist(add_car(Board), keys, NewBoard).
+  foldl(add_car(Puzzle), Keys, Board, NewBoard).
   % TODO: CONTINUE ADDING CODE HERE!
 
 % Gets number of empty spaces to left of a given board row column.

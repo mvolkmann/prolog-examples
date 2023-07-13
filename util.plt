@@ -29,8 +29,13 @@ test(fill) :-
 
 test(fold) :-
   Numbers = [1, 2, 3],
-  foldl(add, Numbers, Sum),
+
+  % The add predicate is defined in util.pl.
+  % foldl(add, Numbers, Sum),
+  foldl(mystery(99), Numbers, 0, Sum),
+  format('Sum = ~w~n', [Sum]),
   assertion(Sum == 6),
+
   foldr(add, Numbers, Sum),
   assertion(Sum == 6).
 

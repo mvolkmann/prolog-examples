@@ -18,5 +18,8 @@ report(P) :-
       zip: 12345
     }
   },
+  dict_keys(P, Keys),
+  format('Keys = ~w~n', [Keys]),
+  maplist(writeln, Keys, Foo),
   report(P),
   halt.

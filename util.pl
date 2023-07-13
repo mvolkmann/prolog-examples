@@ -1,5 +1,9 @@
 % This is used to demonstrate foldl and foldr.
 add(A, B, C) :- C is A + B.
+mystery(X, A, B, C) :-
+  format('mystery: X = ~w~n', [X]),
+  format('mystery: B = ~w~n', [B]),
+  C is A + B.
 
 % Gets a column of values from a 2D list.
 column(_, [], []) :- !.
@@ -18,17 +22,23 @@ fill(N, E, L) :-
 
 % See https://pbrown.me/blog/functional-prolog-map-filter-and-reduce/.
 
+% Use this when the accumulator can start with the first element.
+% The predicate will be passed the current accumulator value,
+% a list element, and a variable to accept the new accumulator value.
 foldl(Predicate, [H|T], Result) :-
     foldl(Predicate, T, H, Result).
 foldl(_, [], Result, Result) :- !.
+% Use this when a specific initial value for the accumulator must be specified.
 foldl(Predicate, [H|T], Acc, Result) :-
-    call(Predicate, Acc, H, NewAcc),
-    foldl(Predicate, T, NewAcc, Result).
+  format('H = ~w~n', [H]),
+  format('Acc = ~w~n', [Acc]),
+  call(Predicate, Acc, H, NewAcc),
+  foldl(Predicate, T, NewAcc, Result).
 
 foldr(_, [LastElem|[]], LastElem) :- !.
 foldr(Predicate, [H|T], Result) :-
-    foldr(Predicate, T, Acc),
-    call(Predicate, H, Acc, Result).
+  foldr(Predicate, T, Acc),
+  call(Predicate, H, Acc, Result).
 
 % These are helper rules for repeat below.
 repeat_(_, 0, []) :- !.
