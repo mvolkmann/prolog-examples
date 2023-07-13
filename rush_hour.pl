@@ -164,9 +164,10 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
   format('add_car: H = ~w~n', [H]),
   format('add_car: fixed = ~w~n', [Car.fixed]),
   format('add_car: variable = ~w~n', [Car.variable]),
-  H == true ->
+  (get_dict(horizontal, Car, H) ->
     set_row(Board, Letter, Car.fixed, Car.variable, Length, NewBoard);
-    set_column(Board, Letter, Car.fixed, Car.variable, Length, NewBoard).
+    set_column(Board, Letter, Car.fixed, Car.variable, Length, NewBoard)
+  ).
 
 solve(Puzzle) :-
   (X = Puzzle.get(x) ->

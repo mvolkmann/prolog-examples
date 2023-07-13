@@ -11,6 +11,7 @@ report(P) :-
     first: 'Mark',
     last: 'Volkmann',
     age: 62,
+    % value: 19,
     address: _{
       street: '123 Some Street',
       city: 'Somewhere',
@@ -20,6 +21,10 @@ report(P) :-
   },
   dict_keys(P, Keys),
   format('Keys = ~w~n', [Keys]),
-  maplist(writeln, Keys, Foo),
   report(P),
+  Value = P.get(value, 0),
+  (Value > 0 ->
+    format('Value = ~w~n', [Value]);
+    writeln('no value found')
+  ),
   halt.
