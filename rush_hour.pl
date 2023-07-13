@@ -28,6 +28,16 @@ size(6).
 % TODO: Finish this (see getBoard in rush_hour.js).
 % board(Positions) :-
 
+add_car(Puzzle, Board, Letter, NewBoard) :-
+  Car = Puzzle.get(Letter),
+  letter_index(Letter, Index),
+  car_length(Index, Length),
+  H = Car.get(horizontal, false),
+  (get_dict(horizontal, Car, H) ->
+    set_row(Board, Letter, Car.fixed, Car.variable, Length, NewBoard);
+    set_column(Board, Letter, Car.fixed, Car.variable, Length, NewBoard)
+  ).
+
 % Gets a border string used when printing a board.
 border(B) :-
   size(Size),
@@ -78,15 +88,12 @@ moves(State, L) :-
 pending_state_added(NewState, OldStates, NewStates) :-
   append(OldStates, [NewState], NewStates).
 
-print_board(Board) :-
-  board_string(Board, S),
-  write(S).
-
 print_moves(State) :-
   moves_string(State, S),
   write(S).
 
 puzzles(P) :-
+  exit_row(ExitRow),
   P = puzzles{
     p1: puzzle{
       a: car{ fixed: 0, variable: 0, horizontal: true },
@@ -96,7 +103,7 @@ puzzles(P) :-
       p: car{ fixed: 0, variable: 1 },
       q: car{ fixed: 3, variable: 1 },
       r: car{ fixed: 5, variable: 2, horizontal: true },
-      x: car{ fixed: EXIT_ROW, variable: 1, horizontal: true }
+      x: car{ fixed: ExitRow, variable: 1, horizontal: true }
     },
     p30: puzzle{
       a: car{ fixed: 2, variable: 0 },
@@ -108,7 +115,7 @@ puzzles(P) :-
       o: car{ fixed: 0, variable: 0 },
       p: car{ fixed: 0, variable: 3, horizontal: true },
       q: car{ fixed: 5, variable: 3 },
-      x: car{ fixed: EXIT_ROW, variable: 1, horizontal: true }
+      x: car{ fixed: ExitRow, variable: 1, horizontal: true }
     },
     p40: puzzle{
       a: car{ fixed: 0, variable: 1, horizontal: true },
@@ -123,7 +130,7 @@ puzzles(P) :-
       o: car{ fixed: 0, variable: 0 },
       p: car{ fixed: 5, variable: 1 },
       q: car{ fixed: 3, variable: 0, horizontal: true },
-      x: car{ fixed: EXIT_ROW, variable: 3, horizontal: true }
+      x: car{ fixed: ExitRow, variable: 3, horizontal: true }
     }
   }.
 
@@ -152,23 +159,6 @@ set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
   L is Length - 1,
   set_row(Board3, Letter, Row, S, L, NewBoard).
 
-add_car(Puzzle, Board, Letter, NewBoard) :-
-  format('add_car: Letter = ~w~n', [Letter]),
-  Car = Puzzle.get(Letter),
-  format('add_car: Car = ~w~n', [Car]),
-  letter_index(Letter, Index),
-  format('add_car: Index = ~w~n', [Index]),
-  car_length(Index, Length),
-  format('add_car: Length = ~w~n', [Length]),
-  H = Car.get(horizontal, false),
-  format('add_car: H = ~w~n', [H]),
-  format('add_car: fixed = ~w~n', [Car.fixed]),
-  format('add_car: variable = ~w~n', [Car.variable]),
-  (get_dict(horizontal, Car, H) ->
-    set_row(Board, Letter, Car.fixed, Car.variable, Length, NewBoard);
-    set_column(Board, Letter, Car.fixed, Car.variable, Length, NewBoard)
-  ).
-
 solve(Puzzle) :-
   (X = Puzzle.get(x) ->
     writeln('Found car x.');
@@ -176,7 +166,8 @@ solve(Puzzle) :-
   ),
   empty_board(Board),
   dict_keys(Puzzle, Keys),
-  foldl(add_car(Puzzle), Keys, Board, NewBoard).
+  foldl(add_car(Puzzle), Keys, Board, NewBoard),
+  write_board(user_output, NewBoard).
   % TODO: CONTINUE ADDING CODE HERE!
 
 % Gets number of empty spaces to left of a given board row column.
