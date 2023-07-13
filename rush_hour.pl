@@ -201,8 +201,10 @@ solve(Puzzle) :-
     writeln('Found car x.');
     writeln('Puzzle is missing car X!')
   ),
-  empty_board(Board).
-  TODO: CONTINUE ADDING CODE HERE!
+  empty_board(Board),
+  dict_keys(Puzzle, Keys),
+  format('Keys = ~w~n', [Keys]).
+  % TODO: CONTINUE ADDING CODE HERE!
 
 % Gets number of empty spaces to left of a given board row column.
 space_row_left(BoardRow, 0, 0).
