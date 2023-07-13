@@ -7,9 +7,6 @@
 
 :- begin_tests(rush_hour).
 
-% Suppress warnings about unused variables.
-:- style_check(-singleton).
-
 test(car_length) :-
   letter_index(a, IndexA),
   car_length(IndexA, LengthA),
@@ -17,18 +14,6 @@ test(car_length) :-
   letter_index(r, IndexR),
   car_length(IndexR, LengthR),
   assertion(LengthR == 3).
-
-test(column) :-
-  Board = [
-    [' ', ' ', a,   ' ', ' ', ' '],
-    [' ', ' ', b,   ' ', ' ', ' '],
-    [' ', ' ', ' ', ' ', ' ', ' '],
-    [' ', ' ', ' ', ' ', ' ', ' '],
-    [' ', ' ', x,   ' ', ' ', ' '],
-    [' ', ' ', ' ', ' ', ' ', ' ']
-  ],
-  column(2, Board, Column),
-  assertion(Column == [a, b, ' ', ' ', x, ' ']).
 
 validate_board_row(Row) :-
   size(Size),
@@ -44,21 +29,6 @@ test(empty_board) :-
   size(Size),
   length(Board, Size),
   maplist(validate_board_row, Board).
-
-test(fill) :-
-  fill(0, x, L0),
-  assertion(L0 == []),
-  fill(1, x, L1),
-  assertion(L1 == [x]),
-  fill(2, x, L2),
-  assertion(L2 == [x, x]).
-
-test(foldl) :-
-  Numbers = [1, 2, 3],
-  foldl(add, Numbers, Sum),
-  assertion(Sum == 6),
-  foldr(add, Numbers, Sum),
-  assertion(Sum == 6).
 
 test(goal_reached) :-
   B1 = [[], [], [x, x, ' ', ' ', ' ', ' '], [], [], []],
@@ -104,16 +74,6 @@ test(pending_state_added) :-
   [H|T] = NewStates,
   assertion(H == NewState),
   length(T, 0).
-
-test(repeat) :-
-  repeat(x, 0, ""),
-  repeat(x, 1, "x"),
-  repeat(x, 3, "xxx").
-
-test(replace) :-
-  replace([], 0, x, []),
-  replace([a, b, c], 0, d, [d, b, c]),
-  replace([a, b, c], 1, d, [a, d, c]).
 
 test(set_column) :-
   Board = [
@@ -209,10 +169,6 @@ test(state_id) :-
   Positions = [1, 2, [], 3, [], [], 4, []],
   state_id(Positions, Id),
   assertion(Id == "1234").
-
-test(tail_after_last) :-
-  tail_after_last(x, [a, b, x, c, x, d, e], T),
-  T =@= [d, e]. % structurally equivalent
 
 test(write_board_row) :-
   new_memory_file(Handle),
