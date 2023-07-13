@@ -17,6 +17,7 @@ fill(N, E, L) :-
   L = [E | L2].
 
 % See https://pbrown.me/blog/functional-prolog-map-filter-and-reduce/.
+
 foldl(Predicate, [H|T], Result) :-
     foldl(Predicate, T, H, Result).
 foldl(_, [], Result, Result) :- !.
@@ -43,11 +44,19 @@ repeat(Char, N, S) :-
   repeat_(Char, N, L),
   atomics_to_string(L, S).
 
-% This replaces a list element at a given zero-based index.
+% This creates a new list from an existing list by copying it
+% and replacing the element at a given zero-based index with a new value.
+% The first argument is the existing list.
+% The second argument is the index of the element to be replaced.
+% The third argument is the new value to be used at that index.
+% The fourth argument is a variable to be set to the new list.
 % For example, replace([a, b, c], 1, d, L) sets L to [a, d, c].
 replace([], _, _, []).
-replace([_|T], 0, X, [X|T]) :- !.
-replace([H|T], I, X, [H|R]):- I > 0, I1 is I-1, replace(T, I1, X, R).
+replace([_|T], 0, Value, [Value|T]) :- !.
+replace([H|T], Index, Value, [H|R]):-
+  Index > 0,
+  I is Index - 1,
+  replace(T, I, Value, R).
 
 % This gets the tail of a list that follows
 % the last occurrence of a given element.
