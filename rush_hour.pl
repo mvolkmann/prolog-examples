@@ -10,19 +10,7 @@ Each color is a single letter code so the board can be printed nicely.
 */
 
 :- set_prolog_flag(double_quotes, chars).
-
-/*
-car_at(X, Y, car(C, (X1, Y1), (X2, Y2))) :-
-  between(X1, X2, X),
-  between(Y1, Y2, Y).
-
-car_at(X, Y, [H|T]) :-
-  car_at(X, Y, H);
-  car_at(X, Y, T).
-  
-board_character(Row, Column, Cars, Char) :-
-  car_at(Row, Column, Cars) -> 
-*/
+:- include(util). % textually includes the contents of the file util.pl
 
 % Constants
 exit_row(2).
@@ -52,14 +40,6 @@ car_length(Index, Length) :-
   letter_index(r, IndexR),
   between(IndexO, IndexR, Index) -> Length = 3; Length = 2.
 
-% Gets a column of values from a 2D list.
-column(_, [], []) :- !.
-column(N, Board, Column) :-
-  [Row|Rest] = Board,
-  nth0(N, Row, Element),
-  column(N, Rest, Column2),
-  Column = [Element | Column2].
-
 empty_board_row(Row) :-
   size(Size),
   length(Row, Size),
@@ -72,13 +52,6 @@ empty_board(Board) :-
   size(Size),
   length(Rows, Size),
   maplist(empty_board_row, Rows, Board).
-
-% This creates a list containing N copies of E.
-fill(0, _, []) :- !.
-fill(N, E, L) :-
-  N2 is N - 1,
-  fill(N2, E, L2),
-  L = [E | L2].
 
 % This determines if there are any cars blocking the x car exit.
 goal_reached(Board) :-
@@ -154,25 +127,6 @@ puzzles(P) :-
     }
   }.
 
-repeat_(_, 0, []) :- !.
-repeat_(Char, N, [Char|T]) :-
-  N2 is N - 1,
-  repeat_(Char, N2, T).
-% repeat("*", 3, S). 
-
-% The first two arguments must be instantiated (ground).
-repeat(Char, N, S) :-
-  ground(Char),
-  ground(N),
-  repeat_(Char, N, L),
-  atomics_to_string(L, S).
-
-% This replaces a list element at a given zero-based index.
-% For example, replace([a, b, c], 1, d, L) sets L to [a, d, c].
-replace([], _, _, []).
-replace([_|T], 0, X, [X|T]) :- !.
-replace([H|T], I, X, [H|R]):- I > 0, I1 is I-1, replace(T, I1, X, R).
-
 % This sets the board letter used in a range of rows for a given column.
 set_column(Board, _, _, _, 0, Board) :- !.
 set_column(Board, Letter, Column, StartRow, Length, NewBoard) :-
@@ -203,7 +157,8 @@ solve(Puzzle) :-
   ),
   empty_board(Board),
   dict_keys(Puzzle, Keys),
-  format('Keys = ~w~n', [Keys]).
+  format('Keys = ~w~n', [Keys]),
+  maplist(add_car(Board), keys, NewBoard).
   % TODO: CONTINUE ADDING CODE HERE!
 
 % Gets number of empty spaces to left of a given board row column.
@@ -251,14 +206,6 @@ state_id(Positions, Id) :-
   exclude(=([]), Positions, Used),
   atomics_to_string(Used, Id).
 
-% This gets the tail of a list that follows
-% the last occurrence of a given element.
-tail_after_last(_, [], []) :- !.
-tail_after_last(E, L, A) :-
-  member(E, L) ->
-    [_|T] = L, tail_after_last(E, T, A);
-    A = L.
-
 write_board_row(Stream, Row) :-
   /* For now I'm hard-coding to format string to make this faster.
   format(Stream, '|', []),
@@ -281,6 +228,17 @@ write_board(Stream, Board) :-
   writeln(Stream, Border).
 
 /*
+car_at(X, Y, car(C, (X1, Y1), (X2, Y2))) :-
+  between(X1, X2, X),
+  between(Y1, Y2, Y).
+
+car_at(X, Y, [H|T]) :-
+  car_at(X, Y, H);
+  car_at(X, Y, T).
+  
+board_character(Row, Column, Cars, Char) :-
+  car_at(Row, Column, Cars) -> 
+
 % This relates a current board (CB) and a car to a new board (NB).
 % TODO: TEST THIS!
 car_board(CB, Letter, Car, NB) :-

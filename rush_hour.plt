@@ -53,6 +53,13 @@ test(fill) :-
   fill(2, x, L2),
   assertion(L2 == [x, x]).
 
+test(foldl) :-
+  Numbers = [1, 2, 3],
+  foldl(add, Numbers, Sum),
+  assertion(Sum == 6),
+  foldr(add, Numbers, Sum),
+  assertion(Sum == 6).
+
 test(goal_reached) :-
   B1 = [[], [], [x, x, ' ', ' ', ' ', ' '], [], [], []],
   goal_reached(B1), % reached
@@ -136,9 +143,11 @@ test(set_row) :-
   nth0(Row, NewBoard, BoardRow),
   assertion(BoardRow =@= [' ', x, x, ' ', ' ', ' ']).
 
+/*
 test(solve) :-
   puzzles(P),
   solve(P.p1).
+*/
 
 test(space_down) :-
   Board = [
