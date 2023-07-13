@@ -30,8 +30,6 @@ foldl(Predicate, [H|T], Result) :-
 foldl(_, [], Result, Result) :- !.
 % Use this when a specific initial value for the accumulator must be specified.
 foldl(Predicate, [H|T], Acc, Result) :-
-  format('H = ~w~n', [H]),
-  format('Acc = ~w~n', [Acc]),
   call(Predicate, Acc, H, NewAcc),
   foldl(Predicate, T, NewAcc, Result).
 

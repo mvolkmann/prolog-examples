@@ -137,7 +137,6 @@ puzzles(P) :-
 % This sets the board letter used in a range of rows for a given column.
 set_column(Board, _, _, _, 0, Board) :- !.
 set_column(Board, Letter, Column, StartRow, Length, NewBoard) :-
-  format('set_column: Letter = ~w~n', [Letter]),
   nth0(StartRow, Board, BoardRow),
   replace(BoardRow, Column, Letter, NewBoardRow),
   copy_term(Board, Board2),
@@ -150,7 +149,6 @@ set_column(Board, Letter, Column, StartRow, Length, NewBoard) :-
 % If the length is zero, the board remains unchanged.
 set_row(Board, _, _, _, 0, Board) :- !.
 set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
-  format('set_row: Letter=~w, Length=~w~n', [Letter, Length]),
   nth0(Row, Board, BoardRow),
   replace(BoardRow, StartColumn, Letter, NewBoardRow),
   copy_term(Board, Board2),
