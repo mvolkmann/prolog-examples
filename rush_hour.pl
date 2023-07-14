@@ -19,15 +19,6 @@ size(6).
 % You don't need a rule to make a deep copy of a board nested list.
 % Just use the copy_term(In, Out) predicate.
 
-% TODO: FINISH THIS!
-% add_horizontal_moves() :-
-
-% TODO: FINISH THIS!
-% add_vertical_moves() :-
-
-% TODO: Finish this (see getBoard in rush_hour.js).
-% board(Positions) :-
-
 add_car(Puzzle, Board, Letter, NewBoard) :-
   Car = Puzzle.get(Letter),
   letter_index(Letter, Index),
@@ -37,6 +28,82 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
     set_row(Board, Letter, Car.fixed, Car.variable, Length, NewBoard);
     set_column(Board, Letter, Car.fixed, Car.variable, Length, NewBoard)
   ).
+
+add_moves(Puzzle, Board, Letter, Moves) :-
+  Car = Puzzle.get(Letter),
+  letter_index(Letter, Index),
+  car_length(Index, Length),
+  H = Car.get(horizontal, false),
+  (get_dict(horizontal, Car, H) ->
+
+    Row = Car.fixed,
+    StartColumn = Car.variable,
+    EndColumn #= StartColumn + Length - 1,
+    space_left(Board, Row, StartColumn, SpaceLeft),
+    format('~w) Left = ~w~n', [Letter, SpaceLeft]),
+    /*
+    (SpaceLeft #> 0 ->
+      LeftStart #= StartColumn - SpaceLeft,
+      LeftEnd #= LeftStart + Length - 1,
+      add_horizontal_moves(Board, Letter, Row, LeftStart, LeftEnd, 1)
+    ),
+    */
+    space_right(Board, Row, EndColumn, SpaceRight),
+    format('~w) Right = ~w~n', [Letter, SpaceRight]);
+    /*
+    (SpaceRight #> 0 ->
+      RightStart #= StartColumn + SpaceRight,
+      RightEnd #= RightStart + Length - 1,
+      add_horizontal_moves(Board, Letter, Row, RightStart, RightEnd, -1)
+    ),
+    */
+
+    Column = Car.fixed,
+    StartRow = Car.variable,
+    EndRow #= StartRow + Length - 1,
+    space_up(Board, Column, StartRow, SpaceUp),
+    space_down(Board, Column, EndRow, SpaceDown),
+    format('~w) Up = ~w, Down = ~w~n', [Letter, SpaceUp, SpaceDown])
+  ),
+  Moves = [].
+
+add_horizontal_moves(Board, Letter, Row, StartColumn, EndColumn, Delta) :-
+  format('~w moves to column ~w~n', [Letter, StartColumn]),
+  (StartColumn \== EndColumn ->
+    NextColumn #= StartColumn + Delta,
+    add_horizontal_moves(Board, Letter, Row, NextColumn, EndColumn, Delta)
+  ).
+
+  /* From JavaScript code ...
+  const { board, variablePositions } = state;
+  const index = letterToIndex(letter);
+  const currentColumn = variablePositions[index];
+  const length = carLength(index);
+
+  let column = startColumn;
+  while (true) {
+    // Make a copy of variablePositions where the car being moved is updated.
+    const newPositions = [...variablePositions];
+    newPositions[index] = column;
+
+    // Make a copy of the board where the car being moved is updated.
+    const newBoard = copyBoard(board);
+    const newBoardRow = newBoard[row];
+    // Remove car being moved.
+    setRow(newBoardRow, SPACE, currentColumn, length);
+    // Add car being moved in new location.
+    setRow(newBoardRow, letter, column, length);
+    // printBoard(newBoard);
+
+    const direction = delta === -1 ? "right" : "left";
+    const distance = Math.abs(column - currentColumn);
+    const move = `${letter} ${direction} ${distance}`;
+    addPendingState(newBoard, newPositions, move, state);
+
+    if (column === endColumn) break;
+    column += delta;
+  }
+  */
 
 % Gets a border string used when printing a board.
 border(B) :-
@@ -156,29 +223,6 @@ set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
   S is StartColumn + 1,
   L is Length - 1,
   set_row(Board3, Letter, Row, S, L, NewBoard).
-
-add_moves(Puzzle, Board, Letter, Moves) :-
-  Car = Puzzle.get(Letter),
-  letter_index(Letter, Index),
-  car_length(Index, Length),
-  H = Car.get(horizontal, false),
-  (get_dict(horizontal, Car, H) ->
-
-    Row = Car.fixed,
-    StartColumn = Car.variable,
-    EndColumn #= StartColumn + Length - 1,
-    space_left(Board, Row, StartColumn, SpaceLeft),
-    space_right(Board, Row, EndColumn, SpaceRight),
-    format('~w) Left = ~w, Right = ~w~n', [Letter, SpaceLeft, SpaceRight]);
-
-    Column = Car.fixed,
-    StartRow = Car.variable,
-    EndRow #= StartRow + Length - 1,
-    space_up(Board, Column, StartRow, SpaceUp),
-    space_down(Board, Column, EndRow, SpaceDown),
-    format('~w) Up = ~w, Down = ~w~n', [Letter, SpaceUp, SpaceDown])
-  ),
-  Moves = [].
 
 solve(Puzzle) :-
   (X = Puzzle.get(x) ->
