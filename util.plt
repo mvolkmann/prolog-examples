@@ -30,13 +30,13 @@ test(fill) :-
 test(fold) :-
   Numbers = [1, 2, 3],
 
-  % The add predicate is defined in util.pl.
-  % foldl(add, Numbers, Sum),
-  foldl(mystery(99), Numbers, 0, Sum),
-  format('Sum = ~w~n', [Sum]),
-  assertion(Sum == 6),
+  % The sum2 and sum3 predicates are defined in util.pl.
+  foldl(sum2, Numbers, S1),
+  assertion(S1 == 6),
+  foldl(sum3(2), Numbers, 0, S2),
+  assertion(S2 == 12),
 
-  foldr(add, Numbers, Sum),
+  foldr(sum2, Numbers, Sum),
   assertion(Sum == 6).
 
 test(repeat) :-

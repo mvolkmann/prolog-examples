@@ -1,9 +1,9 @@
+:- use_module(library(clpfd)).
+
 % This is used to demonstrate foldl and foldr.
-add(A, B, C) :- C is A + B.
-mystery(X, A, B, C) :-
-  format('mystery: X = ~w~n', [X]),
-  format('mystery: B = ~w~n', [B]),
-  C is A + B.
+sum2(A, B, C) :- C #= A + B.
+sum3(P, A, B, C) :-
+  C #= P + A + B.
 
 % Gets a column of values from a 2D list.
 column(_, [], []) :- !.
