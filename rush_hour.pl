@@ -157,15 +157,44 @@ set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
   L is Length - 1,
   set_row(Board3, Letter, Row, S, L, NewBoard).
 
+add_moves(Puzzle, Board, Letter, Moves) :-
+  Car = Puzzle.get(Letter),
+  letter_index(Letter, Index),
+  car_length(Index, Length),
+  H = Car.get(horizontal, false),
+  (get_dict(horizontal, Car, H) ->
+
+    Row = Car.fixed,
+    StartColumn = Car.variable,
+    EndColumn #= StartColumn + Length - 1,
+    space_left(Board, Row, StartColumn, SpaceLeft),
+    space_right(Board, Row, EndColumn, SpaceRight),
+    format('~w) Left = ~w, Right = ~w~n', [Letter, SpaceLeft, SpaceRight]);
+
+    Column = Car.fixed,
+    StartRow = Car.variable,
+    EndRow #= StartRow + Length - 1,
+    space_up(Board, Column, StartRow, SpaceUp),
+    space_down(Board, Column, EndRow, SpaceDown),
+    format('~w) Up = ~w, Down = ~w~n', [Letter, SpaceUp, SpaceDown])
+  ),
+  Moves = [].
+
 solve(Puzzle) :-
   (X = Puzzle.get(x) ->
     writeln('Found car x.');
     writeln('Puzzle is missing car X!')
   ),
   empty_board(Board),
-  dict_keys(Puzzle, Keys),
-  foldl(add_car(Puzzle), Keys, Board, NewBoard),
-  write_board(user_output, NewBoard).
+  dict_keys(Puzzle, Letters),
+  foldl(add_car(Puzzle), Letters, Board, NewBoard),
+  writeln('Starting board:'),
+  write_board(user_output, NewBoard),
+
+  % add_pending_
+
+  maplist(add_moves(Puzzle, NewBoard), Letters, Moves),
+  format('Moves = ~w~n', [Moves]).
   % TODO: CONTINUE ADDING CODE HERE!
 
 % Gets number of empty spaces to left of a given board row column.
@@ -187,9 +216,10 @@ space_row_right(BoardRow, Column, Space) :-
     Space is 0.
 
 % Gets number of empty spaces below a given board cell.
-space_down(Board, Row, Column, Space) :-
+space_down(Board, Column, Row, Space) :-
   % Slice is a list of values in Column.
   column(Column, Board, Slice),
+  % format('space_down: Slice = ~w~n', [Slice]),
   space_row_right(Slice, Row, Space).
 
 % Gets number of empty spaces to left of a given board cell.
@@ -203,9 +233,10 @@ space_right(Board, Row, Column, Space) :-
   space_row_right(BoardRow, Column, Space).
 
 % Gets number of empty spaces above a given board cell.
-space_up(Board, Row, Column, Space) :-
+space_up(Board, Column, Row, Space) :-
   % Slice is a list of values in Column.
   column(Column, Board, Slice),
+  % format('space_up: Slice = ~w~n', [Slice]),
   space_row_left(Slice, Row, Space).
 
 % positions.filter(p => p !== null).join('');

@@ -406,7 +406,7 @@ function solve(cars) {
   printBoard(board);
   console.log(); // blank line
 
-  // This is no move or previous state for the first state to be evaluated.
+  // The initial state has no move or previous state.
   addPendingState(board, cars);
 
   // This is set when a solution is found.

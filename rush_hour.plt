@@ -118,7 +118,7 @@ test(space_down) :-
   ],
   Row = 1,
   Column = 2,
-  space_down(Board, Row, Column, Space),
+  space_down(Board, Column, Row, Space),
   assertion(Space == 2).
 
 test(space_left) :-
@@ -160,7 +160,7 @@ test(space_up) :-
   ],
   Row = 4,
   Column = 2,
-  space_up(Board, Row, Column, Space),
+  space_up(Board, Column, Row, Space),
   assertion(Space == 2).
 
 test(state_id) :-
