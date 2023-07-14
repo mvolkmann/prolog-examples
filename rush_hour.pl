@@ -29,54 +29,70 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
     set_column(Board, Letter, Car.fixed, Car.variable, Length, NewBoard)
   ).
 
+moves_down(Board, Letter, Car) :-
+  Column = Car.fixed,
+  StartRow = Car.variable,
+  letter_index(Letter, Index),
+  car_length(Index, Length),
+  EndRow #= StartRow + Length - 1,
+  space_down(Board, Column, EndRow, Space),
+  (Space #> 0 ->
+    Start #= StartRow + Space,
+    End #= StartRow + 1,
+    add_vertical_moves(Board, Letter, Column, Start, End, 1);
+    true
+  ).
+
+moves_left(Board, Letter, Car) :-
+  Row = Car.fixed,
+  StartColumn = Car.variable,
+  space_left(Board, Row, StartColumn, Space),
+  (Space #> 0 ->
+    Start #= StartColumn - Space,
+    End #= StartColumn - 1,
+    add_horizontal_moves(Board, Letter, Row, Start, End, 1);
+    true
+  ).
+
+moves_right(Board, Letter, Car) :-
+  Row = Car.fixed,
+  StartColumn = Car.variable,
+  letter_index(Letter, Index),
+  car_length(Index, Length),
+  EndColumn #= StartColumn + Length - 1,
+  space_right(Board, Row, EndColumn, Space),
+  (Space #> 0 ->
+    Start #= StartColumn + Space,
+    End #= StartColumn + 1,
+    add_horizontal_moves(Board, Letter, Row, Start, End, -1);
+    true
+  ).
+
+moves_up(Board, Letter, Car) :-
+  Column = Car.fixed,
+  StartRow = Car.variable,
+  space_up(Board, Column, StartRow, Space),
+  (Space #> 0 ->
+    Start #= StartRow - Space,
+    End #= StartRow - 1,
+    add_vertical_moves(Board, Letter, Column, Start, End, 1);
+    true
+  ).
+
 add_moves(Puzzle, Board, Letter, Moves) :-
-  %format('add_moves: Letter = ~w~n', [Letter]),
   Car = Puzzle.get(Letter),
-  %format('add_moves: Car = ~w~n', [Car]),
   letter_index(Letter, Index),
   car_length(Index, Length),
   H = Car.get(horizontal, false),
+  % format('add_moves: Letter=~w, Length=~w, H=~w~n', [Letter, Length, H]),
   (get_dict(horizontal, Car, H) ->
+    % For horizontal cars ...
+    moves_left(Board, Letter, Car),
+    moves_right(Board, Letter, Car);
 
-    Row = Car.fixed,
-    StartColumn = Car.variable,
-    EndColumn #= StartColumn + Length - 1,
-
-    space_left(Board, Row, StartColumn, SpaceLeft),
-    (SpaceLeft #> 0 ->
-      Start #= StartColumn - SpaceLeft,
-      End #= StartColumn - 1,
-      add_horizontal_moves(Board, Letter, Row, Start, End, 1);
-      true
-    ),
-
-    space_right(Board, Row, EndColumn, SpaceRight),
-    (SpaceRight #> 0 ->
-      Start #= StartColumn + SpaceRight,
-      End #= StartColumn + 1,
-      add_horizontal_moves(Board, Letter, Row, Start, End, -1);
-      true
-    );
-
-    Column = Car.fixed,
-    StartRow = Car.variable,
-    EndRow #= StartRow + Length - 1,
-
-    space_up(Board, Column, StartRow, SpaceUp),
-    (SpaceUp #> 0 ->
-      Start #= StartRow - SpaceUp,
-      End #= StartRow - 1,
-      add_vertical_moves(Board, Letter, Column, Start, End, 1);
-      true
-    ),
-
-    space_down(Board, Column, EndRow, SpaceDown),
-    (SpaceDown #> 0 ->
-      Start #= StartRow + SpaceDown,
-      End #= StartRow + 1,
-      add_vertical_moves(Board, Letter, Column, Start, End, -1);
-      true
-    )
+    % For vertical cars ...
+    moves_up(Board, Letter, Car),
+    moves_down(Board, Letter, Car)
   ),
   Moves = [].
 
@@ -256,6 +272,7 @@ solve(Puzzle) :-
 
   % add_pending_
 
+  writeln('solve: calling add_moves'),
   maplist(add_moves(Puzzle, NewBoard), Letters, Moves),
   format('Moves = ~w~n', [Moves]).
   % TODO: CONTINUE ADDING CODE HERE!
