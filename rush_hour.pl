@@ -30,45 +30,53 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
   ).
 
 add_moves(Puzzle, Board, Letter, Moves) :-
-  format('add_moves: Letter = ~w~n', [Letter]),
+  %format('add_moves: Letter = ~w~n', [Letter]),
   Car = Puzzle.get(Letter),
-  format('add_moves: Car = ~w~n', [Car]),
+  %format('add_moves: Car = ~w~n', [Car]),
   letter_index(Letter, Index),
   car_length(Index, Length),
   H = Car.get(horizontal, false),
   (get_dict(horizontal, Car, H) ->
-    writeln('add_moves: looking for horizontal moves'),
 
     Row = Car.fixed,
     StartColumn = Car.variable,
     EndColumn #= StartColumn + Length - 1,
 
     space_left(Board, Row, StartColumn, SpaceLeft),
-    format('~w) SpaceLeft = ~w~n', [Letter, SpaceLeft]),
     (SpaceLeft #> 0 ->
-      LeftStart #= StartColumn - SpaceLeft,
-      LeftEnd #= StartColumn - 1,
-      format('LeftStart=~w, LeftEnd=~w~n', [LeftStart, LeftEnd]),
-      add_horizontal_moves(Board, Letter, Row, LeftStart, LeftEnd, 1);
+      Start #= StartColumn - SpaceLeft,
+      End #= StartColumn - 1,
+      add_horizontal_moves(Board, Letter, Row, Start, End, 1);
       true
     ),
 
     space_right(Board, Row, EndColumn, SpaceRight),
-    format('~w) SpaceRight = ~w~n', [Letter, SpaceRight]),
     (SpaceRight #> 0 ->
-      RightStart #= StartColumn + SpaceRight,
-      RightEnd #= StartColumn + 1,
-      add_horizontal_moves(Board, Letter, Row, RightStart, RightEnd, -1);
+      Start #= StartColumn + SpaceRight,
+      End #= StartColumn + 1,
+      add_horizontal_moves(Board, Letter, Row, Start, End, -1);
       true
     );
 
-    writeln('add_moves: looking for vertical moves'),
     Column = Car.fixed,
     StartRow = Car.variable,
     EndRow #= StartRow + Length - 1,
+
     space_up(Board, Column, StartRow, SpaceUp),
+    (SpaceUp #> 0 ->
+      Start #= StartRow - SpaceUp,
+      End #= StartRow - 1,
+      add_vertical_moves(Board, Letter, Column, Start, End, 1);
+      true
+    ),
+
     space_down(Board, Column, EndRow, SpaceDown),
-    format('~w) Up = ~w, Down = ~w~n', [Letter, SpaceUp, SpaceDown])
+    (SpaceDown #> 0 ->
+      Start #= StartRow + SpaceDown,
+      End #= StartRow + 1,
+      add_vertical_moves(Board, Letter, Column, Start, End, -1);
+      true
+    )
   ),
   Moves = [].
 
@@ -76,7 +84,16 @@ add_horizontal_moves(Board, Letter, Row, StartColumn, EndColumn, Delta) :-
   format('~w moves to column ~w~n', [Letter, StartColumn]),
   (StartColumn =\= EndColumn ->
     NextColumn #= StartColumn + Delta,
-    add_horizontal_moves(Board, Letter, Row, NextColumn, EndColumn, Delta)
+    add_horizontal_moves(Board, Letter, Row, NextColumn, EndColumn, Delta);
+    true
+  ).
+
+add_vertical_moves(Board, Letter, Column, StartRow, EndRow, Delta) :-
+  format('~w moves to row ~w~n', [Letter, StartRow]),
+  (StartRow =\= EndRow ->
+    NextRow #= StartRow + Delta,
+    add_vertical_moves(Board, Letter, Column, NextRow, EndRow, Delta);
+    true
   ).
 
   /* From JavaScript code ...
