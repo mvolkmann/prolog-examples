@@ -30,34 +30,39 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
   ).
 
 add_moves(Puzzle, Board, Letter, Moves) :-
+  format('add_moves: Letter = ~w~n', [Letter]),
   Car = Puzzle.get(Letter),
+  format('add_moves: Car = ~w~n', [Car]),
   letter_index(Letter, Index),
   car_length(Index, Length),
   H = Car.get(horizontal, false),
   (get_dict(horizontal, Car, H) ->
+    writeln('add_moves: looking for horizontal moves'),
 
     Row = Car.fixed,
     StartColumn = Car.variable,
     EndColumn #= StartColumn + Length - 1,
+
     space_left(Board, Row, StartColumn, SpaceLeft),
-    format('~w) Left = ~w~n', [Letter, SpaceLeft]),
-    /*
+    format('~w) SpaceLeft = ~w~n', [Letter, SpaceLeft]),
     (SpaceLeft #> 0 ->
       LeftStart #= StartColumn - SpaceLeft,
-      LeftEnd #= LeftStart + Length - 1,
-      add_horizontal_moves(Board, Letter, Row, LeftStart, LeftEnd, 1)
+      LeftEnd #= StartColumn - 1,
+      format('LeftStart=~w, LeftEnd=~w~n', [LeftStart, LeftEnd]),
+      add_horizontal_moves(Board, Letter, Row, LeftStart, LeftEnd, 1);
+      true
     ),
-    */
+
     space_right(Board, Row, EndColumn, SpaceRight),
-    format('~w) Right = ~w~n', [Letter, SpaceRight]);
-    /*
+    format('~w) SpaceRight = ~w~n', [Letter, SpaceRight]),
     (SpaceRight #> 0 ->
       RightStart #= StartColumn + SpaceRight,
-      RightEnd #= RightStart + Length - 1,
-      add_horizontal_moves(Board, Letter, Row, RightStart, RightEnd, -1)
-    ),
-    */
+      RightEnd #= StartColumn + 1,
+      add_horizontal_moves(Board, Letter, Row, RightStart, RightEnd, -1);
+      true
+    );
 
+    writeln('add_moves: looking for vertical moves'),
     Column = Car.fixed,
     StartRow = Car.variable,
     EndRow #= StartRow + Length - 1,
@@ -69,7 +74,7 @@ add_moves(Puzzle, Board, Letter, Moves) :-
 
 add_horizontal_moves(Board, Letter, Row, StartColumn, EndColumn, Delta) :-
   format('~w moves to column ~w~n', [Letter, StartColumn]),
-  (StartColumn \== EndColumn ->
+  (StartColumn =\= EndColumn ->
     NextColumn #= StartColumn + Delta,
     add_horizontal_moves(Board, Letter, Row, NextColumn, EndColumn, Delta)
   ).
@@ -225,10 +230,7 @@ set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
   set_row(Board3, Letter, Row, S, L, NewBoard).
 
 solve(Puzzle) :-
-  (X = Puzzle.get(x) ->
-    writeln('Found car x.');
-    writeln('Puzzle is missing car X!')
-  ),
+  (X = Puzzle.get(x) -> true; writeln('Puzzle is missing car X!')),
   empty_board(Board),
   dict_keys(Puzzle, Letters),
   foldl(add_car(Puzzle), Letters, Board, NewBoard),
