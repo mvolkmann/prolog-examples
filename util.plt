@@ -19,6 +19,14 @@ test(column) :-
   column(2, Board, Column),
   assertion(Column == [a, b, ' ', ' ', x, ' ']).
 
+test(even) :-
+  clpfd:even(2),
+  \+ clpfd:even(3).
+
+test(every) :-
+  every(clpfd:even, [2, 6, 8]),
+  \+ every(clpfd:even, [2, 5, 8]).
+
 test(fill) :-
   fill(0, x, L0),
   assertion(L0 == []),
@@ -39,6 +47,10 @@ test(fold) :-
   foldr(sum2, Numbers, Sum),
   assertion(Sum == 6).
 
+test(odd) :-
+  clpfd:odd(3),
+  \+ clpfd:odd(2).
+
 test(repeat) :-
   repeat(x, 0, ""),
   repeat(x, 1, "x"),
@@ -48,6 +60,10 @@ test(replace) :-
   replace([], 0, x, []),
   replace([a, b, c], 0, d, [d, b, c]),
   replace([a, b, c], 1, d, [a, d, c]).
+
+test(some) :-
+  some(clpfd:even, [1, 6, 9]),
+  \+ some(clpfd:even, [1, 5, 9]).
 
 test(tail_after_last) :-
   tail_after_last(x, [a, b, x, c, x, d, e], T),

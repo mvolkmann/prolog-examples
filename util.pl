@@ -13,6 +13,10 @@ column(N, Board, Column) :-
   column(N, Rest, Column2),
   Column = [Element | Column2].
 
+% This succeeds if every element in List satisfies Predicate
+% and fails otherwise.
+every(Predicate, List) :- maplist(Predicate, List).
+
 % This creates a list containing N copies of E.
 fill(0, _, []) :- !.
 fill(N, E, L) :-
@@ -65,6 +69,12 @@ replace([H|T], Index, Value, [H|R]):-
   Index > 0,
   I is Index - 1,
   replace(T, I, Value, R).
+
+% This succeeds if at least one element in List satisfies Predicate
+% and fails otherwise.
+some(_, []) :- fail.
+some(Predicate, [H|T]) :-
+  call(Predicate, H), !; some(Predicate, T).
 
 % This gets the tail of a list that follows
 % the last occurrence of a given element.
