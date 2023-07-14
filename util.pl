@@ -38,7 +38,7 @@ foldr(Predicate, [H|T], Result) :-
   foldr(Predicate, T, Acc),
   call(Predicate, H, Acc, Result).
 
-% These are helper rules for repeat below.
+% These are auxilary rules for "repeat" below.
 repeat_(_, 0, []) :- !.
 repeat_(Char, N, [Char|T]) :-
   N2 is N - 1,
