@@ -29,119 +29,70 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
     set_column(Board, Letter, Car.fixed, Car.variable, Length, NewBoard)
   ).
 
-moves_down(Board, Letter, Car) :-
-  Column = Car.fixed,
-  StartRow = Car.variable,
-  letter_index(Letter, Index),
-  car_length(Index, Length),
-  EndRow #= StartRow + Length - 1,
-  space_down(Board, Column, EndRow, Space),
-  (Space #> 0 ->
-    Start #= StartRow + Space,
-    End #= StartRow + 1,
-    add_vertical_moves(Board, Letter, Column, Start, End, 1);
-    true
-  ).
-
-moves_left(Board, Letter, Car) :-
-  Row = Car.fixed,
-  StartColumn = Car.variable,
-  space_left(Board, Row, StartColumn, Space),
-  (Space #> 0 ->
-    Start #= StartColumn - Space,
-    End #= StartColumn - 1,
-    add_horizontal_moves(Board, Letter, Row, Start, End, 1);
-    true
-  ).
-
-moves_right(Board, Letter, Car) :-
-  Row = Car.fixed,
-  StartColumn = Car.variable,
-  letter_index(Letter, Index),
-  car_length(Index, Length),
-  EndColumn #= StartColumn + Length - 1,
-  space_right(Board, Row, EndColumn, Space),
-  (Space #> 0 ->
-    Start #= StartColumn + Space,
-    End #= StartColumn + 1,
-    add_horizontal_moves(Board, Letter, Row, Start, End, -1);
-    true
-  ).
-
-moves_up(Board, Letter, Car) :-
-  Column = Car.fixed,
-  StartRow = Car.variable,
-  space_up(Board, Column, StartRow, Space),
-  (Space #> 0 ->
-    Start #= StartRow - Space,
-    End #= StartRow - 1,
-    add_vertical_moves(Board, Letter, Column, Start, End, 1);
-    true
-  ).
-
-add_moves(Puzzle, Board, Letter, Moves) :-
-  Car = Puzzle.get(Letter),
-  letter_index(Letter, Index),
-  car_length(Index, Length),
+add_moves(Cars, Board, Letter) :-
+  Car = Cars.get(Letter),
   H = Car.get(horizontal, false),
-  % format('add_moves: Letter=~w, Length=~w, H=~w~n', [Letter, Length, H]),
   (get_dict(horizontal, Car, H) ->
     % For horizontal cars ...
-    moves_left(Board, Letter, Car),
-    moves_right(Board, Letter, Car);
+    moves_left(Cars, Board, Letter, Car),
+    moves_right(Cars, Board, Letter, Car);
 
     % For vertical cars ...
-    moves_up(Board, Letter, Car),
-    moves_down(Board, Letter, Car)
-  ),
-  Moves = [].
+    moves_up(Cars, Board, Letter, Car),
+    moves_down(Cars, Board, Letter, Car)
+  ).
 
-add_horizontal_moves(Board, Letter, Row, StartColumn, EndColumn, Delta) :-
-  format('~w moves to column ~w~n', [Letter, StartColumn]),
-  (StartColumn =\= EndColumn ->
-    NextColumn #= StartColumn + Delta,
-    add_horizontal_moves(Board, Letter, Row, NextColumn, EndColumn, Delta);
+add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, Delta) :-
+  format('~w moves to column ~w~n', [Letter, A]),
+
+  copy_term(Cars.get(Letter), NewCar),
+  nb_set_dict(variable, NewCar, A),
+  copy_term(Cars, NewCars),
+  nb_set_dict(Letter, NewCars, NewCar),
+
+  letter_index(Letter, Index),
+  car_length(Index, Length),
+  set_row(Board, ' ', Row, StartColumn, Length, Board2),
+  set_row(Board2, Letter, Row, A, Length, Board3),
+  writeln('add_horizontal_moves: Board3 follows'),
+  print_board(Board3),
+
+  nb_getval(pendingStates, PendingStates),
+  NewState = [Board3, NewCars],
+  append(PendingStates, [NewState], NewPendingStates),
+  nb_setval(pendingStates, NewPendingStates),
+
+  (A =\= B ->
+    Next #= A + Delta,
+    add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, Next, B, Delta);
     true
   ).
 
-add_vertical_moves(Board, Letter, Column, StartRow, EndRow, Delta) :-
-  format('~w moves to row ~w~n', [Letter, StartRow]),
-  (StartRow =\= EndRow ->
-    NextRow #= StartRow + Delta,
-    add_vertical_moves(Board, Letter, Column, NextRow, EndRow, Delta);
+add_vertical_moves(Cars, Board, Letter, Column, StartRow, A, B, Delta) :-
+  format('~w moves to row ~w~n', [Letter, A]),
+
+  copy_term(Cars.get(Letter), NewCar),
+  nb_set_dict(variable, NewCar, A),
+  copy_term(Cars, NewCars),
+  nb_set_dict(Letter, NewCars, NewCar),
+
+  letter_index(Letter, Index),
+  car_length(Index, Length),
+  set_column(Board, ' ', Column, StartRow, Length, Board2),
+  set_column(Board2, Letter, Column, A, Length, Board3),
+  writeln('add_vertical_moves: Board3 follows'),
+  print_board(Board3),
+
+  nb_getval(pendingStates, PendingStates),
+  NewState = [Board3, NewCars],
+  append(PendingStates, [NewState], NewPendingStates),
+  nb_setval(pendingStates, NewPendingStates),
+
+  (A =\= B ->
+    Next #= A + Delta,
+    add_vertical_moves(Cars, Board, Letter, Column, StartRow, Next, B, Delta);
     true
   ).
-
-  /* From JavaScript code ...
-  const { board, variablePositions } = state;
-  const index = letterToIndex(letter);
-  const currentColumn = variablePositions[index];
-  const length = carLength(index);
-
-  let column = startColumn;
-  while (true) {
-    // Make a copy of variablePositions where the car being moved is updated.
-    const newPositions = [...variablePositions];
-    newPositions[index] = column;
-
-    // Make a copy of the board where the car being moved is updated.
-    const newBoard = copyBoard(board);
-    const newBoardRow = newBoard[row];
-    // Remove car being moved.
-    setRow(newBoardRow, SPACE, currentColumn, length);
-    // Add car being moved in new location.
-    setRow(newBoardRow, letter, column, length);
-    // printBoard(newBoard);
-
-    const direction = delta === -1 ? "right" : "left";
-    const distance = Math.abs(column - currentColumn);
-    const move = `${letter} ${direction} ${distance}`;
-    addPendingState(newBoard, newPositions, move, state);
-
-    if (column === endColumn) break;
-    column += delta;
-  }
-  */
 
 % Gets a border string used when printing a board.
 border(B) :-
@@ -190,12 +141,68 @@ moves(State, L) :-
   Move = State.get(move, ''),
   append(L2, [Move], L).
 
+moves_down(Cars, Board, Letter, Car) :-
+  Column = Car.fixed,
+  StartRow = Car.variable,
+  letter_index(Letter, Index),
+  car_length(Index, Length),
+  EndRow #= StartRow + Length - 1,
+  space_down(Board, Column, EndRow, Space),
+  (Space #> 0 ->
+    A #= StartRow + Space,
+    B #= StartRow + 1,
+    add_vertical_moves(Cars, Board, Letter, Column, StartRow, A, B, 1);
+    true
+  ).
+
+moves_left(Cars, Board, Letter, Car) :-
+  Row = Car.fixed,
+  StartColumn = Car.variable,
+  space_left(Board, Row, StartColumn, Space),
+  (Space #> 0 ->
+    A #= StartColumn - Space,
+    B #= StartColumn - 1,
+    add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, 1);
+    true
+  ).
+
+moves_right(Cars, Board, Letter, Car) :-
+  Row = Car.fixed,
+  StartColumn = Car.variable,
+  letter_index(Letter, Index),
+  car_length(Index, Length),
+  EndColumn #= StartColumn + Length - 1,
+  space_right(Board, Row, EndColumn, Space),
+  (Space #> 0 ->
+    A #= StartColumn + Space,
+    B #= StartColumn + 1,
+    add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, -1);
+    true
+  ).
+
+moves_up(Cars, Board, Letter, Car) :-
+  Column = Car.fixed,
+  StartRow = Car.variable,
+  space_up(Board, Column, StartRow, Space),
+  (Space #> 0 ->
+    A #= StartRow - Space,
+    B #= StartRow - 1,
+    add_vertical_moves(Cars, Board, Letter, Column, StartRow, A, B, 1);
+    true
+  ).
+
 pending_state_added(NewState, OldStates, NewStates) :-
   append(OldStates, [NewState], NewStates).
 
+print_board(Board) :- write_board(user_output, Board).
+
+/*
 print_moves(State) :-
   moves_string(State, S),
   write(S).
+*/
+
+print_state([Board, Cars]) :- print_board(Board).
 
 puzzles(P) :-
   exit_row(ExitRow),
@@ -263,22 +270,24 @@ set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
   set_row(Board3, Letter, Row, S, L, NewBoard).
 
 solve(Puzzle) :-
-  (X = Puzzle.get(x) -> true; writeln('Puzzle is missing car X!')),
+  (_ = Puzzle.get(x) -> true; writeln('Puzzle is missing car X!')),
   empty_board(Board),
   dict_keys(Puzzle, Letters),
   foldl(add_car(Puzzle), Letters, Board, NewBoard),
   writeln('Starting board:'),
-  write_board(user_output, NewBoard),
+  print_board(NewBoard),
 
-  % add_pending_
+  InitialState = [Board, Puzzle],
+  nb_setval(pendingStates, [InitialState]),
 
-  writeln('solve: calling add_moves'),
-  maplist(add_moves(Puzzle, NewBoard), Letters, Moves),
-  format('Moves = ~w~n', [Moves]).
+  maplist(add_moves(Puzzle, NewBoard), Letters),
+  nb_getval(pendingStates, PendingStates),
+  format('PendingStates = ~w~n', [PendingStates]),
+  maplist(print_state, PendingStates).
   % TODO: CONTINUE ADDING CODE HERE!
 
 % Gets number of empty spaces to left of a given board row column.
-space_row_left(BoardRow, 0, 0).
+space_row_left(_, 0, 0).
 space_row_left(BoardRow, Column, Space) :-
   Left is Column - 1,
   nth0(Left, BoardRow, Value),
@@ -287,7 +296,7 @@ space_row_left(BoardRow, Column, Space) :-
     Space is 0.
 
 % Gets number of empty spaces to right of a given board row column.
-space_row_right(BoardRow, 0, 0).
+space_row_right(_, 0, 0).
 space_row_right(BoardRow, Column, Space) :-
   Right is Column + 1,
   nth0(Right, BoardRow, Value),
