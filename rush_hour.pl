@@ -34,12 +34,12 @@ add_moves(Cars, Board, Letter) :-
   H = Car.get(horizontal, false),
   (get_dict(horizontal, Car, H) ->
     % For horizontal cars ...
-    moves_left(Cars, Board, Letter, Car),
-    moves_right(Cars, Board, Letter, Car);
+    moves_left(Board, Cars, Letter),
+    moves_right(Board, Cars, Letter);
 
     % For vertical cars ...
-    moves_up(Cars, Board, Letter, Car),
-    moves_down(Cars, Board, Letter, Car)
+    moves_up(Board, Cars, Letter),
+    moves_down(Board, Cars, Letter)
   ).
 
 add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, Delta) :-
@@ -141,7 +141,8 @@ moves(State, L) :-
   Move = State.get(move, ''),
   append(L2, [Move], L).
 
-moves_down(Cars, Board, Letter, Car) :-
+moves_down(Board, Cars, Letter) :-
+  Car = Cars.get(Letter),
   Column = Car.fixed,
   StartRow = Car.variable,
   letter_index(Letter, Index),
@@ -155,18 +156,21 @@ moves_down(Cars, Board, Letter, Car) :-
     true
   ).
 
-moves_left(Cars, Board, Letter, Car) :-
+moves_left(Board, Cars, Letter) :-
+  Car = Cars.get(Letter),
   Row = Car.fixed,
   StartColumn = Car.variable,
   space_left(Board, Row, StartColumn, Space),
   (Space #> 0 ->
     A #= StartColumn - Space,
     B #= StartColumn - 1,
+    format('moves_left: moving ~w left ~w to ~w~n', [Letter, A, B]),
     add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, 1);
     true
   ).
 
-moves_right(Cars, Board, Letter, Car) :-
+moves_right(Board, Cars, Letter) :-
+  Car = Cars.get(Letter),
   Row = Car.fixed,
   StartColumn = Car.variable,
   letter_index(Letter, Index),
@@ -174,13 +178,21 @@ moves_right(Cars, Board, Letter, Car) :-
   EndColumn #= StartColumn + Length - 1,
   space_right(Board, Row, EndColumn, Space),
   (Space #> 0 ->
+    format('moves_right: space to right of ~w is ~w~n', [Letter, Space]),
+    format('moves_right: StartColumn = ~w~n', [StartColumn]),
+    format('moves_right: Length = ~w~n', [Length]),
+    format('moves_right: EndColumn = ~w~n', [EndColumn]),
+    format('moves_right: board follows\n'),
+    print_board(Board),
     A #= StartColumn + Space,
     B #= StartColumn + 1,
+    format('moves_right: moving ~w right ~w to ~w~n', [Letter, A, B]),
     add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, -1);
     true
   ).
 
-moves_up(Cars, Board, Letter, Car) :-
+moves_up(Board, Cars, Letter) :-
+  Car = Cars.get(Letter),
   Column = Car.fixed,
   StartRow = Car.variable,
   space_up(Board, Column, StartRow, Space),
