@@ -30,6 +30,7 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
   ).
 
 add_moves(Cars, Board, Letter) :-
+  format('=> addMoves: Letter=~w~n', [Letter]),
   Car = Cars.get(Letter),
   H = Car.get(horizontal, false),
   (get_dict(horizontal, Car, H) ->
@@ -38,10 +39,16 @@ add_moves(Cars, Board, Letter) :-
     moves_right(Board, Cars, Letter);
 
     % For vertical cars ...
+    format('add_moves: before moves_up, Car ~w is ~w~n', [Letter, Car]),
     moves_up(Board, Cars, Letter),
-    moves_down(Board, Cars, Letter)
+    Car2 = Cars.get(Letter),
+    format('add_moves: after moves_up, Car ~w is ~w~n', [Letter, Car2]),
+    moves_down(Board, Cars, Letter),
+    Car3 = Cars.get(Letter),
+    format('add_moves: after moves_down, Car ~w is ~w~n', [Letter, Car3])
   ).
 
+% THIS SHOULD NOT MODIFY Cars! Does it?
 add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, Delta) :-
   format('~w moves to column ~w~n', [Letter, A]),
 
@@ -68,6 +75,7 @@ add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, Delta) :-
     true
   ).
 
+% THIS SHOULD NOT MODIFY Cars! Does it?
 add_vertical_moves(Cars, Board, Letter, Column, StartRow, A, B, Delta) :-
   format('~w moves to row ~w~n', [Letter, A]),
 
@@ -142,13 +150,19 @@ moves(State, L) :-
   append(L2, [Move], L).
 
 moves_down(Board, Cars, Letter) :-
+  format('== moves_down: Letter=~w~n', [Letter]),
   Car = Cars.get(Letter),
   Column = Car.fixed,
+  format('moves_down: Column=~w~n', [Column]),
   StartRow = Car.variable,
+  format('moves_down: StartRow=~w~n', [StartRow]),
   letter_index(Letter, Index),
   car_length(Index, Length),
+  format('moves_down: Length=~w~n', [Length]),
   EndRow #= StartRow + Length - 1,
+  format('moves_down: EndRow=~w~n', [EndRow]),
   space_down(Board, Column, EndRow, Space),
+  format('** moves_down: space below ~w is ~w~n', [Letter, Space]),
   (Space #> 0 ->
     A #= StartRow + Space,
     B #= StartRow + 1,
@@ -177,8 +191,8 @@ moves_right(Board, Cars, Letter) :-
   car_length(Index, Length),
   EndColumn #= StartColumn + Length - 1,
   space_right(Board, Row, EndColumn, Space),
+  format('** moves_right: space to right of ~w is ~w~n', [Letter, Space]),
   (Space #> 0 ->
-    format('moves_right: space to right of ~w is ~w~n', [Letter, Space]),
     format('moves_right: StartColumn = ~w~n', [StartColumn]),
     format('moves_right: Length = ~w~n', [Length]),
     format('moves_right: EndColumn = ~w~n', [EndColumn]),
