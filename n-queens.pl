@@ -1,4 +1,12 @@
 % See "N-Queens in Prolog" at https://www.youtube.com/watch?v=l_tbL9RjFdo.
+% This code can test, complete, and generate solutions.  For example:
+% The following tests whether a given solution is valid.
+% - n_queens(4, [2, 4, 1, 3]).
+% The following completes the solution beginning with 2 and 4.
+% - n_queens(4, [2, 4, X, Y]).
+% The following generates all possible solutions for a board size of 4.
+% - n_queens(4, L), labeling(L).
+
 :- use_module(library(clpfd)).
 
 n_queens(N, Qs) :-
@@ -35,17 +43,17 @@ safe_queens_(Q0, [Q|Qs], Distance) :-
 :- initialization
   N = 4,
 
+  /*
   % "Generate and Test" approach - very slow
   % Generate every possible combination of queen positions.
   maplist(between(1, N), Qs),
   % Determine which of the combinations are solutions.
   n_queens(N, Qs),
+  */
 
-  /*
   % "Early Prunning" approach - better
   n_queens(N, Qs), % much faster with this before next line
   maplist(between(1, N), Qs),
-  */
 
   /*
   % "Intelligent Search" approach - much better
@@ -66,5 +74,5 @@ safe_queens_(Q0, [Q|Qs], Distance) :-
   labeling([ff], Qs),
   */
 
-  writeln(Qs),
-  halt.
+  writeln(Qs).
+  % halt.
