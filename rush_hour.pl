@@ -23,8 +23,15 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
   Car = Puzzle.get(Letter),
   letter_index(Letter, Index),
   car_length(Index, Length),
+
+  % Dynamically create facts describing which cars are horizontal.
   H = Car.get(horizontal, false),
-  (get_dict(horizontal, Car, H) ->
+  (H == true -> assertz(horizontal(Letter)); true),
+
+  % Dynamically create facts describing the fixed position of each car.
+  assertz(fixed(Letter, Car.fixed)),
+
+  (H == true ->
     set_row(Board, Letter, Car.fixed, Car.variable, Length, NewBoard);
     set_column(Board, Letter, Car.fixed, Car.variable, Length, NewBoard)
   ).
@@ -32,8 +39,7 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
 add_moves(Cars, Board, Letter) :-
   format('=> addMoves: Letter=~w~n', [Letter]),
   Car = Cars.get(Letter),
-  H = Car.get(horizontal, false),
-  (get_dict(horizontal, Car, H) ->
+  (horizontal(Letter) ->
     % For horizontal cars ...
     moves_left(Board, Cars, Letter),
     moves_right(Board, Cars, Letter);
@@ -228,7 +234,7 @@ print_moves(State) :-
   write(S).
 */
 
-print_state([Board, Cars]) :- print_board(Board).
+print_state([Board, _]) :- print_board(Board).
 
 puzzles(P) :-
   exit_row(ExitRow),
@@ -312,6 +318,10 @@ solve(Puzzle) :-
   maplist(print_state, PendingStates).
   % TODO: CONTINUE ADDING CODE HERE!
 
+solve_p1 :-
+  puzzles(Puzzles),
+  solve(Puzzles.p1).
+
 % Gets number of empty spaces to left of a given board row column.
 space_row_left(_, 0, 0).
 space_row_left(BoardRow, Column, Space) :-
@@ -380,36 +390,12 @@ write_board(Stream, Board) :-
   write_board_rows(Stream, Board),
   writeln(Stream, Border).
 
-/*
-car_at(X, Y, car(C, (X1, Y1), (X2, Y2))) :-
-  between(X1, X2, X),
-  between(Y1, Y2, Y).
-
-car_at(X, Y, [H|T]) :-
-  car_at(X, Y, H);
-  car_at(X, Y, T).
-  
-board_character(Row, Column, Cars, Char) :-
-  car_at(Row, Column, Cars) -> 
-
-% This relates a current board (CB) and a car to a new board (NB).
-% TODO: TEST THIS!
-car_board(CB, Letter, Car, NB) :-
-  car_length(Car, Length),
-  horizontal_car(Car, H),
-  H -> 
-    % Handle horizontal car.
-    Row = Car.get(row),
-    StartColumn = Car.get(currentColumn),
-    set_row(CB, Letter, StartColumn, Length, NB);
-    % Handle vertical car.
-    Column = Car.get(column),
-    StartRow = Car.get(currentRow),
-    set_column(CB, Letter, StartRow, Length, NB).
-
-% This creates a 2D array of car letters for a given puzzle.
-cars_board(Cars, Board) :-
-
 :- initialization
-  % halt.
-*/
+  dynamic(horizontal/1),
+  dynamic(fixed/2).
+
+  /* You can run "swipl rush_hour.plt" instead of using this code.
+  puzzles(Puzzles),
+  solve(Puzzles.p1),
+  halt.
+  */
