@@ -13,17 +13,24 @@ safe_queens([]).
 % So we only need to check queens to the right of the one being evaluated.
 % All queens in a given list are safe if ...
 safe_queens([Q|Qs]) :-
-
+  % Queen Q is safe from the first queen in Qs.
   safe_queens_(Q, Qs, 1),
+  % All the queens in Qs are safe from each other.
   safe_queens(Qs).
 
+% Any queen is safe from queens to its right
+% if there are no queens to its right.
 safe_queens_(_, [], _).
-safe_queens_(Q0, [Q|Qs], D) :-
-  Q #\= Q0, % not same row
-  abs(Q0 - Q) #\= D, % not same diagonal
-  D2 #= D + 1,
-  safe_queens_(Q0, Qs, D2).
-  
+
+% Distance is the difference in columns
+% between Q0 and the column to be evaluated.
+% A queen Q0 is safe from queens to its right if ...
+safe_queens_(Q0, [Q|Qs], Distance) :-
+  Q0 #\= Q, % it is not in the same row
+  abs(Q0 - Q) #\= Distance, % it is not on the same diagonal
+  % Check the next column to the right.
+  NextDistance #= Distance + 1,
+  safe_queens_(Q0, Qs, NextDistance).
 
 :- initialization
   N = 20,
