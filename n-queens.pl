@@ -27,19 +27,19 @@ safe_queens_(_, [], _).
 % A queen Q0 is safe from queens to its right if ...
 safe_queens_(Q0, [Q|Qs], Distance) :-
   Q0 #\= Q, % it is not in the same row
-  abs(Q0 - Q) #\= Distance, % it is not on the same diagonal
+  abs(Q - Q0) #\= Distance, % it is not on the same diagonal
   % Check the next column to the right.
   NextDistance #= Distance + 1,
   safe_queens_(Q0, Qs, NextDistance).
 
 :- initialization
-  N = 20,
+  N = 4,
 
-  /*
   % "Generate and Test" approach - very slow
+  % Generate every possible combination of queen positions.
   maplist(between(1, N), Qs),
+  % Determine which of the combinations are solutions.
   n_queens(N, Qs),
-  */
 
   /*
   % "Early Prunning" approach - better
@@ -47,6 +47,7 @@ safe_queens_(Q0, [Q|Qs], Distance) :-
   maplist(between(1, N), Qs),
   */
 
+  /*
   % "Intelligent Search" approach - much better
   n_queens(N, Qs),
   % The labeling predicate provides constraint propagation.
@@ -63,6 +64,7 @@ safe_queens_(Q0, [Q|Qs], Distance) :-
   % There are more predefined search strategies
   % and you can define custom strategies.
   labeling([ff], Qs),
+  */
 
   writeln(Qs),
   halt.
