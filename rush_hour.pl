@@ -16,24 +16,43 @@ Each color is a single letter code so the board can be printed nicely.
 exit_row(2).
 size(6).
 
+% Define facts about the length of each car.
+car_length(a, 2).
+car_length(b, 2).
+car_length(c, 2).
+car_length(d, 2).
+car_length(e, 2).
+car_length(f, 2).
+car_length(g, 2).
+car_length(h, 2).
+car_length(i, 2).
+car_length(j, 2).
+car_length(k, 2).
+car_length(o, 3).
+car_length(p, 3).
+car_length(q, 3).
+car_length(r, 3).
+car_length(x, 2).
+
 % You don't need a rule to make a deep copy of a board nested list.
 % Just use the copy_term(In, Out) predicate.
 
 add_car(Puzzle, Board, Letter, NewBoard) :-
   Car = Puzzle.get(Letter),
-  letter_index(Letter, Index),
-  car_length(Index, Length),
+  car_length(Letter, Length),
 
   % Dynamically create facts describing which cars are horizontal.
   H = Car.get(horizontal, false),
   (H == true -> assertz(horizontal(Letter)); true),
 
   % Dynamically create facts describing the fixed position of each car.
-  assertz(fixed(Letter, Car.fixed)),
+  Fixed = Car.fixed,
+  assertz(fixed(Letter, Fixed)),
 
+  Variable = Car.variable,
   (H == true ->
-    set_row(Board, Letter, Car.fixed, Car.variable, Length, NewBoard);
-    set_column(Board, Letter, Car.fixed, Car.variable, Length, NewBoard)
+    set_row(Board, Letter, Fixed, Variable, Length, NewBoard);
+    set_column(Board, Letter, Fixed, Variable, Length, NewBoard)
   ).
 
 add_moves(Cars, Board, Letter) :-
@@ -63,8 +82,7 @@ add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, Delta) :-
   copy_term(Cars, NewCars),
   nb_set_dict(Letter, NewCars, NewCar),
 
-  letter_index(Letter, Index),
-  car_length(Index, Length),
+  car_length(Letter, Length),
   set_row(Board, ' ', Row, StartColumn, Length, Board2),
   set_row(Board2, Letter, Row, A, Length, Board3),
   writeln('add_horizontal_moves: Board3 follows'),
@@ -90,8 +108,7 @@ add_vertical_moves(Cars, Board, Letter, Column, StartRow, A, B, Delta) :-
   copy_term(Cars, NewCars),
   nb_set_dict(Letter, NewCars, NewCar),
 
-  letter_index(Letter, Index),
-  car_length(Index, Length),
+  car_length(Letter, Length),
   set_column(Board, ' ', Column, StartRow, Length, Board2),
   set_column(Board2, Letter, Column, A, Length, Board3),
   writeln('add_vertical_moves: Board3 follows'),
@@ -115,11 +132,6 @@ border(B) :-
   repeat('-', Count, Dashes),
   atomics_to_string(['+', Dashes, '+'], B).
 
-car_length(Index, Length) :-
-  letter_index(o, IndexO),
-  letter_index(r, IndexR),
-  between(IndexO, IndexR, Index) -> Length = 3; Length = 2.
-
 empty_board_row(Row) :-
   size(Size),
   length(Row, Size),
@@ -139,16 +151,6 @@ goal_reached(Board) :-
   tail_after_last(x, Row2, T),
   maplist(=(' '), T).
 
-index_letter(I, L) :-
-  char_code(a, CodeA),
-  CodeL is I + CodeA,
-  char_code(L, CodeL).
-
-letter_index(L, I) :-
-  char_code(L, CodeL),
-  char_code(a, CodeA),
-  I is CodeL - CodeA.
-
 moves(nil, []) :- !.
 moves(State, L) :-
   moves(State.previousState, L2),
@@ -162,8 +164,7 @@ moves_down(Board, Cars, Letter) :-
   format('moves_down: Column=~w~n', [Column]),
   StartRow = Car.variable,
   format('moves_down: StartRow=~w~n', [StartRow]),
-  letter_index(Letter, Index),
-  car_length(Index, Length),
+  car_length(Letter, Length),
   format('moves_down: Length=~w~n', [Length]),
   EndRow #= StartRow + Length - 1,
   format('moves_down: EndRow=~w~n', [EndRow]),
@@ -193,8 +194,7 @@ moves_right(Board, Cars, Letter) :-
   Car = Cars.get(Letter),
   Row = Car.fixed,
   StartColumn = Car.variable,
-  letter_index(Letter, Index),
-  car_length(Index, Length),
+  car_length(Letter, Length),
   EndColumn #= StartColumn + Length - 1,
   space_right(Board, Row, EndColumn, Space),
   format('** moves_right: space to right of ~w is ~w~n', [Letter, Space]),
