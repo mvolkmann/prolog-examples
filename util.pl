@@ -6,23 +6,23 @@ sum3(P, A, B, C) :-
   C #= P + A + B.
 
 % Gets a column of values from a 2D list.
-column(_, [], []) :- !.
-column(N, Board, Column) :-
+% TODO: How can you make this terminate without a choicepoint?
+column(N, Board, [Element | Column2]) :-
   [Row|Rest] = Board,
   nth0(N, Row, Element),
-  column(N, Rest, Column2),
-  Column = [Element | Column2].
+  column(N, Rest, Column2).
+column(_, [], []).
 
 % This succeeds if every element in List satisfies Predicate
 % and fails otherwise.
 every(Predicate, List) :- maplist(Predicate, List).
 
 % This creates a list containing N copies of E.
-fill(0, _, []) :- !.
-fill(N, E, L) :-
-  N2 is N - 1,
-  fill(N2, E, L2),
-  L = [E | L2].
+fill(N, E, [E|L2]) :-
+  N #> 0,
+  N2 #= N - 1,
+  fill(N2, E, L2).
+fill(0, _, []).
 
 % See https://pbrown.me/blog/functional-prolog-map-filter-and-reduce/.
 

@@ -1,13 +1,14 @@
 :- initialization
-  Things = things{
-    t1: thing{
-      id: obj{ key: 1 }
-    }
+  Thing = thing{
+    id: obj{ key: 1}
   },
-  Thing = Things.get(t1),
   Obj = Thing.get(id),
+  % Make a copy of Obj.
   copy_term(Obj, NewObj),
+  % Modify the copy destructively.
   nb_set_dict(key, NewObj, 2),
-  format('Obj.key = ~w~n', [Obj.key]),
-  format('NewObj.key = ~w~n', [NewObj.key]),
+  % Verify that it was updated.
+  writeln(NewObj.key), % 2
+  % WHY DID THIS CHANGE ALSO?
+  writeln(Obj.key), % 2
   halt.
