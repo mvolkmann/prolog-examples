@@ -20,6 +20,11 @@ moves(Jugs) --> {
   member(jug(b, 4), Jugs)
 }.
 
+% What makes this do a breadth first search?
+% How does this avoid evaluating duplicate states?
+% Can this approach be used in rush_hour.pl?
+% The --> operator and the phrase predicate are part of DCG.
+% Jugs0 is a list of jug structures.
 moves(Jugs0) -->
   % A list of from_to structures will be created that describe the solution.
   [from_to(From, To)],
@@ -64,7 +69,8 @@ moves(Jugs0) -->
 
 :- initialization
   % phrase is part of DCG.
-  length(Ms, _), phrase(moves([jug(a, 8),jug(b, 0),jug(c, 0)]), Ms),
+  InitialState = [jug(a, 8), jug(b, 0), jug(c, 0)],
+  length(Ms, _), phrase(moves(InitialState), Ms),
   maplist(writeln, Ms),
   halt.
 /*
