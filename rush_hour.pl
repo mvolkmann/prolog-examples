@@ -49,38 +49,34 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
   Fixed = Car.fixed,
   assertz(fixed(Letter, Fixed)),
 
+  % Dynamically create facts that map each car letter to an index
+  % that is used in the Fixed list.
+  TODO: Determine the value for Index!
+  assertz(letter_index(Letter, Index)),
+
   Variable = Car.variable,
   (H == true ->
     set_row(Board, Letter, Fixed, Variable, Length, NewBoard);
     set_column(Board, Letter, Fixed, Variable, Length, NewBoard)
   ).
 
-add_moves(Cars, Board, Letter) :-
-  format('=> addMoves: Letter=~w~n', [Letter]),
-  Car = Cars.get(Letter),
+add_moves(Variables, Board, Letter) :-
+  format('=> addMoves: Letter = ~w~n', [Letter]),
   (horizontal(Letter) ->
     % For horizontal cars ...
-    moves_left(Board, Cars, Letter),
-    moves_right(Board, Cars, Letter);
+    moves_left(Board, Variables, Letter),
+    moves_right(Board, Variables, Letter);
 
     % For vertical cars ...
-    format('add_moves: before moves_up, Car ~w is ~w~n', [Letter, Car]),
-    moves_up(Board, Cars, Letter),
-    Car2 = Cars.get(Letter),
-    format('add_moves: after moves_up, Car ~w is ~w~n', [Letter, Car2]),
-    moves_down(Board, Cars, Letter),
-    Car3 = Cars.get(Letter),
-    format('add_moves: after moves_down, Car ~w is ~w~n', [Letter, Car3])
+    moves_up(Board, Variables, Letter),
+    moves_down(Board, Variables, Letter)
   ).
 
-% THIS SHOULD NOT MODIFY Cars! Does it?
-add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, Delta) :-
+add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
   format('~w moves to column ~w~n', [Letter, A]),
 
-  copy_term(Cars.get(Letter), NewCar),
-  nb_set_dict(variable, NewCar, A),
-  copy_term(Cars, NewCars),
-  nb_set_dict(Letter, NewCars, NewCar),
+  copy_term(Variables, NewVariables),
+  nb_set_dict(Letter, NewVariables, A),
 
   car_length(Letter, Length),
   set_row(Board, ' ', Row, StartColumn, Length, Board2),
@@ -89,24 +85,21 @@ add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, Delta) :-
   print_board(Board3),
 
   nb_getval(pendingStates, PendingStates),
-  NewState = [Board3, NewCars],
+  NewState = [Board3, NewVariables],
   append(PendingStates, [NewState], NewPendingStates),
   nb_setval(pendingStates, NewPendingStates),
 
   (A =\= B ->
     Next #= A + Delta,
-    add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, Next, B, Delta);
+    add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, Next, B, Delta);
     true
   ).
 
-% THIS SHOULD NOT MODIFY Cars! Does it?
-add_vertical_moves(Cars, Board, Letter, Column, StartRow, A, B, Delta) :-
+add_vertical_moves(Variables, Board, Letter, Column, StartRow, A, B, Delta) :-
   format('~w moves to row ~w~n', [Letter, A]),
 
-  copy_term(Cars.get(Letter), NewCar),
-  nb_set_dict(variable, NewCar, A),
-  copy_term(Cars, NewCars),
-  nb_set_dict(Letter, NewCars, NewCar),
+  copy_term(Variables, NewVariables),
+  nb_set_dict(Letter, NewVariables, A),
 
   car_length(Letter, Length),
   set_column(Board, ' ', Column, StartRow, Length, Board2),
@@ -115,13 +108,13 @@ add_vertical_moves(Cars, Board, Letter, Column, StartRow, A, B, Delta) :-
   print_board(Board3),
 
   nb_getval(pendingStates, PendingStates),
-  NewState = [Board3, NewCars],
+  NewState = [Board3, NewVariables],
   append(PendingStates, [NewState], NewPendingStates),
   nb_setval(pendingStates, NewPendingStates),
 
   (A =\= B ->
     Next #= A + Delta,
-    add_vertical_moves(Cars, Board, Letter, Column, StartRow, Next, B, Delta);
+    add_vertical_moves(Variables, Board, Letter, Column, StartRow, Next, B, Delta);
     true
   ).
 
@@ -132,14 +125,24 @@ border(B) :-
   repeat('-', Count, Dashes),
   atomics_to_string(['+', Dashes, '+'], B).
 
+% Gets the variable property of the car
+% with a given letter in a given puzzle.
+car_variable(Puzzle, Letter, Variable) :-
+  Car = Puzzle.get(Letter),
+  Variable = Car.get(variable).
+
+% This creates a list that represents an empty board row.
 empty_board_row(Row) :-
   size(Size),
   length(Row, Size),
   maplist(=(' '), Row).
 
+% This creates a list that represents an empty board row.
+% It is needed for compatibility with being called using maplist.
 empty_board_row(_, Row) :-
   empty_board_row(Row).
 
+% This creates a nested list that represents an empty board.
 empty_board(Board) :-
   size(Size),
   length(Rows, Size),
@@ -157,43 +160,37 @@ moves(State, L) :-
   Move = State.get(move, ''),
   append(L2, [Move], L).
 
-moves_down(Board, Cars, Letter) :-
-  format('== moves_down: Letter=~w~n', [Letter]),
-  Car = Cars.get(Letter),
-  Column = Car.fixed,
-  format('moves_down: Column=~w~n', [Column]),
-  StartRow = Car.variable,
-  format('moves_down: StartRow=~w~n', [StartRow]),
+moves_down(Board, Variables, Letter) :-
+  fixed(Letter, Column),
+  letter_index(Letter, Index),
+  nth0(Index, Variables, StartRow),
   car_length(Letter, Length),
-  format('moves_down: Length=~w~n', [Length]),
   EndRow #= StartRow + Length - 1,
-  format('moves_down: EndRow=~w~n', [EndRow]),
   space_down(Board, Column, EndRow, Space),
-  format('** moves_down: space below ~w is ~w~n', [Letter, Space]),
   (Space #> 0 ->
     A #= StartRow + Space,
     B #= StartRow + 1,
-    add_vertical_moves(Cars, Board, Letter, Column, StartRow, A, B, 1);
+    add_vertical_moves(Variables, Board, Letter, Column, StartRow, A, B, 1);
     true
   ).
 
-moves_left(Board, Cars, Letter) :-
-  Car = Cars.get(Letter),
-  Row = Car.fixed,
-  StartColumn = Car.variable,
+moves_left(Board, Variables, Letter) :-
+  fixed(Letter, Row),
+  letter_index(Letter, Index),
+  nth0(Index, Variables, StartColumn),
   space_left(Board, Row, StartColumn, Space),
   (Space #> 0 ->
     A #= StartColumn - Space,
     B #= StartColumn - 1,
     format('moves_left: moving ~w left ~w to ~w~n', [Letter, A, B]),
-    add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, 1);
+    add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, 1);
     true
   ).
 
-moves_right(Board, Cars, Letter) :-
-  Car = Cars.get(Letter),
-  Row = Car.fixed,
-  StartColumn = Car.variable,
+moves_right(Board, Variables, Letter) :-
+  fixed(Letter, Row),
+  letter_index(Letter, Index),
+  nth0(Index, Variables, StartColumn),
   car_length(Letter, Length),
   EndColumn #= StartColumn + Length - 1,
   space_right(Board, Row, EndColumn, Space),
@@ -207,19 +204,19 @@ moves_right(Board, Cars, Letter) :-
     A #= StartColumn + Space,
     B #= StartColumn + 1,
     format('moves_right: moving ~w right ~w to ~w~n', [Letter, A, B]),
-    add_horizontal_moves(Cars, Board, Letter, Row, StartColumn, A, B, -1);
+    add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, -1);
     true
   ).
 
-moves_up(Board, Cars, Letter) :-
-  Car = Cars.get(Letter),
-  Column = Car.fixed,
-  StartRow = Car.variable,
+moves_up(Board, Variables, Letter) :-
+  fixed(Letter, Column),
+  letter_index(Letter, Index),
+  nth0(Index, Variables, StartRow),
   space_up(Board, Column, StartRow, Space),
   (Space #> 0 ->
     A #= StartRow - Space,
     B #= StartRow - 1,
-    add_vertical_moves(Cars, Board, Letter, Column, StartRow, A, B, 1);
+    add_vertical_moves(Variables, Board, Letter, Column, StartRow, A, B, 1);
     true
   ).
 
@@ -309,10 +306,12 @@ solve(Puzzle) :-
   writeln('Starting board:'),
   print_board(NewBoard),
 
-  InitialState = [Board, Puzzle],
+  maplist(car_variable(Puzzle), Letters, Variables),
+
+  InitialState = [Board, Variables],
   nb_setval(pendingStates, [InitialState]),
 
-  maplist(add_moves(Puzzle, NewBoard), Letters),
+  maplist(add_moves(Variables, NewBoard), Letters),
   nb_getval(pendingStates, PendingStates),
   format('PendingStates = ~w~n', [PendingStates]),
   maplist(print_state, PendingStates).
@@ -393,6 +392,7 @@ write_board(Stream, Board) :-
 :- initialization
   dynamic(horizontal/1),
   dynamic(fixed/2).
+  dynamic(letter_index/2).
 
   /* You can run "swipl rush_hour.plt" instead of using this code.
   puzzles(Puzzles),
