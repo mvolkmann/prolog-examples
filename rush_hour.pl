@@ -51,7 +51,8 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
 
   % Dynamically create facts that map each car letter to an index
   % that is used in the Fixed list.
-  TODO: Determine the value for Index!
+  dict_keys(Puzzle, Letters),
+  nth0(Index, Letters, Letter),
   assertz(letter_index(Letter, Index)),
 
   Variable = Car.variable,
@@ -391,7 +392,7 @@ write_board(Stream, Board) :-
 
 :- initialization
   dynamic(horizontal/1),
-  dynamic(fixed/2).
+  dynamic(fixed/2),
   dynamic(letter_index/2).
 
   /* You can run "swipl rush_hour.plt" instead of using this code.
