@@ -75,19 +75,17 @@ add_moves(Variables, Board, Letter) :-
 add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
   format('~w moves to column ~w~n', [Letter, A]),
 
+  % Create a new board that represents the move.
+  car_length(Letter, Length),
+  set_row(Board, ' ', Row, StartColumn, Length, Board2),
+  set_row(Board2, Letter, Row, A, Length, Board3),
+
   % Create a new list of variable values where
   % the value at the index for the given Letter is changed to A.
   letter_index(Letter, Index),
   replace(Variables, Index, A, NewVariables),
 
-  car_length(Letter, Length),
-  set_row(Board, ' ', Row, StartColumn, Length, Board2),
-  set_row(Board2, Letter, Row, A, Length, Board3),
-
-  nb_getval(pendingStates, PendingStates),
-  NewState = [Board3, NewVariables],
-  append(PendingStates, [NewState], NewPendingStates),
-  nb_setval(pendingStates, NewPendingStates),
+  add_pending_state([Board3, NewVariables]),
 
   (A =\= B ->
     Next #= A + Delta,
@@ -95,22 +93,30 @@ add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
     true
   ).
 
+add_pending_state(State) :-
+  goal_reached(State) ->
+    writeln('Solution found!'),
+    halt;
+
+    % Save the new state in the pendingStates list.
+    nb_getval(pendingStates, PendingStates),
+    append(PendingStates, [State], NewPendingStates),
+    nb_setval(pendingStates, NewPendingStates).
+
 add_vertical_moves(Variables, Board, Letter, Column, StartRow, A, B, Delta) :-
   format('~w moves to row ~w~n', [Letter, A]),
+
+  % Create a new board that represents the move.
+  car_length(Letter, Length),
+  set_column(Board, ' ', Column, StartRow, Length, Board2),
+  set_column(Board2, Letter, Column, A, Length, Board3),
 
   % Create a new list of variable values where
   % the value at the index for the given Letter is changed to A.
   letter_index(Letter, Index),
   replace(Variables, Index, A, NewVariables),
 
-  car_length(Letter, Length),
-  set_column(Board, ' ', Column, StartRow, Length, Board2),
-  set_column(Board2, Letter, Column, A, Length, Board3),
-
-  nb_getval(pendingStates, PendingStates),
-  NewState = [Board3, NewVariables],
-  append(PendingStates, [NewState], NewPendingStates),
-  nb_setval(pendingStates, NewPendingStates),
+  add_pending_state([Board3, NewVariables]),
 
   (A =\= B ->
     Next #= A + Delta,
@@ -291,19 +297,30 @@ set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
   set_row(Board3, Letter, Row, S, L, NewBoard).
 
 solve(Puzzle) :-
+  % Verify that the puzzle contains an X car.
   (_ = Puzzle.get(x) -> true; writeln('Puzzle is missing car X!')),
+
+  % Place the cars on the board in their initial positions.
   empty_board(Board),
   dict_keys(Puzzle, Letters),
   foldl(add_car(Puzzle), Letters, Board, NewBoard),
+
+  % Print the starting board so we can verify that the puzzle is correct.
   writeln('Starting board:'),
   print_board(NewBoard),
 
+  % Set Variables to a list of the initial variable positions of each car.
   maplist(car_variable(Puzzle), Letters, Variables),
 
+  % Each state is a list contain a board representation
+  % and a list of variable positions of each car.
+  % Save the initial state in the pendingStates list.
   InitialState = [Board, Variables],
   nb_setval(pendingStates, [InitialState]),
 
+  % Add new states to pendingStates that represent all possible moves.
   maplist(add_moves(Variables, NewBoard), Letters),
+
   nb_getval(pendingStates, PendingStates),
   format('PendingStates = ~w~n', [PendingStates]),
   maplist(print_state, PendingStates).
