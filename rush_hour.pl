@@ -61,7 +61,7 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
     set_column(Board, Letter, Fixed, Variable, Length, NewBoard)
   ).
 
-add_moves(Variables, Board, Letter) :-
+add_moves([Board, Variables], Letter) :-
   (horizontal(Letter) ->
     % For horizontal cars ...
     moves_left(Board, Variables, Letter),
@@ -296,6 +296,23 @@ set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
   L is Length - 1,
   set_row(Board3, Letter, Row, S, L, NewBoard).
 
+search(_, []) :-
+  writeln('No solution was found. :-('),
+  halt.
+
+search(Letters, [State|Rest]) :-
+  % Remove the state to be evaluated from the list of pending states.
+  nb_setval(pendingStates, Rest),
+
+  % Evaluate all the valid moves from the current state.
+  add_moves(State, Letters),
+
+  % The line above likely updated pending states list, so get the new value.
+  nb_getval(pendingStates, PendingStates),
+
+  % Search the next pending state.
+  search(Letters, PendingStates).
+
 solve(Puzzle) :-
   % Verify that the puzzle contains an X car.
   (_ = Puzzle.get(x) -> true; writeln('Puzzle is missing car X!')),
@@ -315,16 +332,16 @@ solve(Puzzle) :-
   % Each state is a list contain a board representation
   % and a list of variable positions of each car.
   % Save the initial state in the pendingStates list.
-  InitialState = [Board, Variables],
-  nb_setval(pendingStates, [InitialState]),
+  PendingStates = [[Board, Variables]],
+  nb_setval(pendingStates, PendingStates),
 
-  % Add new states to pendingStates that represent all possible moves.
-  maplist(add_moves(Variables, NewBoard), Letters),
+  search(Letters, PendingStates).
 
+  /* Print all the pending states.
   nb_getval(pendingStates, PendingStates),
   format('PendingStates = ~w~n', [PendingStates]),
   maplist(print_state, PendingStates).
-  % TODO: CONTINUE ADDING CODE HERE!
+  */
 
 solve_p1 :-
   puzzles(Puzzles),
