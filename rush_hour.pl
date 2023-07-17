@@ -62,7 +62,6 @@ add_car(Puzzle, Board, Letter, NewBoard) :-
   ).
 
 add_moves(Variables, Board, Letter) :-
-  format('=> addMoves: Letter = ~w~n', [Letter]),
   (horizontal(Letter) ->
     % For horizontal cars ...
     moves_left(Board, Variables, Letter),
@@ -84,8 +83,6 @@ add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
   car_length(Letter, Length),
   set_row(Board, ' ', Row, StartColumn, Length, Board2),
   set_row(Board2, Letter, Row, A, Length, Board3),
-  writeln('add_horizontal_moves: Board3 follows'),
-  print_board(Board3),
 
   nb_getval(pendingStates, PendingStates),
   NewState = [Board3, NewVariables],
@@ -109,8 +106,6 @@ add_vertical_moves(Variables, Board, Letter, Column, StartRow, A, B, Delta) :-
   car_length(Letter, Length),
   set_column(Board, ' ', Column, StartRow, Length, Board2),
   set_column(Board2, Letter, Column, A, Length, Board3),
-  writeln('add_vertical_moves: Board3 follows'),
-  print_board(Board3),
 
   nb_getval(pendingStates, PendingStates),
   NewState = [Board3, NewVariables],
@@ -187,7 +182,6 @@ moves_left(Board, Variables, Letter) :-
   (Space #> 0 ->
     A #= StartColumn - Space,
     B #= StartColumn - 1,
-    format('moves_left: moving ~w left ~w to ~w~n', [Letter, A, B]),
     add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, 1);
     true
   ).
@@ -199,16 +193,9 @@ moves_right(Board, Variables, Letter) :-
   car_length(Letter, Length),
   EndColumn #= StartColumn + Length - 1,
   space_right(Board, Row, EndColumn, Space),
-  format('** moves_right: space to right of ~w is ~w~n', [Letter, Space]),
   (Space #> 0 ->
-    format('moves_right: StartColumn = ~w~n', [StartColumn]),
-    format('moves_right: Length = ~w~n', [Length]),
-    format('moves_right: EndColumn = ~w~n', [EndColumn]),
-    format('moves_right: board follows\n'),
-    print_board(Board),
     A #= StartColumn + Space,
     B #= StartColumn + 1,
-    format('moves_right: moving ~w right ~w to ~w~n', [Letter, A, B]),
     add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, -1);
     true
   ).
@@ -368,7 +355,6 @@ space_up(Board, Column, Row, Space) :-
   % format('space_up: Slice = ~w~n', [Slice]),
   space_row_left(Slice, Row, Space).
 
-% positions.filter(p => p !== null).join('');
 state_id(Positions, Id) :-
   exclude(=([]), Positions, Used),
   atomics_to_string(Used, Id).
