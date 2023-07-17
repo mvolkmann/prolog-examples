@@ -28,6 +28,8 @@ moves(Jugs) --> {
 moves(Jugs0) -->
   % A list of from_to structures will be created that describe the solution.
   [from_to(From, To)],
+  % This executes some Prolog predicates that
+  % set variables used by the grammar rule.
   {
     format('* Evaluating moving from ~w to ~w.~n', [From, To]),
 

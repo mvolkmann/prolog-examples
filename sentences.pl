@@ -25,11 +25,11 @@ write_sentence(Atoms) :-
   atoms_sentence(Atoms, Sentence),
   writeln(Sentence).
 
-:- initialization
+% Enter demo. to test this.
+demo :-
   L = [
     [i, like, apples],
     [bananas, are, good, too],
     [cherries, can, be, tart]
   ],
-  maplist(write_sentence, L),
-  halt.
+  maplist(write_sentence, L).

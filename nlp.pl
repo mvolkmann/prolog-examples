@@ -1,20 +1,31 @@
 % This is a basic example of performing Natural Language Processing (NLP) in Prolog.
+:- include(sentences).
 
-:- set_prolog_flag(double_quotes, chars).
-
-sentence --> noun_phrase, verb_phrase.
-noun_phrase --> determiner, noun.
+% From Wikipedia, "English determiners are words such as
+% the, a, each, some, which, this, and six
+% that are most commonly used with nouns to specify their referents."
 determiner --> [the] | [a].
+
 noun --> [cat] | [dog].
+noun_phrase --> determiner, noun.
 verb --> [chased].
 verb_phrase --> verb, noun_phrase.
+sentence --> noun_phrase, verb_phrase.
 
-write_sentence(sentence) :-
- writeln(sentence).
+% Enter `test.`
+test :-
+  phrase(sentence, [the,cat,chased,a,dog]),
+  \+ phrase(sentence, [the,cat,chased,a,mouse]),
+  !.
+  
+% Enter `complete.`
+complete :-
+  findall(Rest, phrase(sentence, [the,cat,chased | Rest]), Solutions),
+  format('Solutions = ~w~n', [Solutions]).
 
-:- initialization
-  findall(X, phrase(sentence, X), Bag),
-  format('Bag = ~w~n', [Bag]),
-  maplist(write_sentence, Bag).
-  % maplist(writeln, Bag).
+% Enter `generate.`
+generate :-
+  findall(X, phrase(sentence, X), Solutions),
+  maplist(atoms_sentence, Solutions, Sentences),
+  maplist(writeln, Sentences).
 
