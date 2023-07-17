@@ -94,21 +94,27 @@ add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
   ).
 
 add_pending_state(State) :-
-  % Determine if this state has already been visited.
+  % Get a unique id for this state.
   [_, Variables] = State,
-  atomics_to_string(Variables, StateId),
-  nb_getval(visitedIds, VisitedIds),
-  (VisitedIds.get(StateId) ->
-    writeln('skipping visited state');
+  atomics_to_string(['s' | Variables], StateId),
+  atom_string(StateKey, StateId),
 
+  % Determine if this state has already been visited.
+  nb_getval(visitedIds, VisitedIds),
+  Visited = VisitedIds.get(StateKey, false),
+
+  (Visited == false ->
+    format('add_pending_state: StateKey = ~w~n', [StateKey]),
     % Record this state as having been visited.
-    NewVisitedIds = VisitedIds.put(StateId, true),
+    NewVisitedIds = VisitedIds.put(StateKey, true),
     nb_setval(visitedIds, NewVisitedIds),
 
     % Add this state to the pending list.
     nb_getval(pendingStates, PendingStates),
     append(PendingStates, [State], NewPendingStates),
-    nb_setval(pendingStates, NewPendingStates)
+    nb_setval(pendingStates, NewPendingStates);
+
+    true % Do nothing if already visited.
   ).
 
 add_vertical_moves(Variables, Board, Letter, Column, StartRow, A, B, Delta) :-
