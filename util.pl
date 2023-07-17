@@ -1,3 +1,7 @@
+% Some of these predicates are also defined in the "apply" library,
+% but its foldl predicate requires specifying the initial value
+% of the accumulator rather than using the first list element.
+
 :- use_module(library(clpfd)).
 
 % This is used to demonstrate foldl and foldr.

@@ -4,7 +4,7 @@ that captures parsed results in a syntax tree.
 It is based on code in the video "Build Syntax Trees in Prolog with DCGs"
 at https://youtu.be/QGXypIkV-GU.
 
-To capture the atoms that matches each grammar rule,
+To capture the atoms that match each grammar rule,
 we specify a structure as the argument of each rule.
 These structures can contain arguments that are fixed atoms
 or variables that are set in the grammar rule body.
@@ -33,6 +33,7 @@ sentence(s(Np, Vp)) --> noun_phrase(Np), verb_phrase(Vp).
 % Enter `test.`
 test :-
   phrase(sentence(Tree), [the,cat,chased,a,dog]), % matches
+  % Tree = s(np(d(the), n(cat)), vp(v(chased), np(d(a), n(dog)))).
   \+ phrase(sentence(Tree), [the,cat,chased,a,mouse]), % does not match
   !.
   
