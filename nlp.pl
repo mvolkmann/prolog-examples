@@ -1,4 +1,10 @@
-% This is a basic example of performing Natural Language Processing (NLP) in Prolog.
+/*
+This is a basic example of using a DCG to perform
+Natural Language Processing (NLP) in Prolog.
+It is based on code in the video "Build Syntax Trees in Prolog with DCGs"
+at https://youtu.be/QGXypIkV-GU.
+*/
+
 :- include(sentences).
 
 % From Wikipedia, "English determiners are words such as
@@ -14,8 +20,8 @@ sentence --> noun_phrase, verb_phrase.
 
 % Enter `test.`
 test :-
-  phrase(sentence, [the,cat,chased,a,dog]),
-  \+ phrase(sentence, [the,cat,chased,a,mouse]),
+  phrase(sentence, [the,cat,chased,a,dog]), % matches
+  \+ phrase(sentence, [the,cat,chased,a,mouse]), % does not match
   !.
   
 % Enter `complete1.`
