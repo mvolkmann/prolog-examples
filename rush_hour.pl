@@ -94,14 +94,22 @@ add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
   ).
 
 add_pending_state(State) :-
-  goal_reached(State) ->
-    writeln('Solution found!'),
-    halt;
+  % Determine if this state has already been visited.
+  [_, Variables] = State,
+  atomics_to_string(Variables, StateId),
+  nb_getval(visitedIds, VisitedIds),
+  (VisitedIds.get(StateId) ->
+    writeln('skipping visited state');
 
-    % Save the new state in the pendingStates list.
+    % Record this state as having been visited.
+    NewVisitedIds = VisitedIds.put(StateId, true),
+    nb_setval(visitedIds, NewVisitedIds),
+
+    % Add this state to the pending list.
     nb_getval(pendingStates, PendingStates),
     append(PendingStates, [State], NewPendingStates),
-    nb_setval(pendingStates, NewPendingStates).
+    nb_setval(pendingStates, NewPendingStates)
+  ).
 
 add_vertical_moves(Variables, Board, Letter, Column, StartRow, A, B, Delta) :-
   format('~w moves to row ~w~n', [Letter, A]),
@@ -301,11 +309,18 @@ search(_, []) :-
   halt.
 
 search(Letters, [State|Rest]) :-
+  (goal_reached(State) ->
+    writeln('Solution found!'), halt;
+    true
+  ),
+
+  % print_state(State),
+
   % Remove the state to be evaluated from the list of pending states.
   nb_setval(pendingStates, Rest),
 
   % Evaluate all the valid moves from the current state.
-  add_moves(State, Letters),
+  maplist(add_moves(State), Letters),
 
   % The line above likely updated pending states list, so get the new value.
   nb_getval(pendingStates, PendingStates),
@@ -332,16 +347,13 @@ solve(Puzzle) :-
   % Each state is a list contain a board representation
   % and a list of variable positions of each car.
   % Save the initial state in the pendingStates list.
-  PendingStates = [[Board, Variables]],
+  PendingStates = [[NewBoard, Variables]],
   nb_setval(pendingStates, PendingStates),
 
-  search(Letters, PendingStates).
+  % Create an empty dict to hold the ids of visited states.
+  nb_setval(visitedIds, ids{}),
 
-  /* Print all the pending states.
-  nb_getval(pendingStates, PendingStates),
-  format('PendingStates = ~w~n', [PendingStates]),
-  maplist(print_state, PendingStates).
-  */
+  search(Letters, PendingStates).
 
 solve_p1 :-
   puzzles(Puzzles),
@@ -388,10 +400,6 @@ space_up(Board, Column, Row, Space) :-
   column(Column, Board, Slice),
   % format('space_up: Slice = ~w~n', [Slice]),
   space_row_left(Slice, Row, Space).
-
-state_id(Positions, Id) :-
-  exclude(=([]), Positions, Used),
-  atomics_to_string(Used, Id).
 
 write_board_row(Stream, Row) :-
   /* For now I'm hard-coding to format string to make this faster.
