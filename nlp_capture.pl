@@ -8,6 +8,8 @@ To capture the atoms that matches each grammar rule,
 we specify a structure as the argument of each rule.
 These structures can contain arguments that are fixed atoms
 or variables that are set in the grammar rule body.
+The grammar rule arguments are "accumulators"
+in that they accumulate the result of parsing in a syntax tree.
 
 This enables each grammar rule to generate a tree of structures
 that describe what was matched.
