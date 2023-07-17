@@ -18,8 +18,13 @@ test :-
   \+ phrase(sentence, [the,cat,chased,a,mouse]),
   !.
   
-% Enter `complete.`
-complete :-
+% Enter `complete1.`
+complete1 :-
+  findall(X, phrase(sentence, [the,X,chased,the,dog]), Solutions),
+  format('Solutions = ~w~n', [Solutions]).
+
+% Enter `complete2.`
+complete2 :-
   findall(Rest, phrase(sentence, [the,cat,chased | Rest]), Solutions),
   format('Solutions = ~w~n', [Solutions]).
 
