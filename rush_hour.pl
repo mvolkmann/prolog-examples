@@ -76,8 +76,10 @@ add_moves(Variables, Board, Letter) :-
 add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
   format('~w moves to column ~w~n', [Letter, A]),
 
-  copy_term(Variables, NewVariables),
-  nb_set_dict(Letter, NewVariables, A),
+  % Create a new list of variable values where
+  % the value at the index for the given Letter is changed to A.
+  letter_index(Letter, Index),
+  replace(Variables, Index, A, NewVariables),
 
   car_length(Letter, Length),
   set_row(Board, ' ', Row, StartColumn, Length, Board2),
@@ -99,8 +101,10 @@ add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
 add_vertical_moves(Variables, Board, Letter, Column, StartRow, A, B, Delta) :-
   format('~w moves to row ~w~n', [Letter, A]),
 
-  copy_term(Variables, NewVariables),
-  nb_set_dict(Letter, NewVariables, A),
+  % Create a new list of variable values where
+  % the value at the index for the given Letter is changed to A.
+  letter_index(Letter, Index),
+  replace(Variables, Index, A, NewVariables),
 
   car_length(Letter, Length),
   set_column(Board, ' ', Column, StartRow, Length, Board2),
@@ -396,7 +400,6 @@ write_board(Stream, Board) :-
   dynamic(letter_index/2).
 
   /* You can run "swipl rush_hour.plt" instead of using this code.
-  puzzles(Puzzles),
-  solve(Puzzles.p1),
+  puzzles(Puzzles), solve(Puzzles.p1),
   halt.
   */
