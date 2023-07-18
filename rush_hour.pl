@@ -85,6 +85,13 @@ add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
 
   add_pending_state([Board3, NewVariables]),
 
+  nb_getval(log, Log),
+  (Log == true ->
+    atomics_to_string([Letter, ' moving horizontally to ', A], Move),
+    writeln(Move);
+    true
+  ),
+
   % If there are more open spaces remaining to evaluate ...
   (A =\= B ->
     Next #= A + Delta,
@@ -92,11 +99,18 @@ add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
     true
   ).
 
-% This adds a given state to the end of the pending list.
+% This adds a given state to the end of the pending list
+% only if it has not already been visited.
 add_pending_state(State) :-
+  nb_getval(visitedIds, VisitedIds),
+  state_key(State, StateKey),
+  Visited = VisitedIds.get(StateKey, false),
+  (Visited == false ->
     nb_getval(pendingStates, PendingStates),
     append(PendingStates, [State], NewPendingStates),
-    nb_setval(pendingStates, NewPendingStates).
+    nb_setval(pendingStates, NewPendingStates);
+    true
+  ).
 
 add_vertical_moves(Variables, Board, Letter, Column, StartRow, A, B, Delta) :-
   % Create a new board that represents the move.
@@ -110,6 +124,13 @@ add_vertical_moves(Variables, Board, Letter, Column, StartRow, A, B, Delta) :-
   replace(Variables, Index, A, NewVariables),
 
   add_pending_state([Board3, NewVariables]),
+
+  nb_getval(log, Log),
+  (Log == true ->
+    atomics_to_string([Letter, ' moving vertically to ', A], Move),
+    writeln(Move);
+    true
+  ),
 
   % If there are more open spaces remaining to evaluate ...
   (A =\= B ->
@@ -212,9 +233,6 @@ moves_up(Board, Variables, Letter) :-
     true
   ).
 
-pending_state_added(NewState, OldStates, NewStates) :-
-  append(OldStates, [NewState], NewStates).
-
 print_board(Board) :- write_board(user_output, Board).
 
 /*
@@ -301,25 +319,24 @@ search(Letters, [State|Rest], Iterations) :-
     true
   ),
 
-  % Determine if this state has already been visited.
   state_key(State, StateKey),
-  nb_getval(visitedIds, VisitedIds),
-  Visited = VisitedIds.get(StateKey, false),
-
-  (Visited == false ->
-    format('add_pending_state: StateKey = ~w~n', [StateKey]),
-    % Record this state as having been visited.
-    NewVisitedIds = VisitedIds.put(StateKey, true),
-    nb_setval(visitedIds, NewVisitedIds),
-    format('NewVisitedIds = ~w~n', [NewVisitedIds]);
-
-    true % Do nothing if already visited.
-  ),
-
-  writeln('In search:'),
+  format('search: StateKey = ~w~n', [StateKey]),
   print_state(State),
 
-  % Remove the state to be evaluated from the list of pending states.
+  (StateKey == 's33400121' ->
+    nb_setval(log, true);
+    nb_setval(log, false)
+  ),
+
+  % We can assume this state has not yet been visited because
+  % we only add states to the pending list that have not been visited.
+
+  % Record this state as having been visited.
+  nb_getval(visitedIds, VisitedIds),
+  NewVisitedIds = VisitedIds.put(StateKey, true),
+  nb_setval(visitedIds, NewVisitedIds),
+
+  % Remove this state from the list of pending states.
   nb_setval(pendingStates, Rest),
 
   % Evaluate all the valid moves from the current state.
@@ -352,20 +369,18 @@ solve(Puzzle) :-
   % Set Variables to a list of the initial variable positions of each car.
   maplist(car_variable(Puzzle), Letters, Variables),
 
+  % Each state is a list contain a board representation
+  % and a list of variable positions of each car.
+  InitialState = [NewBoard, Variables],
+
+  % Create a list to hold the pending states to evaluate.
+  PendingStates = [InitialState],
+  nb_setval(pendingStates, PendingStates),
+
   % Create an empty dict to hold the ids of visited states.
   nb_setval(visitedIds, ids{}),
 
-  % Create an empty list to hold the pending states to evaluate.
-  nb_setval(pendingStates, []),
-
-  % Each state is a list contain a board representation
-  % and a list of variable positions of each car.
-  State = [NewBoard, Variables],
-
-  % Save the initial state.
-  add_pending_state(State),
-
-  nb_getval(pendingStates, PendingStates),
+  % Begin the search for a solution.
   search(Letters, PendingStates, 1).
 
 solve_p1 :-
