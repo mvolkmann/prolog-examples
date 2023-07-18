@@ -93,11 +93,14 @@ add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
     true
   ).
 
-add_pending_state(State) :-
-  % Get a unique id for this state.
+% This gets a unique id for a given state.
+state_id(State, StateKey) :-
   [_, Variables] = State,
   atomics_to_string(['s' | Variables], StateId),
-  atom_string(StateKey, StateId),
+  atom_string(StateKey, StateId).
+
+add_pending_state(State) :-
+  state_id(State, StateKey),
 
   % Determine if this state has already been visited.
   nb_getval(visitedIds, VisitedIds),
@@ -310,17 +313,17 @@ set_row(Board, Letter, Row, StartColumn, Length, NewBoard) :-
   L is Length - 1,
   set_row(Board3, Letter, Row, S, L, NewBoard).
 
-search(_, []) :-
+search(_, [], _) :-
   writeln('No solution was found. :-('),
   halt.
 
-search(Letters, [State|Rest]) :-
+search(Letters, [State|Rest], Iterations) :-
   (goal_reached(State) ->
     writeln('Solution found!'), halt;
     true
   ),
 
-  % print_state(State),
+  print_state(State),
 
   % Remove the state to be evaluated from the list of pending states.
   nb_setval(pendingStates, Rest),
@@ -328,11 +331,16 @@ search(Letters, [State|Rest]) :-
   % Evaluate all the valid moves from the current state.
   maplist(add_moves(State), Letters),
 
-  % The line above likely updated pending states list, so get the new value.
-  nb_getval(pendingStates, PendingStates),
-
   % Search the next pending state.
-  search(Letters, PendingStates).
+  (Iterations < 2 ->
+    % The calls to add_move likely updated pending states list,
+    % so get the new value.
+    nb_getval(pendingStates, PendingStates),
+
+    Next is Iterations + 1,
+    search(Letters, PendingStates, Next);
+    true
+  ).
 
 solve(Puzzle) :-
   % Verify that the puzzle contains an X car.
@@ -350,16 +358,21 @@ solve(Puzzle) :-
   % Set Variables to a list of the initial variable positions of each car.
   maplist(car_variable(Puzzle), Letters, Variables),
 
-  % Each state is a list contain a board representation
-  % and a list of variable positions of each car.
-  % Save the initial state in the pendingStates list.
-  PendingStates = [[NewBoard, Variables]],
-  nb_setval(pendingStates, PendingStates),
-
   % Create an empty dict to hold the ids of visited states.
   nb_setval(visitedIds, ids{}),
 
-  search(Letters, PendingStates).
+  % Create an empty list to hold the pending states to evaluate.
+  nb_setval(pendingStates, []),
+
+  % Each state is a list contain a board representation
+  % and a list of variable positions of each car.
+  State = [NewBoard, Variables],
+
+  % Save the initial state.
+  add_pending_state(State),
+
+  nb_getval(pendingStates, PendingStates),
+  search(Letters, PendingStates, 1).
 
 solve_p1 :-
   puzzles(Puzzles),
