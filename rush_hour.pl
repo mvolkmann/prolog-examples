@@ -73,8 +73,6 @@ add_moves([Board, Variables], Letter) :-
   ).
 
 add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
-  format('~w moves to column ~w~n', [Letter, A]),
-
   % Create a new board that represents the move.
   car_length(Letter, Length),
   set_row(Board, ' ', Row, StartColumn, Length, Board2),
@@ -87,42 +85,20 @@ add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, A, B, Delta) :-
 
   add_pending_state([Board3, NewVariables]),
 
+  % If there are more open spaces remaining to evaluate ...
   (A =\= B ->
     Next #= A + Delta,
     add_horizontal_moves(Variables, Board, Letter, Row, StartColumn, Next, B, Delta);
     true
   ).
 
-% This gets a unique id for a given state.
-state_id(State, StateKey) :-
-  [_, Variables] = State,
-  atomics_to_string(['s' | Variables], StateId),
-  atom_string(StateKey, StateId).
-
+% This adds a given state to the end of the pending list.
 add_pending_state(State) :-
-  state_id(State, StateKey),
-
-  % Determine if this state has already been visited.
-  nb_getval(visitedIds, VisitedIds),
-  Visited = VisitedIds.get(StateKey, false),
-
-  (Visited == false ->
-    format('add_pending_state: StateKey = ~w~n', [StateKey]),
-    % Record this state as having been visited.
-    NewVisitedIds = VisitedIds.put(StateKey, true),
-    nb_setval(visitedIds, NewVisitedIds),
-
-    % Add this state to the pending list.
     nb_getval(pendingStates, PendingStates),
     append(PendingStates, [State], NewPendingStates),
-    nb_setval(pendingStates, NewPendingStates);
-
-    true % Do nothing if already visited.
-  ).
+    nb_setval(pendingStates, NewPendingStates).
 
 add_vertical_moves(Variables, Board, Letter, Column, StartRow, A, B, Delta) :-
-  format('~w moves to row ~w~n', [Letter, A]),
-
   % Create a new board that represents the move.
   car_length(Letter, Length),
   set_column(Board, ' ', Column, StartRow, Length, Board2),
@@ -135,6 +111,7 @@ add_vertical_moves(Variables, Board, Letter, Column, StartRow, A, B, Delta) :-
 
   add_pending_state([Board3, NewVariables]),
 
+  % If there are more open spaces remaining to evaluate ...
   (A =\= B ->
     Next #= A + Delta,
     add_vertical_moves(Variables, Board, Letter, Column, StartRow, Next, B, Delta);
@@ -318,9 +295,25 @@ search(_, [], _) :-
   halt.
 
 search(Letters, [State|Rest], Iterations) :-
+  % atomics_to_string([Letter, ' moves to row ', A], Move),
   (goal_reached(State) ->
     writeln('Solution found!'), halt;
     true
+  ),
+
+  % Determine if this state has already been visited.
+  state_key(State, StateKey),
+  nb_getval(visitedIds, VisitedIds),
+  Visited = VisitedIds.get(StateKey, false),
+
+  (Visited == false ->
+    format('add_pending_state: StateKey = ~w~n', [StateKey]),
+    % Record this state as having been visited.
+    NewVisitedIds = VisitedIds.put(StateKey, true),
+    nb_setval(visitedIds, NewVisitedIds),
+    format('NewVisitedIds = ~w~n', [NewVisitedIds]);
+
+    true % Do nothing if already visited.
   ),
 
   print_state(State),
@@ -369,7 +362,7 @@ solve(Puzzle) :-
   State = [NewBoard, Variables],
 
   % Save the initial state.
-  add_pending_state(State),
+  add_pending_state('Initial', State),
 
   nb_getval(pendingStates, PendingStates),
   search(Letters, PendingStates, 1).
@@ -419,6 +412,12 @@ space_up(Board, Column, Row, Space) :-
   column(Column, Board, Slice),
   % format('space_up: Slice = ~w~n', [Slice]),
   space_row_left(Slice, Row, Space).
+
+% This gets a unique id for a given state.
+state_key(State, StateKey) :-
+  [_, Variables] = State,
+  atomics_to_string(['s' | Variables], StateId),
+  atom_string(StateKey, StateId).
 
 write_board_row(Stream, Row) :-
   /* For now I'm hard-coding to format string to make this faster.

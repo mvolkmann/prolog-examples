@@ -10,23 +10,22 @@ sum3(P, A, B, C) :-
   C #= P + A + B.
 
 % Gets a column of values from a 2D list.
-% TODO: How can you make this terminate without a choicepoint?
+% TODO: How can you avoid using cut AND
+% TODO: make this terminate without a choicepoint?
+column(_, [], []) :- !.
 column(N, Board, [Element | Column2]) :-
   [Row|Rest] = Board,
   nth0(N, Row, Element),
   column(N, Rest, Column2).
-column(_, [], []).
 
 % This succeeds if every element in List satisfies Predicate
 % and fails otherwise.
 every(Predicate, List) :- maplist(Predicate, List).
 
-% This creates a list containing N copies of E.
-fill(N, E, [E|L2]) :-
-  N #> 0,
-  N2 #= N - 1,
-  fill(N2, E, L2).
-fill(0, _, []).
+% This creates a list containing N copies of E
+% (from Discord by @adamcrussell).
+clone(X, X).
+fill(N, E, L) :- length(L, N), maplist(clone(E), L).
 
 % See https://pbrown.me/blog/functional-prolog-map-filter-and-reduce/.
 
