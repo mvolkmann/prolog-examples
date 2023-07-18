@@ -316,6 +316,7 @@ search(Letters, [State|Rest], Iterations) :-
     true % Do nothing if already visited.
   ),
 
+  writeln('In search:'),
   print_state(State),
 
   % Remove the state to be evaluated from the list of pending states.
@@ -325,15 +326,15 @@ search(Letters, [State|Rest], Iterations) :-
   maplist(add_moves(State), Letters),
 
   % Search the next pending state.
-  (Iterations < 2 ->
+  %(Iterations < 10 ->
     % The calls to add_move likely updated pending states list,
     % so get the new value.
     nb_getval(pendingStates, PendingStates),
 
     Next is Iterations + 1,
-    search(Letters, PendingStates, Next);
-    true
-  ).
+    search(Letters, PendingStates, Next). %;
+    %true
+    %).
 
 solve(Puzzle) :-
   % Verify that the puzzle contains an X car.
@@ -362,7 +363,7 @@ solve(Puzzle) :-
   State = [NewBoard, Variables],
 
   % Save the initial state.
-  add_pending_state('Initial', State),
+  add_pending_state(State),
 
   nb_getval(pendingStates, PendingStates),
   search(Letters, PendingStates, 1).
@@ -393,7 +394,6 @@ space_row_right(BoardRow, Column, Space) :-
 space_down(Board, Column, Row, Space) :-
   % Slice is a list of values in Column.
   column(Column, Board, Slice),
-  % format('space_down: Slice = ~w~n', [Slice]),
   space_row_right(Slice, Row, Space).
 
 % Gets number of empty spaces to left of a given board cell.
@@ -410,7 +410,6 @@ space_right(Board, Row, Column, Space) :-
 space_up(Board, Column, Row, Space) :-
   % Slice is a list of values in Column.
   column(Column, Board, Slice),
-  % format('space_up: Slice = ~w~n', [Slice]),
   space_row_left(Slice, Row, Space).
 
 % This gets a unique id for a given state.
