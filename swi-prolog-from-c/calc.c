@@ -9,21 +9,19 @@
 #define MAXLINE 1024
 
 int main(int argc, char **argv) {
-  char expression[MAXLINE];
-  char *expressionAddress = expression;
-  char *program = argv[0];
-  char *argumentVector[2];
-  int n;
-
   // fprintf(stderr, "argc = %d\n", argc);
   if (argc <= 1) {
     fprintf(stderr, "An arithmetic expression must be provided.\n");
     return 1;
   }
 
-  strcpy(expressionAddress, argv[1]);
+  char expression[MAXLINE];
+  char *address = expression;
+  strcpy(address, argv[1]);
 
   // Build Prolog argument vector. 
+  char *argumentVector[2];
+  char *program = argv[0];
   argumentVector[0] = program;
   argumentVector[1] = NULL;
 
@@ -39,7 +37,6 @@ int main(int argc, char **argv) {
   // Add an atom to the list of arguments
   // that is created from the string "expression".
   PL_put_atom_chars(arguments, expression);
-
 
   module_t module = NULL;
   int flags = PL_Q_NORMAL;
