@@ -31,11 +31,13 @@ int main(int argc, char **argv) {
   if (!PL_initialise(1, plav)) PL_halt(1);
 
   // Lookup the calc/1 predicate.
-  predicate_t pred = PL_predicate("calc", 1, "user");
-  term_t h0 = PL_new_term_refs(1);
+  predicate_t predicate = PL_predicate("calc", 1, "user");
+  term_t term = PL_new_term_refs(1);
 
-  PL_put_atom_chars(h0, expression);
-  int rval = PL_call_predicate(NULL, PL_Q_NORMAL, pred, h0);
+  PL_put_atom_chars(term, expression);
+  module_t module = NULL;
+  int flags = PL_Q_NORMAL;
+  int rval = PL_call_predicate(module, flags, predicate, term);
 
   PL_halt(rval ? 0 : 1);
 
