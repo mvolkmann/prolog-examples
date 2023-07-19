@@ -9,12 +9,13 @@
 #define MAXLINE 1024
 
 int main(int argc, char **argv) {
-  // fprintf(stderr, "argc = %d\n", argc);
   if (argc <= 1) {
     fprintf(stderr, "An arithmetic expression must be provided.\n");
-    return 1;
+    return 2;
   }
 
+  // Get the arithmetic expression to evaluate
+  // from the first command-line argument.
   char expression[MAXLINE];
   char *address = expression;
   strcpy(address, argv[1]);
@@ -28,21 +29,27 @@ int main(int argc, char **argv) {
   // Attempt to initialize Prolog and halt if it fails.
   if (!PL_initialise(1, argumentVector)) PL_halt(1);
 
-  // Lookup the calc/1 predicate.
+  // Lookup the calc/1 user predicate defined in calc.pl.
   predicate_t predicate = PL_predicate("calc", 1, "user");
 
-  // Create a number of term references, 1 in this case.
+  // Create a number of term references
+  // needed by the calc predicate, 1 in this case.
   term_t arguments = PL_new_term_refs(1);
 
-  // Add an atom to the list of arguments
+  // Add an atom to the argument list
   // that is created from the string "expression".
   PL_put_atom_chars(arguments, expression);
 
+  // Call the predicate.
   module_t module = NULL;
   int flags = PL_Q_NORMAL;
-  int rval = PL_call_predicate(module, flags, predicate, arguments);
+  // This is a shorthand for the combination of calls
+  // PL_open_query(), PL_next_solution(), and PL_cut_query().
+  // It generates a single solution. 
+  int solutionFound = PL_call_predicate(module, flags, predicate, arguments);
 
-  PL_halt(rval ? 0 : 1);
+  // Halt the Prolog engine.
+  PL_halt(solutionFound ? 0 : 1);
 
-  return 0;
+  return solutionFound;
 }
