@@ -5,6 +5,8 @@
 
 % If we match "cat", there is no need to check for also matching "dog".
 pet --> "cat", { ! } | "dog".
+
+% This matches a sequence of pets separated by single spaces.
 % After exhausting all matches, we can stop checking for more.
 raining --> pet, " ", raining, { ! }.
 raining --> pet.
