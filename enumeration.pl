@@ -3,21 +3,11 @@
 :- use_module(library(dcg/basics)).
 :- use_module(library(dcg/high_order)).
 
-/*
-raining --> [].
-raining --> ("cat" | "dog"), raining.
-
-:- initialization
-  writeln('running'),
-  length(L, _),
-  phrase(raining, L).
-  % maplist(atomics_to_string, L, S).
-*/
-
-/*
-ws --> [W], { char_type(W, whitespace) }, ws.
-ws --> [].
-*/
+% If we match "cat", there is no need to check for also matching "dog".
+pet --> "cat", { ! } | "dog".
+% After exhausting all matches, we can stop checking for more.
+raining --> pet, " ", raining, { ! }.
+raining --> pet.
 
 % This gathers a sequence of arbitrary characters into a string.
 seq(W) --> seq_(Cs), { atomics_to_string(Cs, W) }.
@@ -43,3 +33,13 @@ player(Name, Number) -->
   ".",
   { ! }. % cut is needed to make it terminate
 
+/*
+ws --> [W], { char_type(W, whitespace) }, ws.
+ws --> [].
+
+:- initialization
+  writeln('running'),
+  length(L, _),
+  phrase(raining, L).
+  % maplist(atomics_to_string, L, S).
+*/
