@@ -9,16 +9,21 @@ pet --> "cat", { ! } | "dog".
 raining --> pet, " ", raining, { ! }.
 raining --> pet.
 
-% This gathers a sequence of arbitrary characters into a string.
-seq(W) --> seq_(Cs), { atomics_to_string(Cs, W) }.
-seq_([]) --> [].
-seq_([H|T]) --> [H], seq_(T).
+% This gather a sequence of characters into a list of character atoms.
+seq([]) --> [].
+seq([H|T]) --> [H], seq(T).
+
+% This gather a sequence of characters into a number.
+number_seq(N) --> seq(Cs), { atomics_to_string(Cs, S), number_string(N, S) }.
+
+% This gather a sequence of characters into a string.
+string_seq(S) --> seq(Cs), { atomics_to_string(Cs, S) }.
 
 % To use this, enter something like the following:
 % phrase(hello(Name), "Hello, World!").
 hello(Name) -->
   "Hello, ",
-  seq(Name),
+  string_seq(Name),
   % string_without(" ", Cs), % This does not work!
   "!",
   { ! }. % cut is needed to make it terminate
@@ -27,9 +32,9 @@ hello(Name) -->
 % phrase(player(Name, Number), "Player Gretzky wears number 99.").
 player(Name, Number) -->
   "Player ",
-  seq(Name),
+  string_seq(Name),
   " wears number ",
-  seq(Number),
+  number_seq(Number),
   ".",
   { ! }. % cut is needed to make it terminate
 
