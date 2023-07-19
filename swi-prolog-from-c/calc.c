@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   char expression[MAXLINE];
   char *expressionAddress = expression;
   char *program = argv[0];
-  char *plav[2];
+  char *argumentVector[2];
   int n;
 
   // fprintf(stderr, "argc = %d\n", argc);
@@ -23,12 +23,12 @@ int main(int argc, char **argv) {
 
   strcpy(expressionAddress, argv[1]);
 
-  // Build Prolog argument vector (plav). 
-  plav[0] = program;
-  plav[1] = NULL;
+  // Build Prolog argument vector. 
+  argumentVector[0] = program;
+  argumentVector[1] = NULL;
 
   // Attempt to initialize Prolog and halt if it fails.
-  if (!PL_initialise(1, plav)) PL_halt(1);
+  if (!PL_initialise(1, argumentVector)) PL_halt(1);
 
   // Lookup the calc/1 predicate.
   predicate_t predicate = PL_predicate("calc", 1, "user");
