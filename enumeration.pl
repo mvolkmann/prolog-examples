@@ -19,28 +19,27 @@ ws --> [W], { char_type(W, whitespace) }, ws.
 ws --> [].
 */
 
-seq([]) --> [].
-seq([H|T]) --> [H], seq(T).
+% This gathers a sequence of arbitrary characters into a string.
+seq(W) --> seq_(Cs), { atomics_to_string(Cs, W) }.
+seq_([]) --> [].
+seq_([H|T]) --> [H], seq_(T).
 
 % To use this, enter something like the following:
 % phrase(hello(Name), "Hello, World!").
 hello(Name) -->
   "Hello, ",
-  seq(Cs),
+  seq(Name),
+  % string_without(" ", Cs), % This does not work!
   "!",
-  { atomics_to_string(Cs, Name), ! }. % cut is needed to make it terminate
+  { ! }. % cut is needed to make it terminate
 
 % To use this, enter something like the following:
 % phrase(player(Name, Number), "Player Gretzky wears number 99.").
 player(Name, Number) -->
   "Player ",
-  seq(L1),
+  seq(Name),
   " wears number ",
-  seq(L2),
+  seq(Number),
   ".",
-  {
-    atomics_to_string(L1, Name),
-    atomics_to_string(L2, Number),
-    ! % cut is needed to make it terminate
-  }.
+  { ! }. % cut is needed to make it terminate
 
