@@ -4,8 +4,14 @@ add(A, B, C) :- C #= A + B.
 
 :- initialization
   X in 5..10, Y in 7..14, X #> Y,
+  writeln(X),
+  writeln(Y),
+  /*
+  format('X = ~w, Y = ~w~n', [X, Y]),
   label([X, Y]),
+  */
 
+  /*
   add(2, 3, R2),
   format('R2 = ~w~n', [R2]), % 5
 
@@ -22,5 +28,6 @@ add(A, B, C) :- C #= A + B.
     Results % sets this
   ),
   format('Results = ~w~n', [Results]), % [[3,2],[4,1],[5,0]]
+  */
 
   halt.

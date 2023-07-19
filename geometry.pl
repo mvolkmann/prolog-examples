@@ -1,5 +1,7 @@
 :- use_module(library(clpr)).
 
+circle_area(Radius, Area) :- Pi is pi, {Area = Pi * Radius^2}.
+
 area(circle, Radius, X) :- Pi is pi, {X = Pi * Radius^2}.
 
 % area(square, Side, X) :- X is Side^2.
