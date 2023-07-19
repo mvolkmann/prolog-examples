@@ -1,5 +1,7 @@
 // To build this, enter "% swipl-ld -goal true -o calc calc.c calc.pl".
-// To run this, enter "./calc pi/2".
+// The "-goal true" option prevents starting a top level.
+// To run this, enter "./calc '{arithmetic-expression}'".
+// For example, "./calc 'pi * 2'".
 #include <stdio.h>
 #include <string.h>
 #include <SWI-Prolog.h>
@@ -13,30 +15,27 @@ int main(int argc, char **argv) {
   char *plav[2];
   int n;
 
-  /* combine all the arguments in a single string */
-
-  for (n=1; n<argc; n++) {
-    if ( n != 1 ) *e++ = ' ';
-    strcpy(e, argv[n]);
-    e += strlen(e);
+  // fprintf(stderr, "argc = %d\n", argc);
+  if (argc <= 1) {
+    fprintf(stderr, "An arithmetic expression must be provided.\n");
+    return 1;
   }
 
-  /* make the argument vector for Prolog */
+  strcpy(e, argv[1]);
 
+  // Build Prolog argument vector (plav). 
   plav[0] = program;
   plav[1] = NULL;
 
-  /* initialise Prolog */
-
+  // Attempt to initialize Prolog and halt if it fails.
   if (!PL_initialise(1, plav)) PL_halt(1);
 
-  // Lookup calc/1 and make the arguments and call.
+  // Lookup the calc/1 predicate.
   predicate_t pred = PL_predicate("calc", 1, "user");
   term_t h0 = PL_new_term_refs(1);
-  int rval;
 
   PL_put_atom_chars(h0, expression);
-  rval = PL_call_predicate(NULL, PL_Q_NORMAL, pred, h0);
+  int rval = PL_call_predicate(NULL, PL_Q_NORMAL, pred, h0);
 
   PL_halt(rval ? 0 : 1);
 
