@@ -10,7 +10,7 @@
 
 int main(int argc, char **argv) {
   char expression[MAXLINE];
-  char *e = expression;
+  char *expressionAddress = expression;
   char *program = argv[0];
   char *plav[2];
   int n;
@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  strcpy(e, argv[1]);
+  strcpy(expressionAddress, argv[1]);
 
   // Build Prolog argument vector (plav). 
   plav[0] = program;
@@ -36,7 +36,11 @@ int main(int argc, char **argv) {
   // Create a number of term references, 1 in this case.
   term_t arguments = PL_new_term_refs(1);
 
+  // Add an atom to the list of arguments
+  // that is created from the string "expression".
   PL_put_atom_chars(arguments, expression);
+
+
   module_t module = NULL;
   int flags = PL_Q_NORMAL;
   int rval = PL_call_predicate(module, flags, predicate, arguments);
