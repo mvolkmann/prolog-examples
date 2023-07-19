@@ -32,12 +32,14 @@ int main(int argc, char **argv) {
 
   // Lookup the calc/1 predicate.
   predicate_t predicate = PL_predicate("calc", 1, "user");
-  term_t term = PL_new_term_refs(1);
 
-  PL_put_atom_chars(term, expression);
+  // Create a number of term references, 1 in this case.
+  term_t arguments = PL_new_term_refs(1);
+
+  PL_put_atom_chars(arguments, expression);
   module_t module = NULL;
   int flags = PL_Q_NORMAL;
-  int rval = PL_call_predicate(module, flags, predicate, term);
+  int rval = PL_call_predicate(module, flags, predicate, arguments);
 
   PL_halt(rval ? 0 : 1);
 
