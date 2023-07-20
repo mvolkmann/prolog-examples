@@ -79,14 +79,16 @@ arguments(ArgList) --> ws, identifier(A), ws, ", ", ws, arguments(As), { ArgList
 
 value(V) --> identifier(V) | integer(V).
 
-operator(op(+)) --> "+".
-operator(op(-)) --> "-".
-operator(op(*)) --> "*".
-operator(op(/)) --> "/".
+operator(+) --> "+".
+operator(-) --> "-".
+operator(*) --> "*".
+operator(/) --> "/".
 
 math(M) --> value(V1), ws, operator(O), ws, value(V2), { M = math(O, V1, V2) }.
 
 assignment(A) --> identifier(I), ws, "=", ws, value(V), { A = assign(I, V) }.
+assignment(A) --> identifier(I), ws, "=", ws, math(M), { A = assign(I, M) }.
+
 statement(stmt(demo)) --> "stmt".
 statements(Body) --> statement(S), { Body = [S] }.
 statements(Body) --> statement(S), ws, eol, statements(Ss), { Body = [S|Ss] }.
