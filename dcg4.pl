@@ -50,6 +50,7 @@ print(print(V)) --> "print", ws, value(V).
 % To use this, enter something like the following:
 % once(phrase(program(P), "fn foo(a, b)\nc = a * b\nprint c\nend\nfoo(2, 3)\nprint 19")).
 % phrase_from_file(program(P), "dcg4.txt").
+% once(phrase(program(P), "fn multiply(a, b)\n  c = a * b\n  return c\nend\nmultiply(2, 3)\nprint 6")).
 program(program(Ss)) --> statements(Ss).
 
 return(return(V)) --> "return ", value(V).
@@ -59,6 +60,7 @@ statement(S) -->
 statement_line(S) --> whites, statement(S), whites.
 statements(Stmts) --> statement_line(S), { Stmts = [S] }.
 statements(Stmts) --> statement_line(S), eol, statements(Ss), { Stmts = [S|Ss] }.
+% TODO: Remove underscores in statements list from comments.
 
 value(V) --> identifier(V) | integer(V).
 % white is a space or tab.
