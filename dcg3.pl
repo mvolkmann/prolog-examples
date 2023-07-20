@@ -33,19 +33,6 @@ number_seq(N) -->
 % string_seq(S) --> seq(Cs), { atomics_to_string(Cs, S) }.
 string_seq(S) --> seq(Cs), { atom_codes(S, Cs) }.
 
-
-% From dcg/basics:
-% digit(C) --> [C], { code_type(C, digit) }.
-letter(C) --> [C], { code_type(C, alpha) }.
-lower(C) --> [C], { code_type(C, lower) }.
-upper(C) --> [C], { code_type(C, upper) }.
-letter_or_digit(C) --> letter(C) | digit(C).
-
-identifier_([]) --> [].
-identifier_(I) --> letter_or_digit(C), identifier_(T), { I = [C|T] }.
-% identifier(I) --> letter(C), identifier_(T), { I = [C|T] }.
-identifier(I) --> letter(C), identifier_(T), { atom_codes(I, [C|T]) }.
-
 % For simple text matching and extraction,
 % a regular expression is an easier alternative.
 % To use this, enter something like the following:
@@ -65,12 +52,17 @@ player(Name, Number) -->
   %string_seq(Number),
   ".".
 
-% arguments(ArgList) --> ws, argument(A), ws, ", ", ws, arguments(As), { ArgList = [A|As] }.
-arguments(ArgList) --> ws, identifier(A), ws, { ArgList = [A] }.
+% From dcg/basics:
+% digit(C) --> [C], { code_type(C, digit) }.
+letter(C) --> [C], { code_type(C, alpha) }.
+lower(C) --> [C], { code_type(C, lower) }.
+upper(C) --> [C], { code_type(C, upper) }.
+letter_or_digit(C) --> letter(C) | digit(C).
 
-statement(stmt(demo)) --> "stmt".
-statements(Body) --> statement(S), ws, eol, statements(Ss), { Body = [S|Ss] }.
-statements(Body) --> statement(S), { Body = [S] }.
+identifier_([]) --> [].
+identifier_(I) --> letter_or_digit(C), identifier_(T), { I = [C|T] }.
+% identifier(I) --> letter(C), identifier_(T), { I = [C|T] }.
+identifier(I) --> letter(C), identifier_(T), { atom_codes(I, [C|T]) }.
 
 % white is a space or tab.
 % eol is \n, \r\n, or end of input.
@@ -79,14 +71,17 @@ ws1 --> white | eol.
 ws --> [].
 ws --> ws1, ws.
 
+arguments(ArgList) --> ws, identifier(A), ws, { ArgList = [A] }.
+arguments(ArgList) --> ws, identifier(A), ws, ", ", ws, arguments(As), { ArgList = [A|As] }.
+
+statement(stmt(demo)) --> "stmt".
+statements(Body) --> statement(S), { Body = [S] }.
+statements(Body) --> statement(S), ws, eol, statements(Ss), { Body = [S|Ss] }.
+
 % To use this, enter something like the following:
 % phrase(function(Name, ArgList), "fn foo(bar, baz)").
 function(Name, ArgList) -->
-  "fn ", identifier(Name), "(", arguments(ArgList), ") ", statements, "end".
+  "fn ", identifier(Name), "(", arguments(ArgList), ") ",
+  % statements,
+  "end".
 
-first_word(Word) -->
-  string_without("x", Codes),
-  { string_codes(Word, Codes) }.
-
-like(What) --> "I like ", string_seq(What), " ", seq(_).
-like(What) --> "I like ", string_seq(What).
