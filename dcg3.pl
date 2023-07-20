@@ -21,7 +21,7 @@ seq([H|T]) --> [H], seq(T).
 
 % This gather a sequence of characters into a number.
 % When double_quotes is set the chars, use atomics_to_string.
-% When double_quotes is set the codes, use atom_codes.
+% When double_quotes is set the codes, use number_codes.
 % number_seq(N) --> seq(Cs), { atomics_to_string(Cs, S), number_string(N, S) }.
 number_seq(N) -->
   seq(Cs),
@@ -32,6 +32,19 @@ number_seq(N) -->
 % When double_quotes is set the codes, use atom_codes.
 % string_seq(S) --> seq(Cs), { atomics_to_string(Cs, S) }.
 string_seq(S) --> seq(Cs), { atom_codes(S, Cs) }.
+
+
+% From dcg/basics:
+% digit(C) --> [C], { code_type(C, digit) }.
+letter(C) --> [C], { code_type(C, alpha) }.
+lower(C) --> [C], { code_type(C, lower) }.
+upper(C) --> [C], { code_type(C, upper) }.
+letter_or_digit(C) --> letter(C) | digit(C).
+
+identifier_([]) --> [].
+identifier_(I) --> letter_or_digit(C), identifier_(T), { I = [C|T] }.
+% identifier(I) --> letter(C), identifier_(T), { I = [C|T] }.
+identifier(I) --> letter(C), identifier_(T), { atom_codes(I, [C|T]) }.
 
 % For simple text matching and extraction,
 % a regular expression is an easier alternative.
@@ -52,26 +65,24 @@ player(Name, Number) -->
   %string_seq(Number),
   ".".
 
-argument(A) --> string_seq(A).
-arguments(ArgList) --> argument(A), ", ", arguments(As), { ArgList = [A|As] }.
-arguments(ArgList) --> argument(A), { ArgList = [A] }.
+% arguments(ArgList) --> ws, argument(A), ws, ", ", ws, arguments(As), { ArgList = [A|As] }.
+arguments(ArgList) --> ws, identifier(A), ws, { ArgList = [A] }.
 
 statement(stmt(demo)) --> "stmt".
-statements(Body) --> statement(S), eol, statements(Ss), { Body = [S|Ss] }.
+statements(Body) --> statement(S), ws, eol, statements(Ss), { Body = [S|Ss] }.
 statements(Body) --> statement(S), { Body = [S] }.
 
 % white is a space or tab.
 % eol is \n, \r\n, or end of input.
-ws1_ --> white | eol.
-% ws1 --> whites | "\n".
-ws2_ --> [].
-ws2_ --> ws1_, ws2_.
-ws --> ws1_, ws2_.
+ws1 --> white | eol.
+% ws matches zero or more ws1 characters.
+ws --> [].
+ws --> ws1, ws.
 
 % To use this, enter something like the following:
 % phrase(function(Name, ArgList), "fn foo(bar, baz)").
 function(Name, ArgList) -->
-  "fn ", string_seq(Name), "(", arguments(ArgList), ") ", statements, "end".
+  "fn ", identifier(Name), "(", arguments(ArgList), ") ", statements, "end".
 
 first_word(Word) -->
   string_without("x", Codes),
