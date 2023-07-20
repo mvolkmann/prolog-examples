@@ -1,6 +1,6 @@
-# fn multiply(a, b)
-#  c = a * b
-#  return c
-# end
-# multiply(2, 3)
-# print 6
+fn multiply(a, b)
+  c = a * b
+  return c
+end
+multiply(2, 3)
+print 6
