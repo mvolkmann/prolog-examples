@@ -64,6 +64,9 @@ identifier_(I) --> letter_or_digit(C), identifier_(T), { I = [C|T] }.
 % identifier(I) --> letter(C), identifier_(T), { I = [C|T] }.
 identifier(I) --> letter(C), identifier_(T), { atom_codes(I, [C|T]) }.
 
+% integer(I) --> digit(I).
+% integer(I) --> digit(H), integer(T), { I = [H|T] }.
+
 % white is a space or tab.
 % eol is \n, \r\n, or end of input.
 ws1 --> white | eol.
@@ -74,6 +77,16 @@ ws --> ws1, ws.
 arguments(ArgList) --> ws, identifier(A), ws, { ArgList = [A] }.
 arguments(ArgList) --> ws, identifier(A), ws, ", ", ws, arguments(As), { ArgList = [A|As] }.
 
+value(V) --> identifier(V) | integer(V).
+
+operator(op(+)) --> "+".
+operator(op(-)) --> "-".
+operator(op(*)) --> "*".
+operator(op(/)) --> "/".
+
+math(M) --> value(V1), ws, operator(O), ws, value(V2), { M = math(O, V1, V2) }.
+
+assignment(A) --> identifier(I), ws, "=", ws, value(V), { A = assign(I, V) }.
 statement(stmt(demo)) --> "stmt".
 statements(Body) --> statement(S), { Body = [S] }.
 statements(Body) --> statement(S), ws, eol, statements(Ss), { Body = [S|Ss] }.
