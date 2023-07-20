@@ -1,4 +1,6 @@
-fn foo(a, b)
-  c = a * b
-  print c
-end
+# fn multiply(a, b)
+#  c = a * b
+#  return c
+# end
+# multiply(2, 3)
+# print 6
