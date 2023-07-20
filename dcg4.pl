@@ -40,14 +40,20 @@ assignment(assign(I, M)) --> identifier(I), ws, "=", ws, math(M).
 
 print(print(V)) --> "print", ws, value(V).
 
-statement(S) --> assignment(S) | print(S).
+statement_(S) --> (assignment(S) | print(S)) .
+statement(S) --> whites, statement_(S), whites.
+statement(S) --> whites, statement_(S), ws.
 statements(Body) --> statement(S), { Body = [S] }.
-statements(Body) --> statement(S), ws, eol, statements(Ss), { Body = [S|Ss] }.
+statements(Body) --> statement(S), eol, statements(Ss), { Body = [S|Ss] }.
 
 % To use this, enter something like the following:
 % once(phrase(function(F, A, S), "fn foo(a, b)\nc = a * b\nprint c\nend")).
 function(Name, ArgList, Statements) -->
   "fn ", identifier(Name), "(", arguments(ArgList), ")", ws,
   statements(Statements),
-  ws, "end".
+  ws, "end", ws.
 
+/*
+:- initialization
+  phrase_from_file(function(N, A, S), 'dcg4.txt').
+*/
