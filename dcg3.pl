@@ -3,7 +3,6 @@
 %       codes for the grammar rules in dcg/basics to work!
 :- set_prolog_flag(double_quotes, codes).
 :- use_module(library(dcg/basics)).
-:- use_module(library(dcg/high_order)).
 
 % If we match "cat", there is no need to check for also matching "dog".
 pet --> "cat", { ! } | "dog".
@@ -51,52 +50,3 @@ player(Name, Number) -->
   number_seq(Number),
   %string_seq(Number),
   ".".
-
-% From dcg/basics:
-% digit(C) --> [C], { code_type(C, digit) }.
-letter(C) --> [C], { code_type(C, alpha) }.
-lower(C) --> [C], { code_type(C, lower) }.
-upper(C) --> [C], { code_type(C, upper) }.
-letter_or_digit(C) --> letter(C) | digit(C).
-
-identifier_([]) --> [].
-identifier_(I) --> letter_or_digit(C), identifier_(T), { I = [C|T] }.
-% identifier(I) --> letter(C), identifier_(T), { I = [C|T] }.
-identifier(I) --> letter(C), identifier_(T), { atom_codes(I, [C|T]) }.
-
-% integer(I) --> digit(I).
-% integer(I) --> digit(H), integer(T), { I = [H|T] }.
-
-% white is a space or tab.
-% eol is \n, \r\n, or end of input.
-ws1 --> white | eol.
-% ws matches zero or more ws1 characters.
-ws --> [].
-ws --> ws1, ws.
-
-arguments(ArgList) --> ws, identifier(A), ws, { ArgList = [A] }.
-arguments(ArgList) --> ws, identifier(A), ws, ", ", ws, arguments(As), { ArgList = [A|As] }.
-
-value(V) --> identifier(V) | integer(V).
-
-operator(+) --> "+".
-operator(-) --> "-".
-operator(*) --> "*".
-operator(/) --> "/".
-
-math(M) --> value(V1), ws, operator(O), ws, value(V2), { M = math(O, V1, V2) }.
-
-assignment(A) --> identifier(I), ws, "=", ws, value(V), { A = assign(I, V) }.
-assignment(A) --> identifier(I), ws, "=", ws, math(M), { A = assign(I, M) }.
-
-statement(stmt(demo)) --> "stmt".
-statements(Body) --> statement(S), { Body = [S] }.
-statements(Body) --> statement(S), ws, eol, statements(Ss), { Body = [S|Ss] }.
-
-% To use this, enter something like the following:
-% phrase(function(Name, ArgList), "fn foo(bar, baz)").
-function(Name, ArgList) -->
-  "fn ", identifier(Name), "(", arguments(ArgList), ") ",
-  % statements,
-  "end".
-
