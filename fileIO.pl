@@ -1,17 +1,17 @@
-processStream(end_of_file, _) :- !. % a "cut" that stops execution
+process_stream(end_of_file, _) :- !. % a "cut" that stops execution
 
-processStream(Char, Stream) :-
+process_stream(Char, Stream) :-
   write(Char),
   get_char(Stream, NextChar),
-  processStream(NextChar, Stream).
+  process_stream(NextChar, Stream).
 
-readFile(File) :- 
+read_file(File) :- 
   open(File, read, Stream),
   get_char(Stream, Char),
-  processStream(Char, Stream),
+  process_stream(Char, Stream),
   close(Stream).
 
-writeFile(File, Text) :- 
+write_file(File, Text) :- 
   open(File, write, Stream),
   write(Stream, Text), nl,
   close(Stream).
@@ -37,6 +37,6 @@ my_goal :-
   writeln(Stream, 'line #2'),
   close(Stream),
   memory_file_to_string(Handle, S),
-  format('S = ~w~n', [S]),
+  format('S = ~w~n', [S]).
 
-  halt.
+  % halt.
