@@ -1,7 +1,10 @@
-:- set_prolog_flag(double_quotes, chars).
+% :- set_prolog_flag(double_quotes, codes).
+:- set_prolog_flag(double_quotes, string).
 
-xs --> "".
-xs --> "x", xs.
+xs --> [].
+xs --> [x], xs.
+ys --> "".
+ys --> "y", ys.
 
 % phrase(xs, Ls). % finds all possible solutions
 

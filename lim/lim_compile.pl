@@ -1,6 +1,5 @@
-% NOTE: It seems important for double_quotes to be set to
-%       codes for the grammar rules in dcg/basics to work!
-:- set_prolog_flag(double_quotes, codes).
+% NOTE: It seems important for double_quotes to not be set to
+%       chars for the grammar rules in dcg/basics to work!
 :- use_module(library(dcg/basics)).
 :- use_module(library(pio)).
 
