@@ -36,8 +36,10 @@ fn_def(fn(Name, Args, Statements)) -->
   ws, "end", ws.
 
 identifier_([]) --> [].
-identifier_(id(I)) --> letter_or_digit(C), identifier_(T), { I = [C|T] }.
-identifier(id(I)) --> letter(C), identifier_(T), { atom_codes(I, [C|T]) }.
+% identifier_(id(I)) --> letter_or_digit(C), identifier_(T), { I = [C|T] }.
+% identifier(id(I)) --> letter(C), identifier_(T), { atom_codes(I, [C|T]) }.
+identifier_(I) --> letter_or_digit(C), identifier_(T), { I = [C|T] }.
+identifier(I) --> letter(C), identifier_(T), { atom_codes(I, [C|T]) }.
 
 math(math(O, V1, V2)) --> value(V1), ws, operator(O), ws, value(V2).
 
@@ -76,6 +78,7 @@ compile(InFile, OutFile) :-
   once(phrase_from_file(program(P), InFile)),
   format('P = ~w~n', [P]),
   open(OutFile, write, Stream),
+  /*
   Options = [
     brace_terms(true),
     character_escapes_unicode(false),
@@ -84,20 +87,22 @@ compile(InFile, OutFile) :-
     quoted(true)
   ],
   write_term(Stream, P, Options),
-  % write_canonical(Stream, P),
+  */
+  write_canonical(Stream, P),
   close(Stream).
 
 % InFile must be a text file created by the compile rule above.
 run(InFile) :-
+  format('run: InFile = ~w~n', InFile),
   open(InFile, read, Stream),
+  /*
   Options = [
-    % brace_terms(true),
     character_escapes_unicode(false),
     dotlists(true)
-    % ignore_ops(true),
-    % quoted(true)
   ],
   read_term(Stream, P, Options),
+  */
+  read(Stream, P),
   format('P = ~w~n', [P]),
   close(Stream).
 
