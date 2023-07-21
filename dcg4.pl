@@ -26,6 +26,7 @@ def_args(Args) -->
   ws, identifier(A), ws, ",", ws, def_args(As), { Args = [A|As] }.
 
 fn_call(call(Name, Args)) --> identifier(Name), "(", call_args(Args), ")".
+fn_call(call(Name, Args)) --> identifier(Name), "(", call_args(Args), ")".
 
 % To use this, enter something like the following:
 % once(phrase(fn_def(F), "fn foo(a, b)\nc = a * b\nprint c\nend")).
@@ -35,8 +36,8 @@ fn_def(fn(Name, Args, Statements)) -->
   ws, "end", ws.
 
 identifier_([]) --> [].
-identifier_(I) --> letter_or_digit(C), identifier_(T), { I = [C|T] }.
-identifier(I) --> letter(C), identifier_(T), { atom_codes(I, [C|T]) }.
+identifier_(id(I)) --> letter_or_digit(C), identifier_(T), { I = [C|T] }.
+identifier(id(I)) --> letter(C), identifier_(T), { atom_codes(I, [C|T]) }.
 
 math(math(O, V1, V2)) --> value(V1), ws, operator(O), ws, value(V2).
 
@@ -48,9 +49,8 @@ operator(/) --> "/".
 print(print(V)) --> "print", ws, value(V).
 
 % To use this, enter something like the following:
-% once(phrase(program(P), "fn foo(a, b)\nc = a * b\nprint c\nend\nfoo(2, 3)\nprint 19")).
-% phrase_from_file(program(P), "dcg4.txt").
 % once(phrase(program(P), "fn multiply(a, b)\n  c = a * b\n  return c\nend\nmultiply(2, 3)\nprint 6")).
+% once(phrase_from_file(program(P), "dcg4.txt")).
 program(program(Ss)) --> statements(Ss), eol.
 
 return(return(V)) --> "return ", value(V).
@@ -62,13 +62,98 @@ statements(Stmts) --> statement_line(S), { Stmts = [S] }.
 statements(Stmts) --> statement_line(S), eol, statements(Ss), { Stmts = [S|Ss] }.
 % TODO: Remove underscores in statements list from comments.
 
-value(V) --> identifier(V) | integer(V).
+value(V) --> identifier(V) | integer(V) | fn_call(V).
+
 % white is a space or tab.
 % eol is \n, \r\n, or end of input.
 ws1 --> white | eol.
 % ws matches zero or more ws1 characters.
 ws --> [].
 ws --> ws1, ws.
+
+
+compile(InFile, OutFile) :- 
+  once(phrase_from_file(program(P), InFile)),
+  format('P = ~w~n', [P]),
+  open(OutFile, write, Stream),
+  Options = [
+    brace_terms(true),
+    character_escapes_unicode(false),
+    dotlists(true),
+    ignore_ops(true),
+    quoted(true)
+  ],
+  write_term(Stream, P, Options),
+  % write_canonical(Stream, P),
+  close(Stream).
+
+% InFile must be a text file created by the compile rule above.
+run(InFile) :-
+  open(InFile, read, Stream),
+  Options = [
+    % brace_terms(true),
+    character_escapes_unicode(false),
+    dotlists(true)
+    % ignore_ops(true),
+    % quoted(true)
+  ],
+  read_term(Stream, P, Options),
+  format('P = ~w~n', [P]),
+  close(Stream).
+
+execute :-
+  P = program([fn(multiply,[a,b],[assign(c,math(*,a,b)),return(c)]),assign(product,call(multiply,[2,3])),print(product)]),
+  format('P = ~w~n', [P]),
+  Vtable = _{},
+  eval(Vtable, P).
+
+eval(Vtable, assign(Name, Value)) :-
+  format('assigning ~w to ~w~n', [Value, Name]),
+  V = lookup(Value),
+  Vtable.put(Name, V).
+
+eval(Vtable, call(Name, Args)) :-
+  format('calling function ~w with arguments ~w~n', [Name, Args]),
+  Stmts = Vtable.get(Name),
+  maplist(eval, Stmts).
+
+eval(Vtable, fn(Name, Args, Stmts)) :-
+  format('defining function ~w with arguments ~w~n', [Name, Args]),
+  Vtable.put(Name, Stmts).
+
+eval(Vtable, program(Stmts)) :-
+  writeln("evaluating program"),
+  maplist(eval(Vtable), Stmts).
+
+eval(Vtable, print(Value)) :-
+  lookup(Vtable, Value, V),
+  format('printing ~w~n', [V]).
+
+eval(Vtable, return(Value)) :-
+  format('returning ~w~n', [Value]),
+  Stack = Vtable.get(stack_, []),
+  NewStack = [Value | Stack],
+  Vtable.put(NewStack).
+
+lookup(Vtable, call(_, _), Value) :-
+  Stack = Vtable.get(stack_, []),
+  length(Stack, Length),
+  Length == 0 ->
+    writeln('stack is empty!'),
+    Value = 0;
+    % Pop the first item from the stack.
+    [Value|Tail] = Stack,
+    Vtable.put(stack_, Tail).
+
+lookup(Vtable, id(Name), Value) :- Value = Vtable.get(Name).
+
+lookup(_, integer(I), Value) :- Value = I.
+
+lookup(Vtable, math(Operator, LHS, RHS), Value) :-
+  lookup(Vtable, LHS, L),
+  lookup(Vtable, RHS, R),
+  format('math ~w ~w ~w~n', L, Operator, R),
+  Value = 19. % TODO: Do the calculation.
 
 /*
 :- initialization

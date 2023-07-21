@@ -1,0 +1,2 @@
+program(.(fn(multiply,.(a,.(b,[])),.(assign(c,math(*,a,b)),.(return(c),[]))),.(assign(product,call(multiply,.(2,.(3,[])))),.(print(product),[]))))
+

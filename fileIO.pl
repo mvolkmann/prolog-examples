@@ -13,7 +13,7 @@ read_file(File) :-
 
 write_file(File, Text) :- 
   open(File, write, Stream),
-  write(Stream, Text), nl,
+  write(Stream, Text),
   close(Stream).
 
 my_goal :-
