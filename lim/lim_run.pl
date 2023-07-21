@@ -5,7 +5,6 @@
 :- use_module(library(pio)).
 
 run(InFile) :-
-  format('run: InFile = ~w~n', InFile),
   Options = [type(binary)],
   open(InFile, read, Stream, Options),
   fast_read(Stream, P),
@@ -20,34 +19,37 @@ execute(P) :-
   eval(Vtable, P).
 
 eval(Vtable, assign(Name, Value)) :-
-  format('assigning ~w to ~w~n', [Value, Name]),
+  format('eval assign: Name = ~w, Value = ~w~n', [Value, Name]),
   V = lookup(Value),
   Vtable.put(Name, V).
 
 eval(Vtable, call(Name, Args)) :-
-  format('calling function ~w with arguments ~w~n', [Name, Args]),
+  format('eval call: Name = ~w, Args = ~w~n', [Name, Args]),
   Stmts = Vtable.get(Name),
   maplist(eval, Stmts).
 
 eval(Vtable, fn(Name, Args, Stmts)) :-
-  format('defining function ~w with arguments ~w~n', [Name, Args]),
+  format('eval fn: Name = ~w, Args = ~w~n', [Name, Args]),
   Vtable.put(Name, Stmts).
 
 eval(Vtable, program(Stmts)) :-
-  writeln('evaluating program'),
+  writeln('eval program'),
   maplist(eval(Vtable), Stmts).
 
 eval(Vtable, print(Value)) :-
+  format('eval print: Value = ~w~n', [Value]),
   lookup(Vtable, Value, V),
-  format('printing ~w~n', [V]).
+  format('eval: V = ~w~n', [V]),
+  writeln(V).
 
 eval(Vtable, return(Value)) :-
-  format('returning ~w~n', [Value]),
+  format('eval return: Value = ~w~n', [Value]),
   Stack = Vtable.get(stack_, []),
   NewStack = [Value | Stack],
   Vtable.put(NewStack).
 
 lookup(Vtable, call(_, _), Value) :-
+  format('lookup call'),
   Stack = Vtable.get(stack_, []),
   length(Stack, Length),
   (Length == 0 ->
@@ -58,11 +60,19 @@ lookup(Vtable, call(_, _), Value) :-
     Vtable.put(stack_, Tail)
   ).
 
-lookup(Vtable, id(Name), Value) :- Value = Vtable.get(Name).
+lookup(Vtable, id(Name), Value) :-
+  format('lookup id: Name = ~w~n', [Name]),
+  Value = Vtable.get(Name).
 
-lookup(_, integer(I), Value) :- Value = I.
+% lookup(_, integer(I), Value) :-
+lookup(_, V, Value) :-
+  format('lookup generic: V = ~w~n', [V]),
+  Value = V.
 
 lookup(Vtable, math(Operator, LHS, RHS), Value) :-
+  format('lookup math: Operator = ~w~n', [Operator]),
+  format('lookup math: LHS = ~w~n', [LHS]),
+  format('lookup math: RHS = ~w~n', [RHS]),
   lookup(Vtable, LHS, L),
   lookup(Vtable, RHS, R),
   format('math ~w ~w ~w~n', L, Operator, R),
