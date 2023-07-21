@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# This compiles a .lim file, producing a .limc file
+# which contains a serialized, binary, Prolog term.
+
+if [ $# -ne 1 ]; then
+  echo usage: limc {file-name}
+  exit 1
+fi
+
+swipl lim_compile.pl "$1"

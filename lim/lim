@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# This runs a .limb file which contains a serialized, binary, Prolog term.
+
+if [ $# -ne 1 ]; then
+  echo usage: lim {file-name}
+  exit 1
+fi
+
+swipl lim_run.pl "$1"
