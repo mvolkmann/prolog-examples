@@ -1,64 +1,52 @@
-/*
-expr --> term.
-expr --> term, operator, expr.
+% This uses DCGs.
+% NOTE: It seems important for double_quotes to not be set to
+%       chars for the grammar rules in dcg/basics to work!
+:- set_prolog_flag(double_quotes, codes).
+% :- use_module(library(dcg/basics)).
 
-term --> [Num], {integer(Num)}.
+% If we match "cat", there is no need to check for also matching "dog".
+pet --> "cat", { ! } | "dog".
 
-operator --> [+].
-operator --> [-].
+% This matches a sequence of pets separated by single spaces.
+% After exhausting all matches, we can stop checking for more.
+% To use this, enter something like the following:
+% phrase(raining, "cat cat dog dog cat").
+raining --> pet, " ", raining, { ! }.
+raining --> pet.
 
-parse(Input, Result) :-
-    phrase(expr, Input, Result).
+% This gather a sequence of characters into a list of character atoms.
+seq([]) --> [].
+seq([H|T]) --> [H], seq(T).
 
-% Example 1: "2 + 3 - 1" should parse to [2,+,3,-,1]
-% ?- parse([2,+,3,-,1], Result).
-% Result = [2, +, 3, -, 1]
+% This gather a sequence of characters into a number.
+% When double_quotes is set the chars, use atomics_to_string.
+% When double_quotes is set the codes, use number_codes.
+% number_seq(N) --> seq(Cs), { atomics_to_string(Cs, S), number_string(N, S) }.
+number_seq(N) -->
+  seq(Cs),
+  { length(Cs, L), (L == 0 -> N = 0; number_codes(N, Cs)) }.
 
-% Example 2: "5 - 2 + 8" should parse to [5,-,2,+,8]
-% ?- parse([5,-,2,+,8], Result).
-% Result = [5, -, 2, +, 8]
-*/
+% This gather a sequence of characters into a string.
+% When double_quotes is set the chars, use atomics_to_string.
+% When double_quotes is set the codes, use atom_codes.
+% string_seq(S) --> seq(Cs), { atomics_to_string(Cs, S) }.
+string_seq(S) --> seq(Cs), { atom_codes(S, Cs) }.
 
-/*
-% DCG for parsing arithmetic expressions
-% expr(Expr, Rest) parses an arithmetic expression, returning Expr and the remaining input Rest.
+% For simple text matching and extraction,
+% a regular expression is an easier alternative.
+% To use this, enter something like the following:
+% once(phrase(hello(Name), "Hello, World!")).
+hello(Name) -->
+  "Hello, ",
+  string_seq(Name),
+  "!".
 
-% Rule for a number
-expr(Num) --> number(Num).
-
-% Rule for an expression enclosed in parentheses
-expr(Expr) --> "(", expr(Expr), ")".
-
-% Rule for addition
-expr(AddExpr) --> expr(Left), "+", expr(Right), {AddExpr is Left + Right}.
-
-% Rule for multiplication
-expr(MulExpr) --> expr(Left), "*", expr(Right), {MulExpr is Left * Right}.
-
-% Rule for parsing a number (non-empty sequence of digits)
-number(Num) --> digit(D), digits(Ds), {number_codes(Num, [D|Ds])}.
-
-% Rules for parsing digits
-digits([D|Ds]) --> digit(D), digits(Ds).
-digits([]) --> [].
-
-% Rule for parsing a single digit
-digit(D) --> [D], {code_type(D, digit)}.
-
-% Predicate to parse an expression
-parse(Expression, Result) :-
-    phrase(expr(Result), Expression).
-*/
-
-% Define the DCG rules
-expression --> term, ("+" ; "-"), expression.
-expression --> term.
-
-term --> integer.
-integer --> digit, integer.
-integer --> digit.
-digit --> [D], { code_type(D, digit) }.
-
-% Helper predicate to parse the expression
-parse_expression(Input, Expression) :-
-    phrase(expression, Input, Expression).
+% To use this, enter something like the following:
+% once(phrase(player(Name, Number), "Player Gretzky wears number 99.")).
+player(Name, Number) -->
+  "Player ",
+  string_seq(Name),
+  " wears number ",
+  number_seq(Number),
+  %string_seq(Number),
+  ".".
