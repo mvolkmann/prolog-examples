@@ -73,42 +73,29 @@ ws1 --> white | eol.
 ws --> [].
 ws --> ws1, ws.
 
-
+% Example: compile('dcg4.txt', 'dcg4.pb').
 compile(InFile, OutFile) :- 
   once(phrase_from_file(program(P), InFile)),
   format('P = ~w~n', [P]),
-  open(OutFile, write, Stream),
-  /*
-  Options = [
-    brace_terms(true),
-    character_escapes_unicode(false),
-    dotlists(true),
-    ignore_ops(true),
-    quoted(true)
-  ],
-  write_term(Stream, P, Options),
-  */
-  write_canonical(Stream, P),
+  Options = [type(binary)],
+  open(OutFile, write, Stream, Options),
+  fast_write(Stream, P),
   close(Stream).
 
 % InFile must be a text file created by the compile rule above.
+% Example: run('dcg4.pb').
 run(InFile) :-
   format('run: InFile = ~w~n', InFile),
-  open(InFile, read, Stream),
-  /*
-  Options = [
-    character_escapes_unicode(false),
-    dotlists(true)
-  ],
-  read_term(Stream, P, Options),
-  */
-  read(Stream, P),
-  format('P = ~w~n', [P]),
-  close(Stream).
+  Options = [type(binary)],
+  open(InFile, read, Stream, Options),
+  fast_read(Stream, P),
+  format('run: P = ~w~n', [P]),
+  close(Stream),
+  execute(P).
 
-execute :-
-  P = program([fn(multiply,[a,b],[assign(c,math(*,a,b)),return(c)]),assign(product,call(multiply,[2,3])),print(product)]),
-  format('P = ~w~n', [P]),
+% P = program([fn(multiply,[a,b],[assign(c,math(*,a,b)),return(c)]),assign(product,call(multiply,[2,3])),print(product)]),
+execute(P) :-
+  format('execute: P = ~w~n', [P]),
   Vtable = _{},
   eval(Vtable, P).
 
@@ -127,7 +114,7 @@ eval(Vtable, fn(Name, Args, Stmts)) :-
   Vtable.put(Name, Stmts).
 
 eval(Vtable, program(Stmts)) :-
-  writeln("evaluating program"),
+  writeln('evaluating program'),
   maplist(eval(Vtable), Stmts).
 
 eval(Vtable, print(Value)) :-
