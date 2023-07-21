@@ -138,12 +138,13 @@ eval(Vtable, return(Value)) :-
 lookup(Vtable, call(_, _), Value) :-
   Stack = Vtable.get(stack_, []),
   length(Stack, Length),
-  Length == 0 ->
+  (Length == 0 ->
     writeln('stack is empty!'),
     Value = 0;
     % Pop the first item from the stack.
     [Value|Tail] = Stack,
-    Vtable.put(stack_, Tail).
+    Vtable.put(stack_, Tail)
+  ).
 
 lookup(Vtable, id(Name), Value) :- Value = Vtable.get(Name).
 
