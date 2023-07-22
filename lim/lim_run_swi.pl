@@ -42,16 +42,15 @@ eval(print(Value)) :-
 
 eval(return(Value)) :-
   format('eval return: Value = ~w~n', [Value]),
-  % Store the return value in the previous vtable.
-  vtables_get(vtables, [_|T]),
-  [Vtable|_] = T,
-  Vtable.put(return_, Value).
+  lookup(Value, V),
+  % Store the return value.
+  nb_setval(return_, V).
 
 % This kind of call uses the return value,
 % perhaps in an assignment or as a function argument.
 lookup(call(Name, Args), V) :-
   process_call(Name, Args),
-  vtables_get(return_, V).
+  nb_getval(return_, V).
 
 lookup(const(Value), V) :-
   % format('lookup const: Value = ~w~n', [Value]),
