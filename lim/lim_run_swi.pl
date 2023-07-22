@@ -97,8 +97,8 @@ process_call(Name, Args) :-
 
   % Add a new vtable to the front of the list
   % to hold local variables in this function call.
-  vtables_get(vtables, Vtables),
-  vtables_put(vtables, [VT | Vtables]),
+  nb_getval(vtables, Vtables),
+  nb_setval(vtables, [VT | Vtables]),
   writeln('process_call: updated vtables'),
 
   % Execute the statements.
@@ -106,8 +106,8 @@ process_call(Name, Args) :-
   maplist(eval, Stmts),
 
   % Remove the vtable for this call.
-  vtables_get(vtables, [_|T]),
-  vtables_put(vtables, T).
+  nb_getval(vtables, [_|T]),
+  nb_setval(vtables, T).
 
 % This gets the value of a given key in the
 % first vtable found in the vtables list that defines it.
