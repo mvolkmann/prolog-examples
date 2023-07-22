@@ -1,41 +1,23 @@
-:- use_module(library(apply)).
+:- use_module(library(apply)). % for foldl
 :- use_module(library(dcg/basics)).
-:- use_module(library(pio)).
-
-run(InFile) :-
-  Options = [type(binary)],
-  open(InFile, read, Stream, Options),
-  fast_read(Stream, P),
-  close(Stream),
-  execute(P).
-
-% P = program([fn(multiply,[a,b],[assign(c,math(*,a,b)),return(c)]),assign(product,call(multiply,[2,3])),print(product)]),
-execute(P) :-
-  % format('execute: P = ~w~n', [P]),
-  nb_setval(vtables, [vtable{}]),
-  eval(P).
 
 eval(assign(Name, Value)) :-
   lookup(Value, V),
   vtables_put(Name, V).
 
 % This kind of call does not assign its return value to anything.
-eval(call(Name, Args)) :-
-  process_call(Name, Args).
+eval(call(Name, Args)) :- process_call(Name, Args).
 
 eval(fn(Name, Params, Stmts)) :-
   vtables_put(Name, [Params, Stmts]).
 
-eval(program(Stmts)) :-
-  maplist(eval, Stmts).
+eval(program(Stmts)) :- maplist(eval, Stmts).
 
-eval(print(Value)) :-
-  lookup(Value, V),
-  writeln(V).
+eval(print(Value)) :- lookup(Value, V), writeln(V).
 
 eval(return(Value)) :-
   lookup(Value, V),
-  % Store the return value.
+  % Store the return value so caller can retrieve it.
   nb_setval(return_, V).
 
 % This kind of call uses the return value,
@@ -86,6 +68,21 @@ process_call(Name, Args) :-
   nb_getval(vtables, [_|T]),
   nb_setval(vtables, T).
 
+read_file(InFile, Program) :-
+  Options = [type(binary)],
+  open(InFile, read, Stream, Options),
+  fast_read(Stream, Program),
+  close(Stream).
+
+run_file(InFile) :-
+  read_file(InFile, Program),
+  run_program(Program).
+
+run_program(Program) :-
+  % Create the top-level vtable.
+  nb_setval(vtables, [vtable{}]),
+  eval(Program).
+
 % This gets the value of a given key in the
 % first vtable found in the vtables list that defines it.
 vtables_get(Key, Value) :-
@@ -108,6 +105,8 @@ vtables_put(Key, Value) :-
   nb_setval(vtables, [NewH|T]).
 
 :- initialization
+  % Get the first command-line argument which should be
+  % a file path to the .limb file to run.
   current_prolog_flag(argv, [InFile|_]),
-  run(InFile),
+  run_file(InFile),
   halt.

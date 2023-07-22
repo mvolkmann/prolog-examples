@@ -1,5 +1,4 @@
 :- use_module(library(dcg/basics)).
-:- use_module(library(pio)).
 
 % From dcg/basics:
 % digit(C) --> [C], { code_type(C, digit) }.
