@@ -63,11 +63,6 @@ lookup(const(Value), V) :-
   format('lookup const: Value = ~w~n', [Value]),
   V = Value.
 
-lookup(Name, Value) :-
-  format('lookup by name: Name = ~w~n', [Name]),
-  vtable_get(Name, Value),
-  format('lookup by name: Value = ~w~n', [value]).
-
 lookup(math(Operator, LHS, RHS), Value) :-
   format('lookup math: Operator = ~w~n', [Operator]),
   format('lookup math: LHS = ~w~n', [LHS]),
@@ -77,9 +72,17 @@ lookup(math(Operator, LHS, RHS), Value) :-
   format('math ~w ~w ~w~n', L, Operator, R),
   Value = 19. % TODO: Do the calculation.
 
+lookup(Name, Value) :-
+  format('lookup by name: Name = ~w~n', [Name]),
+  vtable_get(Name, Value),
+  format('lookup by name: Value = ~w~n', [value]).
+
 vtable_get(Key, Value) :-
+  format('vtable_get: Key = ~w~n', [Key]),
   nb_getval(vtable, Vtable),
-  Vtable.get(Key, Value).
+  format('vtable_get: Vtable = ~w~n', [Vtable]),
+  Value = Vtable.get(Key),
+  format('vtable_get: Value = ~w~n', [Value]).
 
 vtable_put(Key, Value) :-
   nb_getval(vtable, Vtable),
