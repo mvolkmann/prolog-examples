@@ -20,3 +20,22 @@ repeat(Char, N, S) :-
   ground(N),
   repeat_(Char, N, L),
   atomics_to_string(L, S).
+
+write_type(Thing) :-
+  atom(Thing) -> writeln("atom"); % ex. a
+  is_list(Thing) -> writeln("list"); % ex. [a]
+  compound(Thing) -> writeln("compound"); % ex. a(b)
+  float(Thing) -> writeln("float"); % ex. 3.1
+  integer(Thing) -> writeln("integer"); % ex. 3
+  string(Thing) -> writeln("string"); % ex. "a"
+  var(Thing) -> writeln("variable"); % ex. A
+  writeln("unknown").
+
+'test' is always an atom.
+`test` is always a list of ASCII code integers.
+
+When double_quotes is string, "test" is a string.
+When double_quotes is chars, "test" is a list of character atoms.
+When double_quotes is codes, "test" is a list of ASCII code integers.
+When double_quotes is atom, "test" is an atom. 
+

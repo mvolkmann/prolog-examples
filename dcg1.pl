@@ -1,8 +1,10 @@
-% :- set_prolog_flag(double_quotes, codes).
-:- set_prolog_flag(double_quotes, string).
-
+% This matches lists like [x, x, x].
+% It does not match `xxx`.
 xs --> [].
 xs --> [x], xs.
+
+% This matches lists like [121, 121, 121].
+% It also matches `yyy`.
 ys --> "".
 ys --> "y", ys.
 
@@ -37,16 +39,17 @@ panindrome(L) :- phrase(qes(L), L).
 ... --> [] | [_], ... .
 
 % ... can be used to get the last element in a list.
-% ?- phrase((..., [Last]), "xyz"). % output is Last = z; false.
+% ?- phrase((..., [Last]), `xyz`). % output is Last = 122 (code for z); false.
 
 % ... can be used to determine if a given sublist
 % occurs anywhere in a list.
-% ?- phrase((..., "y", ...), "xyz"). % output is true
-% ?- phrase((..., "ar", ...), "Mark"). % output is true
+% ?- phrase((..., "y", ...), `xyz`). % output is true
+% ?- phrase((..., "ar", ...), `Mark`). % output is true
 
 % ... can be used to determine if
 % any element occurs twice in succession in a list.
-% ?- phrase((..., [X, X], ...), "Mississippi"). % finds s, s, and p
+% ?- phrase((..., [X, X], ...), `Mississippi`).
+% finds 115 (s), 115 (s), and 112 (p)
 
 % This represents trees as a DCG.
 nodes(nil) --> [].
