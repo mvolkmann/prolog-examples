@@ -1,2 +1,2 @@
-V = 7
-print V
+v = 7
+print v

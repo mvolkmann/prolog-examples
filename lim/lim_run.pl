@@ -63,9 +63,10 @@ lookup(const(Value), V) :-
   format('lookup const: Value = ~w~n', [Value]),
   V = Value.
 
-lookup(id(Name), Value) :-
-  format('lookup id: Name = ~w~n', [Name]),
-  vtable_get(Name, Value).
+lookup(Name, Value) :-
+  format('lookup by name: Name = ~w~n', [Name]),
+  vtable_get(Name, Value),
+  format('lookup by name: Value = ~w~n', [value]).
 
 lookup(math(Operator, LHS, RHS), Value) :-
   format('lookup math: Operator = ~w~n', [Operator]),
@@ -82,7 +83,9 @@ vtable_get(Key, Value) :-
 
 vtable_put(Key, Value) :-
   nb_getval(vtable, Vtable),
-  nb_setval(vtable, Vtable.put(Key, Value)).
+  NewVtable = Vtable.put(Key, Value),
+  format('vtable_put: NewVtable = ~w~n', [NewVtable]),
+  nb_setval(vtable, NewVtable).
 
 :- initialization
   current_prolog_flag(argv, [InFile|_]),

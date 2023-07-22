@@ -10,8 +10,8 @@ lower(C) --> [C], { code_type(C, lower) }.
 upper(C) --> [C], { code_type(C, upper) }.
 letter_or_digit(C) --> letter(C) | digit(C).
 
-assignment(assign(I, V)) --> identifier(I), ws, "=", ws, value(V).
-assignment(assign(I, M)) --> identifier(I), ws, "=", ws, math(M).
+assignment(assign(I, V)) --> id(I), ws, "=", ws, value(V).
+assignment(assign(I, M)) --> id(I), ws, "=", ws, math(M).
 
 call_args(Args) --> ws, value(V), ws, { Args = [V] }.
 call_args(Args) -->
@@ -21,25 +21,25 @@ comment --> whites, "#", string_without("\n", _).
 
 constant(const(V)) --> integer(V).
 
-def_args(Args) --> ws, identifier(A), ws, { Args = [A] }.
+def_args(Args) --> ws, id(A), ws, { Args = [A] }.
 def_args(Args) -->
-  ws, identifier(A), ws, ",", ws, def_args(As), { Args = [A|As] }.
+  ws, id(A), ws, ",", ws, def_args(As), { Args = [A|As] }.
 
-fn_call(call(Name, Args)) --> identifier(Name), "(", call_args(Args), ")".
-fn_call(call(Name, Args)) --> identifier(Name), "(", call_args(Args), ")".
+fn_call(call(Name, Args)) --> id(Name), "(", call_args(Args), ")".
+fn_call(call(Name, Args)) --> id(Name), "(", call_args(Args), ")".
 
 % To use this, enter something like the following:
 % once(phrase(fn_def(F), "fn foo(a, b)\nc = a * b\nprint c\nend")).
 fn_def(fn(Name, Args, Statements)) -->
-  "fn ", identifier(Name), "(", def_args(Args), ")", ws,
+  "fn ", id(Name), "(", def_args(Args), ")", ws,
   statements(Statements),
   ws, "end", ws.
 
-identifier_([]) --> [].
-% identifier_(id(I)) --> letter_or_digit(C), identifier_(T), { I = [C|T] }.
-% identifier(id(I)) --> letter(C), identifier_(T), { atom_codes(I, [C|T]) }.
-identifier_(I) --> letter_or_digit(C), identifier_(T), { I = [C|T] }.
-identifier(I) --> letter(C), identifier_(T), { atom_codes(I, [C|T]) }.
+id_([]) --> [].
+% id_(id(I)) --> letter_or_digit(C), id_(T), { I = [C|T] }.
+% id(id(I)) --> letter(C), id_(T), { atom_codes(I, [C|T]) }.
+id_(I) --> letter_or_digit(C), id_(T), { I = [C|T] }.
+id(I) --> letter(C), id_(T), { atom_codes(I, [C|T]) }.
 
 math(math(O, V1, V2)) --> value(V1), ws, operator(O), ws, value(V2).
 
@@ -64,7 +64,7 @@ statements(Stmts) --> statement_line(S), { Stmts = [S] }.
 statements(Stmts) --> statement_line(S), eol, statements(Ss), { Stmts = [S|Ss] }.
 % TODO: Remove underscores in statements list from comments.
 
-value(V) --> constant(V) | identifier(V) | fn_call(V).
+value(V) --> constant(V) | id(V) | fn_call(V).
 
 % white is a space or tab.
 % eol is \n, \r\n, or end of input.
