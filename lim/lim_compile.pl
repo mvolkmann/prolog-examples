@@ -19,6 +19,8 @@ call_args(Args) -->
 
 comment --> whites, "#", string_without("\n", _).
 
+constant(const(V)) --> integer(V).
+
 def_args(Args) --> ws, identifier(A), ws, { Args = [A] }.
 def_args(Args) -->
   ws, identifier(A), ws, ",", ws, def_args(As), { Args = [A|As] }.
@@ -62,7 +64,7 @@ statements(Stmts) --> statement_line(S), { Stmts = [S] }.
 statements(Stmts) --> statement_line(S), eol, statements(Ss), { Stmts = [S|Ss] }.
 % TODO: Remove underscores in statements list from comments.
 
-value(V) --> identifier(V) | integer(V) | fn_call(V).
+value(V) --> constant(V) | identifier(V) | fn_call(V).
 
 % white is a space or tab.
 % eol is \n, \r\n, or end of input.

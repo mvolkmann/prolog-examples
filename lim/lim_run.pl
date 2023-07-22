@@ -14,69 +14,75 @@ run(InFile) :-
 % P = program([fn(multiply,[a,b],[assign(c,math(*,a,b)),return(c)]),assign(product,call(multiply,[2,3])),print(product)]),
 execute(P) :-
   format('execute: P = ~w~n', [P]),
-  Vtable = _{},
-  eval(Vtable, P).
+  nb_setval(vtable, vtable{}),
+  eval(P).
 
-eval(Vtable, assign(Name, Value)) :-
-  format('eval assign: Name = ~w, Value = ~w~n', [Value, Name]),
-  V = lookup(Value),
-  format('eval assign: V = ~w~n', [Value]),
-  Vtable.put(Name, V).
+eval(assign(Name, Value)) :-
+  format('eval assign: Name = ~w, Value = ~w~n', [Name, Value]),
+  lookup(Value, V),
+  format('eval assign: V = ~w~n', [V]),
+  vtable_put(Name, V).
 
-eval(Vtable, call(Name, Args)) :-
+eval(call(Name, Args)) :-
   format('eval call: Name = ~w, Args = ~w~n', [Name, Args]),
-  Stmts = Vtable.get(Name),
+  vtable_get(Name, Stmts),
   maplist(eval, Stmts).
 
-eval(Vtable, fn(Name, Args, Stmts)) :-
+eval(fn(Name, Args, Stmts)) :-
   format('eval fn: Name = ~w, Args = ~w~n', [Name, Args]),
-  Vtable.put(Name, Stmts).
+  vtable_put(Name, Stmts).
 
-eval(Vtable, program(Stmts)) :-
+eval(program(Stmts)) :-
   writeln('eval program'),
-  maplist(eval(Vtable), Stmts).
+  maplist(eval, Stmts).
 
-eval(Vtable, print(Value)) :-
+eval(print(Value)) :-
   format('eval print: Value = ~w~n', [Value]),
-  lookup(Vtable, Value, V),
+  lookup(Value, V),
   format('eval: V = ~w~n', [V]),
   writeln(V).
 
-eval(Vtable, return(Value)) :-
+eval(return(Value)) :-
   format('eval return: Value = ~w~n', [Value]),
-  Stack = Vtable.get(stack_, []),
-  NewStack = [Value | Stack],
-  Vtable.put(NewStack).
+  vtable_get(stack_, Stack),
+  vtable_put(stack_, [Value | Stack]).
 
-lookup(Vtable, call(_, _), Value) :-
+lookup(call(_, _), Value) :-
   format('lookup call'),
-  Stack = Vtable.get(stack_, []),
+  vtable_get(stack_, Stack),
   length(Stack, Length),
   (Length == 0 ->
     writeln('stack is empty!'),
     Value = 0;
     % Pop the first item from the stack.
     [Value|Tail] = Stack,
-    Vtable.put(stack_, Tail)
+    vtable_put(stack_, Tail)
   ).
 
-lookup(Vtable, id(Name), Value) :-
+lookup(const(Value), V) :-
+  format('lookup const: Value = ~w~n', [Value]),
+  V = Value.
+
+lookup(id(Name), Value) :-
   format('lookup id: Name = ~w~n', [Name]),
-  Value = Vtable.get(Name).
+  vtable_get(Name, Value).
 
-% lookup(_, integer(I), Value) :-
-lookup(_, V, Value) :-
-  format('lookup generic: V = ~w~n', [V]),
-  Value = V.
-
-lookup(Vtable, math(Operator, LHS, RHS), Value) :-
+lookup(math(Operator, LHS, RHS), Value) :-
   format('lookup math: Operator = ~w~n', [Operator]),
   format('lookup math: LHS = ~w~n', [LHS]),
   format('lookup math: RHS = ~w~n', [RHS]),
-  lookup(Vtable, LHS, L),
-  lookup(Vtable, RHS, R),
+  lookup(LHS, L),
+  lookup(RHS, R),
   format('math ~w ~w ~w~n', L, Operator, R),
   Value = 19. % TODO: Do the calculation.
+
+vtable_get(Key, Value) :-
+  nb_getval(vtable, Vtable),
+  Vtable.get(Key, Value).
+
+vtable_put(Key, Value) :-
+  nb_getval(vtable, Vtable),
+  nb_setval(vtable, Vtable.put(Key, Value)).
 
 :- initialization
   current_prolog_flag(argv, [InFile|_]),
