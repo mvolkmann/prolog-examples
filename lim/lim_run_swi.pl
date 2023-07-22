@@ -66,18 +66,18 @@ lookup(const(Value), V) :-
   format('lookup const: Value = ~w~n', [Value]),
   V = Value.
 
-lookup(math(Operator, LHS, RHS), Value) :-
-  format('lookup math: Operator = ~w~n', [Operator]),
-  format('lookup math: LHS = ~w~n', [LHS]),
-  format('lookup math: RHS = ~w~n', [RHS]),
+lookup(math(Operator, LHS, RHS), Result) :-
   lookup(LHS, L),
   lookup(RHS, R),
-  format('math ~w ~w ~w~n', [L, Operator, R]),
-  Operator == '+' -> Value is L + R;
-  Operator == '-' -> Value is L - R;
-  Operator == '*' -> Value is L * R;
-  Operator == '/' -> Value is L / R;
-  Value = 0. % TODO: Throw an error.
+  format('lookup math: ~w ~w ~w~n', [L, Operator, R]),
+  (
+    Operator == '+' -> Result is L + R;
+    Operator == '-' -> Result is L - R;
+    Operator == '*' -> Result is L * R;
+    Operator == '/' -> Result is L / R;
+    Value = 0 % TODO: Throw an error.
+  ),
+  format('lookup math: result = ~w~n', [Result]).
 
 lookup(Name, Value) :-
   format('lookup by name: Name = ~w~n', [Name]),
