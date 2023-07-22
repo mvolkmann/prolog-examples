@@ -1,2 +1,7 @@
-v = 6 / 4 
+fn add(n1, n2)
+  sum = n1 + n2
+  return sum
+end
+
+v = add(2, 3)
 print v

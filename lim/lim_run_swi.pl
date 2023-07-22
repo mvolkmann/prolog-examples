@@ -21,14 +21,15 @@ eval(assign(Name, Value)) :-
   format('eval assign: V = ~w~n', [V]),
   vtables_put(Name, V).
 
+% This kind of call does not assign its return value to anything.
 eval(call(Name, Args)) :-
   format('eval call: Name = ~w, Args = ~w~n', [Name, Args]),
-  vtables_get(Name, Stmts),
+  vtables_get(Name, [Params, Stmts]),
   maplist(eval, Stmts).
 
-eval(fn(Name, Args, Stmts)) :-
-  format('eval fn: Name = ~w, Args = ~w~n', [Name, Args]),
-  vtables_put(Name, Stmts).
+eval(fn(Name, Params, Stmts)) :-
+  format('eval fn: Name = ~w, Params = ~w~n', [Name, Params]),
+  vtables_put(Name, [Params, Stmts]).
 
 eval(program(Stmts)) :-
   writeln('eval program'),
@@ -47,7 +48,9 @@ eval(return(Value)) :-
   [Vtable|_] = T,
   Vtable.put(return_, Value).
 
-lookup(call(_, _)) :-
+% This kind of call uses the return value,
+% perhaps in an assignment or as a function argument.
+lookup(call(Name, Args)) :-
   format('lookup call'),
 
   % Add a new vtable to the front of the list
@@ -56,7 +59,14 @@ lookup(call(_, _)) :-
   NewVtable = vtable{},
   vtables_put(vtables, [NewVtable | Vtables]),
 
-  % TODO: Call the function.
+  % Get the parameters and statements in the function.
+  vtables_get(Name, [Params|Stmts]),
+
+  % Assign all the arguments to the parameters.
+  % TODO:
+
+  % Execute the statements.
+  % TODO:
 
   % Remove the vtable for this call.
   vtables_get(vtables, [_|T]),
@@ -75,7 +85,7 @@ lookup(math(Operator, LHS, RHS), Result) :-
     Operator == '-' -> Result is L - R;
     Operator == '*' -> Result is L * R;
     Operator == '/' -> Result is L / R;
-    Value = 0 % TODO: Throw an error.
+    Result = 0 % TODO: Throw an error.
   ),
   format('lookup math: result = ~w~n', [Result]).
 
