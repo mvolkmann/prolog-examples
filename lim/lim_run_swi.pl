@@ -1,3 +1,4 @@
+:- use_module(library(apply)).
 :- use_module(library(dcg/basics)).
 :- use_module(library(pio)).
 
@@ -48,25 +49,35 @@ eval(return(Value)) :-
   [Vtable|_] = T,
   Vtable.put(return_, Value).
 
+param_assign(VT0, Name, Value, VT1) :-
+  format('param_assign: Name = ~w, Value = ~w~n', [Name, Value]),
+  VT1 = VT0.put(Name, Value).
+
 % This kind of call uses the return value,
 % perhaps in an assignment or as a function argument.
 lookup(call(Name, Args)) :-
-  format('lookup call'),
+  format('lookup call: Name = ~w~n', [Name]),
+  format('lookup call: Args = ~w~n', [Args]),
 
   % Add a new vtable to the front of the list
   % to hold local variables in this function call.
   vtables_get(vtables, Vtables),
-  NewVtable = vtable{},
-  vtables_put(vtables, [NewVtable | Vtables]),
+  VT0 = vtable{},
+
+  % Get the argument values.
+  maplist(lookup, Args, Values),
+  format('lookup call: Values = ~w~n', [Values]),
 
   % Get the parameters and statements in the function.
   vtables_get(Name, [Params|Stmts]),
 
-  % Assign all the arguments to the parameters.
-  % TODO:
+  % Assign all the argument values to the parameters.
+  foldl(param_assign(VT0), Params, Values, VT),
+  format('lookup call: VT = ~w~n', [VT]),
+  vtables_put(vtables, [VT | Vtables]),
 
   % Execute the statements.
-  % TODO:
+  maplist(eval, Stmts),
 
   % Remove the vtable for this call.
   vtables_get(vtables, [_|T]),
