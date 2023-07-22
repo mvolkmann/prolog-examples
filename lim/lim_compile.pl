@@ -29,7 +29,7 @@ fn_call(call(Name, Args)) --> id(Name), "(", call_args(Args), ")".
 fn_call(call(Name, Args)) --> id(Name), "(", call_args(Args), ")".
 
 % To use this, enter something like the following:
-% once(phrase(fn_def(F), "fn foo(a, b)\nc = a * b\nprint c\nend")).
+% once(phrase(fn_def(F), `fn foo(a, b)\nc = a * b\nprint c\nend`)).
 fn_def(fn(Name, Args, Statements)) -->
   "fn ", id(Name), "(", def_args(Args), ")", ws,
   statements(Statements),
@@ -51,7 +51,7 @@ operator(/) --> "/".
 print(print(V)) --> "print", ws, value(V).
 
 % To use this, enter something like the following:
-% once(phrase(program(P), "fn multiply(a, b)\n  c = a * b\n  return c\nend\nmultiply(2, 3)\nprint 6")).
+% once(phrase(program(P), `fn multiply(a, b)\n  c = a * b\n  return c\nend\nmultiply(2, 3)\nprint 6`)).
 % once(phrase_from_file(program(P), "dcg4.txt")).
 program(program(Ss)) --> statements(Ss), eol.
 
