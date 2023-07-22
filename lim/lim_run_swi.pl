@@ -1,6 +1,8 @@
 :- use_module(library(apply)). % for foldl
 :- use_module(library(dcg/basics)).
 
+% This assigns a value to a variable.
+% The value can be a constant, math expression, or a function call.
 eval(assign(Name, Value)) :-
   lookup(Value, V),
   vtables_put(Name, V).
@@ -8,13 +10,18 @@ eval(assign(Name, Value)) :-
 % This kind of call does not assign its return value to anything.
 eval(call(Name, Args)) :- process_call(Name, Args).
 
-eval(fn(Name, Params, Stmts)) :-
-  vtables_put(Name, [Params, Stmts]).
+% This stores a function definition in the current vtable.
+eval(fn(Name, Params, Stmts)) :- vtables_put(Name, [Params, Stmts]).
 
+% This evaluates all the statements in a program.
 eval(program(Stmts)) :- maplist(eval, Stmts).
 
+% This gets a value (which can be a constant, math expression,
+% or a function call) and prints it to stdout.
 eval(print(Value)) :- lookup(Value, V), writeln(V).
 
+% This stores a value being returned from a function
+% so the caller can find it.  See "lookup(call...) below."
 eval(return(Value)) :-
   lookup(Value, V),
   % Store the return value so caller can retrieve it.
@@ -26,8 +33,10 @@ lookup(call(Name, Args), V) :-
   process_call(Name, Args),
   nb_getval(return_, V).
 
+% This gets the value of a constant.
 lookup(const(Value), Value).
 
+% This evaluates a math expression.
 lookup(math(Operator, LHS, RHS), Result) :-
   lookup(LHS, L),
   lookup(RHS, R),
@@ -39,12 +48,16 @@ lookup(math(Operator, LHS, RHS), Result) :-
     Result = 0 % TODO: Throw an error.
   ).
 
+% This gets a value from the vtables.
 lookup(Name, Value) :-
   vtables_get(Name, Value).
 
+% This adds a name/value pair to a vtable, creating a new vtable.
 param_assign(Name, Value, VT0, VT1) :-
   VT1 = VT0.put(Name, Value).
 
+% This is used by both "eval(call...)" and "lookup(call...)"
+% to process calling a function.
 process_call(Name, Args) :-
   % Get the argument values.
   maplist(lookup, Args, Values),
@@ -68,16 +81,21 @@ process_call(Name, Args) :-
   nb_getval(vtables, [_|T]),
   nb_setval(vtables, T).
 
+% This reads a binary file produced by limc.
 read_file(InFile, Program) :-
   Options = [type(binary)],
   open(InFile, read, Stream, Options),
   fast_read(Stream, Program),
   close(Stream).
 
+% This runs the code in a binary file produced by limc.
+% The file should contain a binary representation of a Prolog term
+% that describes a program found in a .lim file.
 run_file(InFile) :-
   read_file(InFile, Program),
   run_program(Program).
 
+% This runs a lim program.
 run_program(Program) :-
   % Create the top-level vtable.
   nb_setval(vtables, [vtable{}]),

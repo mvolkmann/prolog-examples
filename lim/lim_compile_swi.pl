@@ -1,5 +1,6 @@
 :- use_module(library(dcg/basics)).
 
+% These are DCG rules that consume a single character of a specific type.
 % From dcg/basics:
 % digit(C) --> [C], { code_type(C, digit) }.
 letter(C) --> [C], { code_type(C, alpha) }.
