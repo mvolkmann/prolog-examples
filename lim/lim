@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 # This runs a .limb file which contains a serialized, binary, Prolog term.
 
 if [ $# -ne 1 ]; then
@@ -6,4 +6,5 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
-swipl lim_run.pl "$1"
+swipl lim_run_swi.pl "$1"
+# scryerp lim_run.pl "$1"

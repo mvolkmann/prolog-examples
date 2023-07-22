@@ -1,6 +1,5 @@
-% NOTE: It seems important for double_quotes to not be set to
-%       chars for the grammar rules in dcg/basics to work!
-:- use_module(library(dcg/basics)).
+:- use_module(library(charsio)).
+:- use_module(library(dcgs)).
 :- use_module(library(pio)).
 
 run(InFile) :-

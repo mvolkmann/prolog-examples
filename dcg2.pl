@@ -1,8 +1,7 @@
 % This uses DCGs.
-% NOTE: It seems important for double_quotes to not be set to
-%       chars for the grammar rules in dcg/basics to work!
-:- use_module(library(dcg/basics)).
+% :- use_module(library(dcg/basics)).
 
+/*
 % If we match "cat", there is no need to check for also matching "dog".
 pet --> "cat", { ! } | "dog".
 
@@ -12,6 +11,7 @@ pet --> "cat", { ! } | "dog".
 % phrase(raining, `cat cat dog dog cat`).
 raining --> pet, " ", raining, { ! }.
 raining --> pet.
+*/
 
 % For simple text matching and extraction,
 % a regular expression is an easier alternative.

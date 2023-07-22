@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 # This compiles a .lim file, producing a .limc file
 # which contains a serialized, binary, Prolog term.
 
@@ -7,4 +7,6 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
-swipl lim_compile.pl "$1"
+swipl lim_compile_swi.pl "$1"
+# scryerp=/Users/volkmannm/Documents/dev/lang/prolog/scryer-prolog/target/release/scryer-prolog
+# scryerp lim_compile.pl "$1"
