@@ -6,13 +6,14 @@ When we do, we just pour as much as possible.
 The goal is to find a sequence of pours
 that result in a jug containing 2 units.
 
-The jug structure arguments are number, capacity, and current level.
+The jug structure arguments are label, capacity, and current level.
 The from_to structure arguments are from jug number and to jug number.
 The solution is a list of from_to structures.
 */
 
 %:- use_module(library(clpfd)). % only for SWI-Prolog
 :- use_module(library(clpz)). % only for Scryer Prolog
+:- use_module(library(dcgs)). % only for Scryer Prolog
 :- use_module(library(format)). % only for Scryer Prolog
 :- use_module(library(lists)). % only for Scryer Prolog
 
@@ -42,12 +43,12 @@ moves(Jugs0) -->
   ]).
 
 print_move(from_to(F, T)) :-
-  format('Pour from ~w to ~w.~n', [F, T]).
+  format("Pour from ~w to ~w.~n", [F, T]).
 
 :- initialization((
    length(Moves, L), % for iterative deepening
    phrase(moves([jug(a,4,0), jug(b,3,0), jug(c,7,7)]), Moves),
-   format('The solution requires ~d moves.~n', [L]),
+   format("The solution requires ~d moves.~n", [L]),
    maplist(print_move, Moves),
    halt
  )).

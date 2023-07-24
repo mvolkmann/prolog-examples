@@ -1,5 +1,5 @@
 % This uses DCGs.
-% :- use_module(library(dcg/basics)).
+:- use_module(library(dcg/basics)).
 
 /*
 % If we match "cat", there is no need to check for also matching "dog".
