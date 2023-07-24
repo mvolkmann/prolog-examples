@@ -8,5 +8,4 @@ if [ $# -ne 1 ]; then
 fi
 
 swipl lim_compile_swi.pl "$1"
-# scryerp=/Users/volkmannm/Documents/dev/lang/prolog/scryer-prolog/target/release/scryer-prolog
 # scryerp lim_compile.pl "$1"
