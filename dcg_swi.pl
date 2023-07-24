@@ -1,5 +1,4 @@
-% This uses DCGs.
-:- use_module(library(dcg/basics)).
+:- use_module(library(dcg/basics)). % in SWI-Prolog
 
 /*
 % If we match "cat", there is no need to check for also matching "dog".
@@ -16,15 +15,13 @@ raining --> pet.
 % For simple text matching and extraction,
 % a regular expression is an easier alternative.
 % To use this, enter something like the following:
-% phrase(hello(Name), `Hello, World!`). % in SWI-Prolog
-% phrase(hello(Name), "Hello, World!"). % in Scryer
+% phrase(hello(Name), "Hello, World!").
 hello(Name) -->
   "Hello, ", string(S), "!", !,
   { string_codes(Name, S) }.
 
 % To use this, enter something like the following:
-% phrase(player(Name, Number), `Player Gretzky wears number 99.`). % in SWI-Prolog
-% phrase(player(Name, Number), "Player Gretzky wears number 99."). % in Scryer
+% phrase(player(Name, Number), "Player Gretzky wears number 99.").
 player(Name, Number) -->
   "Player ",
   string_without(" ", Cs),
