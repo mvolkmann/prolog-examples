@@ -13,6 +13,8 @@ The solution is a list of from_to structures.
 
 %:- use_module(library(clpfd)). % only for SWI-Prolog
 :- use_module(library(clpz)). % only for Scryer Prolog
+:- use_module(library(format)). % only for Scryer Prolog
+:- use_module(library(lists)). % only for Scryer Prolog
 
 % A solution has been found when any jug contains 2 units.
 % Jugs0 is a list of three jug structures.
