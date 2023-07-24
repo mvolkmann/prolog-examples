@@ -6,5 +6,5 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
-swipl lim_run_swi.pl "$1"
-# scryerp lim_run.pl "$1"
+# swipl lim_run_swi.pl "$1"
+scryerp lim_run_scryer.pl "$1"

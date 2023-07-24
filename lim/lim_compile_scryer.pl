@@ -2,11 +2,10 @@
 :- use_module(library(dcgs)).
 :- use_module(library(pio)).
 
-% From dcg/basics:
 % digit(C) --> [C], { code_type(C, digit) }.
-letter(C) --> [C], { code_type(C, alpha) }.
-lower(C) --> [C], { code_type(C, lower) }.
-upper(C) --> [C], { code_type(C, upper) }.
+letter(C) --> [C], { char_type(C, alpha) }.
+lower(C) --> [C], { char_type(C, lower) }.
+upper(C) --> [C], { char_type(C, upper) }.
 letter_or_digit(C) --> letter(C) | digit(C).
 
 assignment(assign(I, V)) --> id(I), ws, "=", ws, value(V).
@@ -81,11 +80,13 @@ compile(InFile, OutFile) :-
   fast_write(Stream, P),
   close(Stream).
 
-:- initialization
-  current_prolog_flag(argv, Argv),
-  [InFile|_] = Argv,
+:- initialization((
+  % current_prolog_flag(argv, Argv),
+  % [InFile|_] = Argv,
+  InFile = "demo.lim",
   split_string(InFile, '.', '', [Name|_]),
   string_concat(Name, '.limb', OutFile),
   compile(InFile, OutFile),
   format('created ~w~n', OutFile),
-  halt.
+  halt
+)).
