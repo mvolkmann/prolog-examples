@@ -1,5 +1,5 @@
-% :- use_module(library(dcg/basics)). % in SWI-Prolog
-:- use_module(library(charsio)). % in Scryer Prolog
+:- use_module(library(dcgs)). % for -->, seq, and phrase
+:- use_module(library(charsio)). % for char_type
 
 % To use this, enter something like the following:
 % phrase(hello(Name), "Hello, World!").

@@ -1,4 +1,4 @@
-:- use_module(library(dcg/basics)). % in SWI-Prolog
+:- use_module(library(dcg/basics)). % for string_without and digits
 
 /*
 % If we match "cat", there is no need to check for also matching "dog".
