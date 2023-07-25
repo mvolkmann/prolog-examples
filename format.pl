@@ -1,11 +1,15 @@
 :- use_module(library(dcgs)).
 :- use_module(library(format)).
-
-my_format(FS, Args, Result) :-
-  phrase(format_(FS, Args), Result).
+:- use_module(library(lists)).
 
 :- initialization((
   S = 'test string',
-  my_format("S is ~w.~n", [S], Result),
-  write(Result)
+
+  % Using format_ instead of format captures the result
+  % instead of writing it to stdout.
+  phrase(format_("S is ~w.~n", [S]), Result),
+
+  % Result is a list of character atoms.
+  % This writes each one to stdout.
+  maplist(write, Result)
 )).
