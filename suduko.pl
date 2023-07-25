@@ -1,6 +1,14 @@
 % This is based on code from Markus Triska in the SWI-Prolog manual.
 
+/*
+% For SWI-Prolog ...
 :- use_module(library(clpfd)).
+*/
+
+% For Scryer Prolog ...
+:- use_module(library(clpz)).
+:- use_module(library(format)).
+:- use_module(library(lists)).
 
 sudoku(Rows) :-
   % Verify that Rows is a list with 9 elements.
@@ -40,7 +48,10 @@ blocks([], [], []).
 
 % When a block is not empty, get its 9 values
 % and verify that they are unique.
-blocks([R1C1,R1C2,R1C3|T1], [R2C1,R2C2,R2C3|T2], [R3C1,R3C2,R3C3|T3]) :-
+blocks(
+  [R1C1,R1C2,R1C3|T1],
+  [R2C1,R2C2,R2C3|T2],
+  [R3C1,R3C2,R3C3|T3]) :-
   all_distinct([R1C1, R1C2, R1C3, R2C1, R2C2, R2C3, R3C1, R3C2, R3C3]),
   blocks(T1, T2, T3).
 
@@ -48,14 +59,18 @@ blocks([R1C1,R1C2,R1C3|T1], [R2C1,R2C2,R2C3|T2], [R3C1,R3C2,R3C3|T3]) :-
 print_rows([]).
 
 % When there are more rows, print the first row.
-print_rows([H|T]) :- print_row(H), print_rows(T).
+print_rows([H|T]) :-
+  print_row(H),
+  print_rows(T).
 
 % When the last element of a row has been printed, print a newline.
 print_row([]) :- nl.
 
 % When there are more row elements,
 % print the first one followed by a space.
-print_row([H|T]) :- format("~w ", H), print_row(T).
+print_row([H|T]) :-
+  format("~w ", [H]),
+  print_row(T).
 
 % Each puzzle must contain at least 17 clues.
 
