@@ -84,14 +84,15 @@ moves(Jugs0) -->
   % required to reach the goal state.
   moves([jug(From, FromFill), jug(To, ToFill) | Jugs]).
 
-:- initialization
+:- initialization((
   InitialState = [jug(a, 8), jug(b, 0), jug(c, 0)],
   % This causes iterative deepening to be used.
   length(Ms, _),
   % The phrase predicate is defined by the DCG library.
   phrase(moves(InitialState), Ms),
   maplist(writeln, Ms),
-  halt.
+  halt
+)).
 /*
 One solutions is:
 Ms = [

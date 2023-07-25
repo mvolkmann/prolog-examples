@@ -76,7 +76,7 @@ show(N, Options) :-
 show(_, _ ) :- halt.
 */
 
-:- initialization
+:- initialization((
   N = 20,
 
   /*
@@ -116,4 +116,5 @@ show(_, _ ) :- halt.
 
   writeln(Qs),
   % phrase(format('Qs = ~w~n', [Qs])).
-  halt.
+  halt
+)).

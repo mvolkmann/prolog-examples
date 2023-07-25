@@ -122,9 +122,10 @@ vtables_put(Key, Value) :-
   NewH = H.put(Key, Value),
   nb_setval(vtables, [NewH|T]).
 
-:- initialization
+:- initialization((
   % Get the first command-line argument which should be
   % a file path to the .limb file to run.
   current_prolog_flag(argv, [InFile|_]),
   run_file(InFile),
-  halt.
+  halt
+)).

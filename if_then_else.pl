@@ -8,8 +8,8 @@ check(Name) :-
   ),
   writeln('after arrow').
 
-:- initialization
-
+:- initialization((
   check(mark),
   check(jeremy),
-  halt.
+  halt
+)).

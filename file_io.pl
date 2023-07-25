@@ -20,7 +20,7 @@ my_goal :-
   writeln('line #1'),
   writeln('line #2').
 
-:- initialization
+:- initialization((
   % open('demo.txt', write, Stream),
   % Stream = string(S),
 
@@ -39,4 +39,5 @@ my_goal :-
   memory_file_to_string(Handle, S),
   format('S = ~w~n', [S]).
 
-  % halt.
+  % halt
+)).

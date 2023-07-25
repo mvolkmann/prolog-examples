@@ -6,7 +6,7 @@ report(P) :-
   Value = P.get(Key, 0),
   format('key ~w = ~w~n', [Key, Value]).
 
-:- initialization
+:- initialization((
   P = person{
     first: 'Mark',
     last: 'Volkmann',
@@ -27,4 +27,5 @@ report(P) :-
     format('Value = ~w~n', [Value]);
     writeln('no value found')
   ),
-  halt.
+  halt
+)).

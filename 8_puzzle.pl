@@ -87,7 +87,7 @@ member(X, [_|T]):-
 %-----------------------Output Queries---------------------------------->
 
 % ?- test(Plan).
-:- initialization
+:- initialization((
   Init = [
     at(tile7,9),
     at(tile1,8),
@@ -112,4 +112,5 @@ member(X, [_|T]):-
   ],
   solve(Init, Goal, Plan),
   writeln(Plan),
-  writeln('finished').
+  writeln('finished')
+)).

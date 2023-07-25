@@ -1,0 +1,2 @@
+:- initialization(consult(family)).
+

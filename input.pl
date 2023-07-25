@@ -21,7 +21,8 @@ read_string(S0) :-
   ).
 
 /*
-:- initialization
+:- initialization((
   greet,
-  halt.
+  halt
+)).
 */

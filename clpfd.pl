@@ -2,7 +2,7 @@
 
 add(A, B, C) :- C #= A + B.
 
-:- initialization
+:- initialization((
   X in 5..10, Y in 7..14, X #> Y,
   writeln(X),
   writeln(Y),
@@ -30,4 +30,5 @@ add(A, B, C) :- C #= A + B.
   format('Results = ~w~n', [Results]), % [[3,2],[4,1],[5,0]]
   */
 
-  halt.
+  halt
+)).

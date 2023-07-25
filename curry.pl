@@ -6,7 +6,7 @@ sum2(X, Y, Z) :-
 sum3(A1, A2, A3, A4) :-
   A4 #= A1 + A2 + A3.
 
-:- initialization
+:- initialization((
   sum3(1, 2, 3, R1),
   writeln(R1), % 6
 
@@ -31,4 +31,5 @@ sum3(A1, A2, A3, A4) :-
   % call(Term), % evaluates term
   (call(Term) -> writeln('yes'); writeln('no')), % yes
 
-  halt.
+  halt
+)).

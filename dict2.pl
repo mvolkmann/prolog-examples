@@ -1,4 +1,4 @@
-:- initialization
+:- initialization((
   Thing = thing{
     id: obj{ key: 1}
   },
@@ -11,4 +11,5 @@
   writeln(NewObj.key), % 2
   % WHY DID THIS CHANGE ALSO?
   writeln(Obj.key), % 2
-  halt.
+  halt
+)).

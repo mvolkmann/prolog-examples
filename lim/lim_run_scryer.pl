@@ -89,7 +89,8 @@ vtable_put(Key, Value) :-
   format('vtable_put: NewVtable = ~w~n', [NewVtable]),
   nb_setval(vtable, NewVtable).
 
-:- initialization
+:- initialization((
   current_prolog_flag(argv, [InFile|_]),
   run(InFile),
-  halt.
+  halt
+)).

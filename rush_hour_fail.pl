@@ -292,7 +292,7 @@ max(X, Y, Y) :- Y > X.
 min(X, Y, X) :- X =< Y.
 min(X, Y, Y) :- Y < X.
 
-:- initialization
+:- initialization((
   % X goes left to right from 0 to 5.
   % Y goes top to bottom from 0 to 5.
   % This is the set for puzzle #1.
@@ -314,4 +314,5 @@ min(X, Y, Y) :- Y < X.
   % The exit will be marked with E when a solution is found.
   % After 12 seconds this ends with "Stack limit exceeded".
   % solve_astar_print(Board),
-  halt.
+  halt
+)).

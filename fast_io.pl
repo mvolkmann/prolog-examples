@@ -1,4 +1,4 @@
-:- initialization
+:- initialization((
   File = "demo.pb",
   Data = foo(bar, baz),
   Options = [type(binary)],
@@ -9,4 +9,5 @@
   fast_read(RStream, NewData),
   close(RStream),
   format('NewData = ~w~n', NewData),
-  halt.
+  halt
+)).

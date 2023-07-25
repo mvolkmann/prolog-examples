@@ -1,8 +1,9 @@
 :- use_module(library(http/http_server)).
 
-:- initialization
+:- initialization((
   consult(exercise1_3),
-  http_server([port(8081)]).
+  http_server([port(8081)])
+)).
 
 :- http_handler(
   root(.),

@@ -30,7 +30,7 @@ report(Thing) :-
 % Auxiliary rule names end in an underscore by convention.
 report_(Thing, X) :- format('~w is ~w.~n', [Thing, X]).
 
-:- initialization
+:- initialization((
   add_predicates,
   findall(F, fruit(F), Fruits),
   writeln(Fruits), % [apple, banana, cherry]
@@ -38,4 +38,5 @@ report_(Thing, X) :- format('~w is ~w.~n', [Thing, X]).
   maplist(report, Things),
   sum(2, 3, S),
   writeln(S), % 5
-  halt.
+  halt
+)).

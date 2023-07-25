@@ -8,13 +8,14 @@ print_row(Row) :-
   % The 3rd list element is right-aligned.
   format('~w~t~10+~t~w~t~10+~t~w~10+~n', Row).
 
-:- initialization
+:- initialization((
   Rows = [
     ["foo", "bar", "baz"],
     ["foolish", "barking", "bazooka"]
   ],
   maplist(print_row, Rows),
-  halt.
+  halt
+)).
 
 /* The output is:
 foo          bar           baz

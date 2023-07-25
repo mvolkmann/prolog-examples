@@ -14,7 +14,7 @@ linked_list(Node, L) :-
   % This appends in reverse order.
   append(L2, [Node.value], L).
 
-:- initialization
+:- initialization((
   N1 = node{value: 'alpha', next: nil},
   N2 = node{value: 'beta', next: N1},
   N3 = node{value: 'gamma', next: N2},
@@ -27,4 +27,5 @@ linked_list(Node, L) :-
   atomics_to_string(L, ',', S),
 
   writeln(S), % alpha,beta,gamma
-  halt.
+  halt
+)).

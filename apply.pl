@@ -5,7 +5,7 @@
 double(X, Y) :- Y is X * 2.
 sum(N1, N2, Sum) :- Sum is N1 + N2.
 
-:- initialization
+:- initialization((
   Numbers = [1, 2, 3],
   foldl(sum, Numbers, 0, Sum),
   format('Sum = ~w~n', [Sum]),
@@ -13,4 +13,5 @@ sum(N1, N2, Sum) :- Sum is N1 + N2.
   maplist(double, Numbers, Doubled),
   format('Doubled = ~w~n', [Doubled]),
 
-  halt.
+  halt
+)).

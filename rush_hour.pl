@@ -454,12 +454,13 @@ write_board(Stream, Board) :-
   write_board_rows(Stream, Board),
   writeln(Stream, Border).
 
-:- initialization
+:- initialization((
   dynamic(horizontal/1),
   dynamic(fixed/2),
   dynamic(letter_index/2).
 
   /* You can run "swipl rush_hour.plt" instead of using this code.
   puzzles(Puzzles), solve(Puzzles.p1),
-  halt.
+  halt
   */
+)).

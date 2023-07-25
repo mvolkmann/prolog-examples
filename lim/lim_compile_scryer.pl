@@ -1,6 +1,8 @@
 :- use_module(library(charsio)).
 :- use_module(library(dcgs)).
+:- use_module(library(format)). % Why not picked up from ~/.scryerrc?
 :- use_module(library(pio)).
+:- include(strings_scryer).
 
 % digit(C) --> [C], { code_type(C, digit) }.
 letter(C) --> [C], { char_type(C, alpha) }.
@@ -81,12 +83,14 @@ compile(InFile, OutFile) :-
   close(Stream).
 
 :- initialization((
-  % current_prolog_flag(argv, Argv),
-  % [InFile|_] = Argv,
-  InFile = "demo.lim",
-  split_string(InFile, '.', '', [Name|_]),
-  string_concat(Name, '.limb', OutFile),
-  compile(InFile, OutFile),
-  format('created ~w~n', OutFile),
-  halt
+  '$toplevel':argv(Args),
+  [InFile|_] = Args,
+  format("InFile = ~w~n", [InFile]),
+  phrase(filename_extension(Name, _), InFile),
+  format("Name = ~w~n", [Name]),
+  OutFile = [Name|".limb"],
+  format("OutFile = ~w~n", [OutFile])
+  % compile(InFile, OutFile),
+  % format('created ~w~n', OutFile),
+  % halt
 )).
