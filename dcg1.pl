@@ -13,7 +13,7 @@ ys --> "y", ys.
 % The following predicates are DCG building blocks.
 
 % Definition of a sequence.
-% Scryer Prolog provides this in its dcg library.
+% Scryer Prolog provides this in its dcgs library.
 seq([]) --> [].
 seq([H|T]) --> [H], seq(T).
 
@@ -22,7 +22,7 @@ append(Xs, Ys, Zs) :- phrase((seq(Xs), seq(Ys)), Zs).
 % :- append("abc", "xyz", L), writeln(L). % output is [a,b,c,x,y,z]
 
 % Concatenation of any number of lists.
-% Scryer Prolog provides this in its dcg library.
+% Scryer Prolog provides this in its dcgs library.
 seqq([]) --> [].
 seqq([H|T]) --> seq(H), seqq(T).
 % :- phrase(seqq(["ab", "cd", "ef"]), L), writeln(L). % output is [a,b,c,d,e,f].
@@ -36,6 +36,7 @@ panindrome(L) :- phrase(qes(L), L).
 % palindrome("mom"). % true
 
 % This describes any sequence.
+% Scryer Prolog provides this in its dcgs library.
 ... --> [] | [_], ... .
 
 % ... can be used to get the last element in a list.
