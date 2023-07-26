@@ -2,9 +2,10 @@
 :- use_module(library(charsio)). % for char_type
 
 % To use this, enter something like the following:
-% phrase(hello(Name), "Hello, World!").
-hello(Name) -->
-  "Hello, ", seq(Name), "!", !.
+% phrase(hello("World"), "Hello, World!"). % true
+% phrase(hello(Name), "Hello, World!"). % Name = "World"
+% phrase(hello(Name), X). % generates all possible results
+hello(Name) --> "Hello, ", seq(Name), "!", !.
 
 % To use this, enter something like the following:
 % phrase(player(Name, Number), "Player Gretzky wears number 99.").
