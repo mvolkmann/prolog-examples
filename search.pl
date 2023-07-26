@@ -1,6 +1,8 @@
+/* These lines are needed in Scryer Prolog, but not in SWI-Prolog.
 :- use_module(library(dcgs)).
 :- use_module(library(format)).
 :- use_module(library(lists)).
+*/
 
 /* This is an alternate strategy.
 from_to_path(From, To, Path) :-
@@ -60,6 +62,7 @@ from_to_path_(From, To, PreviousPath) -->
 
 :- initialization((
   length(Path, L), % for iterative deepening
+  format("path length is ~d~n", [L]), % 3
   from_to_path(a, g, Path),
   % This searches:
   % a
@@ -69,7 +72,6 @@ from_to_path_(From, To, PreviousPath) -->
   % Then searching continues.
   % a b d h i e j k c f
   % How can I stop it from continuing to search after a solution is found?
-  format("path length is ~d~n", [L]), % 3
   format("path is ~w~n", [Path]), % [a,c,g]
   halt
 )).
