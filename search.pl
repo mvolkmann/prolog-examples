@@ -29,11 +29,12 @@ from_to_path(From, To, Path) :- from_to_path_(From, To, Path).
 
 from_to_path_(Node, Node, [Node]).
 
-from_to_path_(From, To, [To|Path]) :-
+from_to_path_(From, To, Path) :-
   format("searching for path from ~w to ~w~n", [From, To]),
-  from_to_path_(From, ToParent, Path),
-  edge(ToParent, To).
-  % \+ member(To, Path). % avoids cycles
+  edge(ToParent, To),
+  from_to_path_(From, ToParent, Path1),
+  \+ member(To, Path1), % To is NOT a member of Path1; avoids cycles
+  append(Path1, [To], Path).
 
 :- initialization((
   /*
