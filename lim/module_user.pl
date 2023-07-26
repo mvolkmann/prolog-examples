@@ -1,4 +1,4 @@
-% The strings module define in strings.pl is specific to Scryer Prolog.
+% The strings module defined in strings.pl is specific to Scryer Prolog.
 :- use_module(strings).
 :- use_module(library(format)).
 
