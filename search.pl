@@ -1,8 +1,8 @@
-/* These lines are needed in Scryer Prolog, but not in SWI-Prolog.
+% These lines are needed in Scryer Prolog, but not in SWI-Prolog.
 :- use_module(library(dcgs)).
+:- use_module(library(dif)).
 :- use_module(library(format)).
 :- use_module(library(lists)).
-*/
 
 /* This is an alternate strategy.
 from_to_path(From, To, Path) :-
@@ -54,8 +54,8 @@ from_to_path_(To, To, _) -->
 from_to_path_(From, To, PreviousPath) -->
   {
     format("evaluating ~w~n", [From]),
-    edge(From, Next)
-    % \+ memberchk(Next, PreviousPath) % include to avoid cycles
+    edge(From, Next),
+    maplist(dif(To), PreviousPath) % include to avoid cycles
   },
   [From],
   from_to_path_(Next, To, [From|PreviousPath]).

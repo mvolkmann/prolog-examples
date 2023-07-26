@@ -8,3 +8,6 @@ bs --> "b", bs_.
 bs_ --> [] | bs.
 
 as_and_bs --> as, bs.
+
+% To generate solutions using iterative deepening, enter the following:
+% length(X, _), phrase(as_and_bs, X).
