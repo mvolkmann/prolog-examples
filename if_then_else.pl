@@ -1,15 +1,29 @@
-male(mark).
+:- use_module(library(reif)).
 
-check(Name) :-
-  writeln('before arrow'),
-  (male(Name) ->
-    format('~w is male.~n', [Name]);
-    format('~w is not male.~n', [Name])
-  ),
-  writeln('after arrow').
+dog(comet).
+
+writeln(X) :- write(X), nl.
+
+report(Name) :-
+  dog(Name) ->
+    writeln('dog');
+    writeln('not a dog').
+
+is_dog(X, B) :- dog(X) -> B = true; B = false.
+
+report_reif(Name) :-
+  % The first argument must be a predicate that accepts
+  % an extra variable argument to receive true or false.
+  if_(
+    is_dog(Name),
+    writeln('dog'),
+    writeln('not a dog')
+  ).
 
 :- initialization((
-  check(mark),
-  check(jeremy),
+  report(comet), % dog
+  report(mark), % not a dog
+  report_reif(comet), % dog
+  report_reif(mark), % not a dog
   halt
 )).
