@@ -19,14 +19,11 @@ report_reif(Name) :-
     writeln('not a dog')
   ).
 
-:- initialization((
+run :-
   report_reif(comet), % dog
   report_reif(mark), % not a dog
 
   Beings = [mark, comet, tami, maisey, ramsay, oscar],
   tpartition(is_dog, Beings, Dogs, NonDogs),
-  format("dogs include ~w~n", [Dogs]),
-  format("non-dogs include ~w~n", [NonDogs]),
-
-  halt
-)).
+  format("dogs include ~w~n", [Dogs]), % [comet,maisey,ramsay,oscar]
+  format("non-dogs include ~w~n", [NonDogs]). % [mark,tami]

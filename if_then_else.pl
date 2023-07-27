@@ -21,10 +21,8 @@ report_reif(Name) :-
     writeln('not a dog')
   ).
 
-:- initialization((
+run :-
   report(comet), % dog
   report(mark), % not a dog
   report_reif(comet), % dog
-  report_reif(mark), % not a dog
-  halt
-)).
+  report_reif(mark). % not a dog
