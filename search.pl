@@ -49,7 +49,7 @@ from_to_path(From, To, Path) :-
 
 from_to_path_(To, To, _) -->
   { write('found solution'), nl},
-  [To].
+  [To]. % adding a cut here does not help
 
 from_to_path_(From, To, PreviousPath) -->
   {
@@ -63,6 +63,7 @@ from_to_path_(From, To, PreviousPath) -->
 :- initialization((
   length(Path, L), % for iterative deepening
   format("path length is ~d~n", [L]), % 3
+  % Wrapping the next goal in once does not help.
   from_to_path(a, g, Path),
   % This searches:
   % a
