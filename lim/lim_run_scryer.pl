@@ -81,15 +81,14 @@ process_call(Name, Args) :-
   bb_get(vtables, [_|T]),
   bb_set(vtables, T).
 
-% This reads a binary file produced by limc.
+% This reads a file produced by limc.
 read_file(InFile, Program) :-
-  Options = [type(binary)],
-  open(InFile, read, Stream, Options),
-  fast_read(Stream, Program),
+  open(InFile, read, Stream),
+  read(Stream, Program),
   close(Stream).
 
-% This runs the code in a binary file produced by limc.
-% The file should contain a binary representation of a Prolog term
+% This runs the code in a file produced by limc.
+% The file should contain a Prolog term
 % that describes a program found in a .lim file.
 run_file(InFile) :-
   read_file(InFile, Program),
