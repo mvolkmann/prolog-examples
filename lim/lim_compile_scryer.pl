@@ -24,8 +24,10 @@ lower(C) --> [C], { char_type(C, lower) }.
 upper(C) --> [C], { char_type(C, upper) }.
 letter_or_digit(C) --> letter(C) | digit(C).
 
-ws --> [C], { char_type(C, whitespace) }, ws.
+% ws is zero or more whitespace characters such as a space, tab, or newline.
+ws --> ws1, ws.
 ws --> [].
+ws1 --> [C], { char_type(C, whitespace) }.
 
 assignment(assign(I, V)) --> id(I), ws, "=", ws, value(V).
 assignment(assign(I, M)) --> id(I), ws, "=", ws, math(M).
