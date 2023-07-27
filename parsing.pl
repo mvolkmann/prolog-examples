@@ -1,4 +1,4 @@
-% TODO: INCLUDE THIS IN BLOG!!!
+% This is in the "Lexical Analysis" section in my Prolog blog page.
 % This was only tested in Scryer Prolog.
 :- use_module(library(charsio)). % for char_type
 
@@ -23,6 +23,10 @@ digits_([]) --> [].
 % I = 1961.
 integer(I) --> digits(Ds), { number_chars(I, Ds) }.
 
+% See https://github.com/mthom/scryer-prolog/discussions/1921
+% There may be a bug related to ascii_punctuation.
+punctuation(P) --> [P], { char_type(P, ascii_punctuation) }.
+
 % This is an "eager consumer rule" which
 % causes tokens to extend to their maximum length.
 % Eager consumer rules check for the nil case ([]) last.
@@ -33,6 +37,7 @@ word([]) --> [].
 % gives ["This","is","a","test"].
 % This will not terminate if it encounters
 % an unexpected character such as punctuation.
+% TODO: Try to fix this with the punctuation grammar rule above.
 words([]) --> [].
 words([H|T]) --> ws, word(H), ws, words(T).
 
