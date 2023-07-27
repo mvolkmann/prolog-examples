@@ -9,6 +9,8 @@ letter(C) --> [C], { char_type(C, alpha) }.
 lower(C) --> [C], { char_type(C, lower) }.
 upper(C) --> [C], { char_type(C, upper) }.
 letter_or_digit(C) --> letter(C) | digit(C).
+ws --> [C], { char_type(C, whitespace) }, ws.
+ws --> [].
 
 assignment(assign(I, V)) --> id(I), ws, "=", ws, value(V).
 assignment(assign(I, M)) --> id(I), ws, "=", ws, math(M).
@@ -65,13 +67,6 @@ statements(Stmts) --> statement_line(S), eol, statements(Ss), { Stmts = [S|Ss] }
 % TODO: Remove underscores in statements list from comments.
 
 value(V) --> constant(V) | id(V) | fn_call(V).
-
-% white is a space or tab.
-% eol is \n, \r\n, or end of input.
-ws1 --> white | eol.
-% ws matches zero or more ws1 characters.
-ws --> [].
-ws --> ws1, ws.
 
 % Example: compile('dcg4.txt', 'dcg4.pb').
 compile(InFile, OutFile) :- 
