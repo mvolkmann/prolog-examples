@@ -1,101 +1,130 @@
 :- use_module(library(assoc)).
-:- use_module(library(charsio)).
-:- use_module(library(dcgs)).
-:- use_module(library(pio)).
 :- use_module(strings).
 
-run(InFile) :-
-  format("run: InFile = ~w~n", [InFile]),
-  open(InFile, read, Stream),
-  read(Stream, P),
-  format("run: P = ~w~n", [P]),
-  close(Stream),
-  execute(P).
-
-% P = program([fn(multiply,[a,b],[assign(c,math(*,a,b)),return(c)]),assign(product,call(multiply,[2,3])),print(product)]),
-execute(P) :-
-  format("execute: P = ~w~n", [P]),
-  % bb_set and bb_get are defined in the iso_ext library.
-  % Is the iso_ext library loaded by default?
-  empty_assoc(A),
-  bb_set(vtable, A),
-  eval(P).
-
+% This assigns a value to a variable.
+% The value can be a constant, math expression, or a function call.
 eval(assign(Name, Value)) :-
-  format("eval assign: Name = ~w, Value = ~w~n", [Name, Value]),
   lookup(Value, V),
-  format("eval assign: V = ~w~n", [V]),
-  vtable_put(Name, V).
+  vtables_put(Name, V).
 
-eval(call(Name, Args)) :-
-  format("eval call: Name = ~w, Args = ~w~n", [Name, Args]),
-  vtable_get(Name, Stmts),
-  maplist(eval, Stmts).
+% This kind of call does not assign its return value to anything.
+eval(call(Name, Args)) :- process_call(Name, Args).
 
-eval(fn(Name, Args, Stmts)) :-
-  format("eval fn: Name = ~w, Args = ~w~n", [Name, Args]),
-  vtable_put(Name, Stmts).
+% This stores a function definition in the current vtable.
+eval(fn(Name, Params, Stmts)) :- vtables_put(Name, [Params, Stmts]).
 
-eval(program(Stmts)) :-
-  writeln('eval program'),
-  maplist(eval, Stmts).
+% This evaluates all the statements in a program.
+eval(program(Stmts)) :- maplist(eval, Stmts).
 
-eval(print(Value)) :-
-  format("eval print: Value = ~w~n", [Value]),
-  lookup(Value, V),
-  format("eval: V = ~w~n", [V]),
-  writeln(V).
+% This gets a value (which can be a constant, math expression,
+% or a function call) and prints it to stdout.
+eval(print(Value)) :- lookup(Value, V), writeln(V).
 
+% This stores a value being returned from a function
+% so the caller can find it.  See "lookup(call...) below."
 eval(return(Value)) :-
-  format("eval return: Value = ~w~n", [Value]),
-  vtable_get(stack_, Stack),
-  vtable_put(stack_, [Value | Stack]).
+  lookup(Value, V),
+  % Store the return value so caller can retrieve it.
+  bb_set(return_, V).
 
-lookup(call(_, _), Value) :-
-  writeln('lookup call'),
-  vtable_get(stack_, Stack),
-  length(Stack, Length),
-  (Length == 0 ->
-    writeln('stack is empty!'),
-    Value = 0;
-    % Pop the first item from the stack.
-    [Value|Tail] = Stack,
-    vtable_put(stack_, Tail)
-  ).
+% This kind of call uses the return value,
+% perhaps in an assignment or as a function argument.
+lookup(call(Name, Args), V) :-
+  process_call(Name, Args),
+  bb_get(return_, V).
 
-lookup(const(Value), V) :-
-  format("lookup const: Value = ~w~n", [Value]),
-  V = Value.
+% This gets the value of a constant.
+lookup(const(Value), Value).
 
-lookup(math(Operator, LHS, RHS), Value) :-
-  format("lookup math: Operator = ~w~n", [Operator]),
-  format("lookup math: LHS = ~w~n", [LHS]),
-  format("lookup math: RHS = ~w~n", [RHS]),
+% This evaluates a math expression.
+lookup(math(Operator, LHS, RHS), Result) :-
   lookup(LHS, L),
   lookup(RHS, R),
-  format("math ~w ~w ~w~n", L, Operator, R),
-  Value = 19. % TODO: Do the calculation.
+  (
+    Operator == '+' -> Result is L + R;
+    Operator == '-' -> Result is L - R;
+    Operator == '*' -> Result is L * R;
+    Operator == '/' -> Result is L / R;
+    Result = 0 % TODO: Throw an error.
+  ).
 
+% This gets a value from the vtables.
 lookup(Name, Value) :-
-  format("lookup by name: Name = ~w~n", [Name]),
-  vtable_get(Name, Value),
-  format("lookup by name: Value = ~w~n", [value]).
+  vtables_get(Name, Value).
 
-vtable_get(Key, Value) :-
-  format("vtable_get: Key = ~w~n", [Key]),
-  bb_get(vtable, Vtable),
-  format("vtable_get: Vtable = ~w~n", [Vtable]),
-  Value = Vtable.get(Key),
-  format("vtable_get: Value = ~w~n", [Value]).
+% This adds a name/value pair to a vtable, creating a new vtable.
+param_assign(Name, Value, VT0, VT1) :-
+  put_assoc(Name, VT0, Value, VT1).
 
-vtable_put(Key, Value) :-
-  bb_get(vtable, Vtable),
-  NewVtable = Vtable.put(Key, Value),
-  format("vtable_put: NewVtable = ~w~n", [NewVtable]),
-  bb_set(vtable, NewVtable).
+% This is used by both "eval(call...)" and "lookup(call...)"
+% to process calling a function.
+process_call(Name, Args) :-
+  % Get the argument values.
+  maplist(lookup, Args, Values),
 
-writeln(X) :- write(X), nl.
+  % Get the parameters and statements in the function.
+  vtables_get(Name, [Params, Stmts]),
+
+  % Assign all the argument values to the parameters.
+  empty_assoc(VT0),
+  foldl(param_assign, Params, Values, VT0, VT),
+
+  % Add a new vtable to the front of the list
+  % to hold local variables in this function call.
+  bb_get(vtables, Vtables),
+  bb_set(vtables, [VT | Vtables]),
+
+  % Execute the statements.
+  maplist(eval, Stmts),
+
+  % Remove the vtable for this call.
+  bb_get(vtables, [_|T]),
+  bb_set(vtables, T).
+
+% This reads a binary file produced by limc.
+read_file(InFile, Program) :-
+  Options = [type(binary)],
+  open(InFile, read, Stream, Options),
+  fast_read(Stream, Program),
+  close(Stream).
+
+% This runs the code in a binary file produced by limc.
+% The file should contain a binary representation of a Prolog term
+% that describes a program found in a .lim file.
+run_file(InFile) :-
+  read_file(InFile, Program),
+  run_program(Program).
+
+% This runs a lim program.
+run_program(Program) :-
+  % Create the top-level vtable.
+  empty_assoc(vtable),
+  bb_set(vtables, [vtable]),
+  eval(Program).
+
+% This gets the value of a given key in the
+% first vtable found in the vtables list that defines it.
+vtables_get(Key, Value) :-
+  bb_get(vtables, Vtables),
+  vtables_get_(Vtables, Key, Value).
+
+% Theses are auxiliary rules used by vtables_get.
+vtables_get_([], _, _) :- fail.
+vtables_get_([H|T], Key, Value) :-
+  (get_assoc(Key, H, V) ->
+    Value = V;
+    vtables_get_(T, Key, Value)
+  ).
+
+% This adds or updates a given key in the
+% first vtable found in the vtables list.
+vtables_put(Key, Value) :-
+  bb_get(vtables, [H|T]),
+  put_assoc(Key, H, Value, NewH),
+  bb_set(vtables, [NewH|T]).
 
 run :-
+  % Get the first command-line argument which should be
+  % a file path to the .limb file to run.
   argv([InFile|_]),
-  run(InFile).
+  run_file(InFile).

@@ -99,14 +99,3 @@ run :-
   append(Name, ".limb", OutFile),
   compile(InFile, OutFile),
   format("created ~s~n", [OutFile]).
-
-/*
-:- initialization((
-  argv([InFile|_]),
-  phrase(filename_extension(Name, _), InFile),
-  append(Name, ".limb", OutFile),
-  compile(InFile, OutFile),
-  % format('created ~w~n', OutFile),
-  halt
-)).
-*/

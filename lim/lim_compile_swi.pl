@@ -80,12 +80,10 @@ compile(InFile, OutFile) :-
   fast_write(Stream, P),
   close(Stream).
 
-:- initialization((
+run :-
   current_prolog_flag(argv, Argv),
   [InFile|_] = Argv,
   split_string(InFile, '.', '', [Name|_]),
   string_concat(Name, '.limb', OutFile),
   compile(InFile, OutFile),
-  format('created ~w~n', OutFile),
-  halt
-)).
+  format('created ~w~n', OutFile).
