@@ -23,8 +23,8 @@ digits_([]) --> [].
 % I = 1961.
 integer(I) --> digits(Ds), { number_chars(I, Ds) }.
 
-% See https://github.com/mthom/scryer-prolog/discussions/1921
-% There may be a bug related to ascii_punctuation.
+% There is a bug related to the value of ascii_punctuation.
+% See https://github.com/mthom/scryer-prolog/issues/1926.
 punctuation(P) --> [P], { char_type(P, ascii_punctuation) }.
 
 % This is an "eager consumer rule" which

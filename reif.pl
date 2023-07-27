@@ -1,14 +1,12 @@
-% Also see reif.pl!
+:- use_module(library(format)).
 :- use_module(library(reif)).
 
 dog(comet).
+dog(maisey).
+dog(oscar).
+dog(ramsay).
 
 writeln(X) :- write(X), nl.
-
-report(Name) :-
-  dog(Name) ->
-    writeln('dog');
-    writeln('not a dog').
 
 is_dog(X, B) :- dog(X) -> B = true; B = false.
 
@@ -22,9 +20,13 @@ report_reif(Name) :-
   ).
 
 :- initialization((
-  report(comet), % dog
-  report(mark), % not a dog
   report_reif(comet), % dog
   report_reif(mark), % not a dog
+
+  Beings = [mark, comet, tami, maisey, ramsay, oscar],
+  tpartition(is_dog, Beings, Dogs, NonDogs),
+  format("dogs include ~w~n", [Dogs]),
+  format("non-dogs include ~w~n", [NonDogs]),
+
   halt
 )).
