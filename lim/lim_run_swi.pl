@@ -45,7 +45,7 @@ lookup(math(Operator, LHS, RHS), Result) :-
     Operator == '-' -> Result is L - R;
     Operator == '*' -> Result is L * R;
     Operator == '/' -> Result is L / R;
-    Result = 0 % TODO: Throw an error.
+    fail
   ).
 
 % This gets a value from the vtables.

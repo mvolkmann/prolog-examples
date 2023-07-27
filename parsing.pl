@@ -23,9 +23,10 @@ digits_([]) --> [].
 % I = 1961.
 integer(I) --> digits(Ds), { number_chars(I, Ds) }.
 
-% There is a bug related to the value of ascii_punctuation.
-% See https://github.com/mthom/scryer-prolog/issues/1926.
 punctuation(P) --> [P], { char_type(P, ascii_punctuation) }.
+% opt_p is short for optional punctuation.
+opt_p --> punctuation(_).
+opt_p --> [].
 
 % This is an "eager consumer rule" which
 % causes tokens to extend to their maximum length.
@@ -35,11 +36,9 @@ word([]) --> [].
 
 % For example, once(phrase(words(Ws), "This is a test")).
 % gives ["This","is","a","test"].
-% This will not terminate if it encounters
-% an unexpected character such as punctuation.
-% TODO: Try to fix this with the punctuation grammar rule above.
+% Note that punctuation characters that follow words are ignored.
 words([]) --> [].
-words([H|T]) --> ws, word(H), ws, words(T).
+words([H|T]) --> ws, word(H), opt_p, ws, words(T).
 
 % ws matches one or more whitespace characters which include
 % space, tab (\t), newline (\n), formfeed (\f), carriage return (\r),

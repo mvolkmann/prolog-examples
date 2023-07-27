@@ -41,11 +41,11 @@ lookup(math(Operator, LHS, RHS), Result) :-
   lookup(LHS, L),
   lookup(RHS, R),
   (
-    Operator == '+' -> Result is L + R;
-    Operator == '-' -> Result is L - R;
-    Operator == '*' -> Result is L * R;
-    Operator == '/' -> Result is L / R;
-    Result = 0 % TODO: Throw an error.
+    Operator == "+" -> Result is L + R;
+    Operator == "-" -> Result is L - R;
+    Operator == "*" -> Result is L * R;
+    Operator == "/" -> Result is L / R;
+    fail
   ).
 
 % This gets a value from the vtables.
@@ -96,9 +96,12 @@ run_file(InFile) :-
 
 % This runs a lim program.
 run_program(Program) :-
+  format("run_program: Program = ~w~n", [Program]),
   % Create the top-level vtable.
   empty_assoc(vtable),
+  format("run_program: vtable = ~w~n", [vtable]),
   bb_set(vtables, [vtable]),
+  writeln('run_program: after call to bb_set'),
   eval(Program).
 
 % This gets the value of a given key in the
@@ -121,6 +124,8 @@ vtables_put(Key, Value) :-
   bb_get(vtables, [H|T]),
   put_assoc(Key, H, Value, NewH),
   bb_set(vtables, [NewH|T]).
+
+writeln(X) :- write(X), nl.
 
 run :-
   % Get the first command-line argument which should be

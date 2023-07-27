@@ -8,9 +8,7 @@
 compile(InFile, OutFile) :- 
   once(phrase_from_file(program(P), InFile)),
   % format("P = ~w~n", [P]),
-  open(OutFile, write, Stream),
-  write(Stream, P),
-  close(Stream).
+  phrase_to_file(portray_clause_(P), OutFile).
 
 % This matches any single digit.
 % The char_type predicate is defined in the charsio library.
@@ -90,8 +88,6 @@ statements(Stmts) --> statement_line(S), eol, statements(Ss), { Stmts = [S|Ss] }
 % TODO: Remove underscores in statements list from comments.
 
 value(V) --> constant(V) | id(V) | fn_call(V).
-
-writeln(X) :- write(X), nl.
 
 run :-
   argv([InFile|_]),

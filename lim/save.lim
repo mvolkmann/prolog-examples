@@ -1,7 +1,0 @@
-fn multiply(a, b)
-  c = a * b
-  return c
-end
-
-product = multiply(2, 3)
-print product
