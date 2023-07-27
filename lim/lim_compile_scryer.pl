@@ -4,11 +4,26 @@
 :- use_module(library(pio)).
 :- initialization(consult(strings)).
 
-% digit(C) --> [C], { code_type(C, digit) }.
+% This matches any single digit.
+% The char_type predicate is defined in the charsio library.
+digit(D) --> [D], { char_type(D, decimal_digit) }.
+
+% This matches any non-empty list of digits.
+digits([D|Ds]) --> digit(D), digits_(Ds).
+
+% This matches any list of digits including an empty list.
+digits_([D|Ds]) --> digit(D), digits_(Ds).
+digits_([]) --> [].
+
+% This matches any non-empty list of digits and converts it to an integer.
+integer(I) --> digits(Ds), { number_chars(I, Ds) }.
+
+eol --> "\r\n" | "\n".
 letter(C) --> [C], { char_type(C, alpha) }.
 lower(C) --> [C], { char_type(C, lower) }.
 upper(C) --> [C], { char_type(C, upper) }.
 letter_or_digit(C) --> letter(C) | digit(C).
+
 ws --> [C], { char_type(C, whitespace) }, ws.
 ws --> [].
 
@@ -19,7 +34,7 @@ call_args(Args) --> ws, value(V), ws, { Args = [V] }.
 call_args(Args) -->
   ws, value(V), ws, ",", ws, call_args(Vs), { Args = [V|Vs] }.
 
-comment --> whites, "#", string_without("\n", _).
+comment --> ws, "#", seq(_), eol.
 
 constant(const(V)) --> integer(V).
 
@@ -38,10 +53,8 @@ fn_def(fn(Name, Args, Statements)) -->
   ws, "end", ws.
 
 id_([]) --> [].
-% id_(id(I)) --> letter_or_digit(C), id_(T), { I = [C|T] }.
-% id(id(I)) --> letter(C), id_(T), { atom_codes(I, [C|T]) }.
 id_(I) --> letter_or_digit(C), id_(T), { I = [C|T] }.
-id(I) --> letter(C), id_(T), { atom_codes(I, [C|T]) }.
+id([C|T]) --> letter(C), id_(T).
 
 math(math(O, V1, V2)) --> value(V1), ws, operator(O), ws, value(V2).
 
@@ -55,13 +68,13 @@ print(print(V)) --> "print", ws, value(V).
 % To use this, enter something like the following:
 % once(phrase(program(P), `fn multiply(a, b)\n  c = a * b\n  return c\nend\nmultiply(2, 3)\nprint 6`)).
 % once(phrase_from_file(program(P), "dcg4.txt")).
-program(program(Ss)) --> statements(Ss), eol.
+program(program(Ss)) --> statements(Ss). % , eol.
 
 return(return(V)) --> "return ", value(V).
 
 statement(S) -->
   assignment(S) | comment | fn_call(S) | fn_def(S) | print(S) | return(S).
-statement_line(S) --> whites, statement(S), whites.
+statement_line(S) --> ws, statement(S), ws.
 statements(Stmts) --> statement_line(S), { Stmts = [S] }.
 statements(Stmts) --> statement_line(S), eol, statements(Ss), { Stmts = [S|Ss] }.
 % TODO: Remove underscores in statements list from comments.
@@ -77,6 +90,7 @@ compile(InFile, OutFile) :-
   fast_write(Stream, P),
   close(Stream).
 
+/*
 :- initialization((
   '$toplevel':argv(Args),
   [InFile|_] = Args,
@@ -87,3 +101,4 @@ compile(InFile, OutFile) :-
   format('created ~w~n', OutFile),
   halt
 )).
+*/
