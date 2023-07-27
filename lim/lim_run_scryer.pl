@@ -96,8 +96,6 @@ vtable_put(Key, Value) :-
 
 writeln(X) :- write(X), nl.
 
-:- initialization((
+run :-
   argv([InFile|_]),
-  run(InFile),
-  halt
-)).
+  run(InFile).

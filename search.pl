@@ -60,7 +60,7 @@ from_to_path_(From, To, PreviousPath) -->
   [From],
   from_to_path_(Next, To, [From|PreviousPath]).
 
-:- initialization((
+run :-
   length(Path, L), % for iterative deepening
   format("path length is ~d~n", [L]), % 3
   % Wrapping the next goal in once does not help.
@@ -73,7 +73,5 @@ from_to_path_(From, To, PreviousPath) -->
   % Then searching continues.
   % a b d h i e j k c f
   % How can I stop it from continuing to search after a solution is found?
-  format("path is ~w~n", [Path]), % [a,c,g]
-  halt
-)).
+  format("path is ~w~n", [Path]). % [a,c,g]
 
