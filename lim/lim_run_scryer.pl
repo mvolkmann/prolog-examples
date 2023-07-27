@@ -1,3 +1,4 @@
+:- use_module(library(assoc)).
 :- use_module(library(charsio)).
 :- use_module(library(dcgs)).
 :- use_module(library(pio)).
@@ -14,7 +15,7 @@ run(InFile) :-
 % P = program([fn(multiply,[a,b],[assign(c,math(*,a,b)),return(c)]),assign(product,call(multiply,[2,3])),print(product)]),
 execute(P) :-
   format("execute: P = ~w~n", [P]),
-  nb_setval(vtable, vtable{}),
+  bb_set(vtable, vtable{}),
   eval(P).
 
 eval(assign(Name, Value)) :-
@@ -79,16 +80,16 @@ lookup(Name, Value) :-
 
 vtable_get(Key, Value) :-
   format("vtable_get: Key = ~w~n", [Key]),
-  nb_getval(vtable, Vtable),
+  bb_get(vtable, Vtable),
   format("vtable_get: Vtable = ~w~n", [Vtable]),
   Value = Vtable.get(Key),
   format("vtable_get: Value = ~w~n", [Value]).
 
 vtable_put(Key, Value) :-
-  nb_getval(vtable, Vtable),
+  bb_get(vtable, Vtable),
   NewVtable = Vtable.put(Key, Value),
   format("vtable_put: NewVtable = ~w~n", [NewVtable]),
-  nb_setval(vtable, NewVtable).
+  bb_set(vtable, NewVtable).
 
 writeln(X) :- write(X), nl.
 
