@@ -93,6 +93,14 @@ value(V) --> constant(V) | id(V) | fn_call(V).
 
 writeln(X) :- write(X), nl.
 
+run :-
+  argv([InFile|_]),
+  phrase(filename_extension(Name, _), InFile),
+  append(Name, ".limb", OutFile),
+  compile(InFile, OutFile),
+  format("created ~s~n", [OutFile]).
+
+/*
 :- initialization((
   argv([InFile|_]),
   phrase(filename_extension(Name, _), InFile),
@@ -101,3 +109,4 @@ writeln(X) :- write(X), nl.
   % format('created ~w~n', OutFile),
   halt
 )).
+*/

@@ -9,4 +9,4 @@ fi
 
 # swipl lim_compile_swi.pl "$1"
 alias scryerp=/Users/volkmannm/Documents/dev/lang/prolog/scryer-prolog/target/release/scryer-prolog
-scryerp lim_compile_scryer.pl -- "$1"
+scryerp -g run,halt lim_compile_scryer.pl -- "$1"

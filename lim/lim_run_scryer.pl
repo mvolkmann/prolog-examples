@@ -15,7 +15,10 @@ run(InFile) :-
 % P = program([fn(multiply,[a,b],[assign(c,math(*,a,b)),return(c)]),assign(product,call(multiply,[2,3])),print(product)]),
 execute(P) :-
   format("execute: P = ~w~n", [P]),
-  bb_set(vtable, vtable{}),
+  % bb_set and bb_get are defined in the iso_ext library.
+  % Is the iso_ext library loaded by default?
+  empty_assoc(A),
+  bb_set(vtable, A),
   eval(P).
 
 eval(assign(Name, Value)) :-
