@@ -1,8 +1,16 @@
 :- use_module(library(charsio)).
 :- use_module(library(dcgs)).
 :- use_module(library(format)). % Why not picked up from ~/.scryerrc?
+:- use_module(library(lists)).
 :- use_module(library(pio)).
-:- initialization(consult(strings)).
+:- use_module(strings).
+
+compile(InFile, OutFile) :- 
+  once(phrase_from_file(program(P), InFile)),
+  % format("P = ~w~n", [P]),
+  open(OutFile, write, Stream),
+  write(Stream, P),
+  close(Stream).
 
 % This matches any single digit.
 % The char_type predicate is defined in the charsio library.
@@ -83,24 +91,13 @@ statements(Stmts) --> statement_line(S), eol, statements(Ss), { Stmts = [S|Ss] }
 
 value(V) --> constant(V) | id(V) | fn_call(V).
 
-% Example: compile('dcg4.txt', 'dcg4.pb').
-compile(InFile, OutFile) :- 
-  once(phrase_from_file(program(P), InFile)),
-  % format('P = ~w~n', [P]),
-  Options = [type(binary)],
-  open(OutFile, write, Stream, Options),
-  fast_write(Stream, P),
-  close(Stream).
+writeln(X) :- write(X), nl.
 
-/*
 :- initialization((
-  '$toplevel':argv(Args),
-  [InFile|_] = Args,
+  argv([InFile|_]),
   phrase(filename_extension(Name, _), InFile),
-  OutFile = [Name|".limb"],
-  format("OutFile = ~w~n", [OutFile]),
+  append(Name, ".limb", OutFile),
   compile(InFile, OutFile),
-  format('created ~w~n', OutFile),
+  % format('created ~w~n', OutFile),
   halt
 )).
-*/

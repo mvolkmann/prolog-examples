@@ -7,4 +7,5 @@ if [ $# -ne 1 ]; then
 fi
 
 # swipl lim_run_swi.pl "$1"
+alias scryerp=/Users/volkmannm/Documents/dev/lang/prolog/scryer-prolog/target/release/scryer-prolog
 scryerp lim_run_scryer.pl -- "$1"
