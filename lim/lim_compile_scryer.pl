@@ -96,11 +96,14 @@ statement(S) -->
   assign(S) | comment(S) | fn_call(S) | fn_def(S) | print(S) | return(S).
 statement_line([]) --> ws, eol.
 statement_line(S) --> ws, statement(S), ws, eol.
-statements(Stmts) --> statement_line(S), { Stmts = [S] }.
+statements(Stmts) -->
+  statement_line(S),
+  % This avoids including empty lists from comments and blank lines.
+  { S == [] -> Stmts = []; Stmts = [S] }.
 statements(Stmts) -->
   statement_line(S), statements(Ss),
   % This avoids including empty lists from comments and blank lines.
-  { (S == [] -> Stmts = Ss; Stmts = [S|Ss]) }.
+  { S == [] -> Stmts = Ss; Stmts = [S|Ss] }.
 
 % TODO: Adding math(V) to value(V) introduces left recursion
 % TODO: which results in an endless loop!
