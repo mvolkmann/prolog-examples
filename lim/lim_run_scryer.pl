@@ -1,4 +1,5 @@
 :- use_module(library(assoc)).
+:- use_module(library(iso_ext)). % for bb_get and bb_put
 :- use_module(strings).
 
 % This assigns a value to a variable.
@@ -11,10 +12,12 @@ eval(assign(Name, Value)) :-
 eval(call(Name, Args)) :- process_call(Name, Args).
 
 % This stores a function definition in the current vtable.
-eval(fn(Name, Params, Stmts)) :- vtables_put(Name, [Params, Stmts]).
+eval(fn(Name, Params, Stmts)) :-
+  vtables_put(Name, [Params, Stmts]).
 
 % This evaluates all the statements in a program.
-eval(program(Stmts)) :- maplist(eval, Stmts).
+eval(program(Stmts)) :-
+  maplist(eval, Stmts).
 
 % This gets a value (which can be a constant, math expression,
 % or a function call) and prints it to stdout.
@@ -25,7 +28,7 @@ eval(print(Value)) :- lookup(Value, V), writeln(V).
 eval(return(Value)) :-
   lookup(Value, V),
   % Store the return value so caller can retrieve it.
-  bb_set(return_, V).
+  bb_put(return_, V).
 
 % This kind of call uses the return value,
 % perhaps in an assignment or as a function argument.
@@ -41,10 +44,11 @@ lookup(math(Operator, LHS, RHS), Result) :-
   lookup(LHS, L),
   lookup(RHS, R),
   (
-    Operator == "+" -> Result is L + R;
-    Operator == "-" -> Result is L - R;
-    Operator == "*" -> Result is L * R;
-    Operator == "/" -> Result is L / R;
+    Operator == (+) -> Result is L + R;
+    Operator == (-) -> Result is L - R;
+    Operator == (*) -> Result is L * R;
+    Operator == (/) -> Result is L / R;
+    writeln('lookup math: Operator not matched'),
     fail
   ).
 
@@ -72,14 +76,14 @@ process_call(Name, Args) :-
   % Add a new vtable to the front of the list
   % to hold local variables in this function call.
   bb_get(vtables, Vtables),
-  bb_set(vtables, [VT | Vtables]),
+  bb_put(vtables, [VT | Vtables]),
 
   % Execute the statements.
   maplist(eval, Stmts),
 
   % Remove the vtable for this call.
   bb_get(vtables, [_|T]),
-  bb_set(vtables, T).
+  bb_put(vtables, T).
 
 % This reads a file produced by limc.
 read_file(InFile, Program) :-
@@ -96,12 +100,9 @@ run_file(InFile) :-
 
 % This runs a lim program.
 run_program(Program) :-
-  format("run_program: Program = ~w~n", [Program]),
   % Create the top-level vtable.
   empty_assoc(Vtable),
-  format("run_program: vtable = ~w~n", [Vtable]),
-  bb_set(vtables, [Vtable]),
-  writeln('run_program: after call to bb_set'),
+  bb_put(vtables, [Vtable]),
   eval(Program).
 
 % This gets the value of a given key in the
@@ -123,7 +124,7 @@ vtables_get_([H|T], Key, Value) :-
 vtables_put(Key, Value) :-
   bb_get(vtables, [H|T]),
   put_assoc(Key, H, Value, NewH),
-  bb_set(vtables, [NewH|T]).
+  bb_put(vtables, [NewH|T]).
 
 writeln(X) :- write(X), nl.
 
