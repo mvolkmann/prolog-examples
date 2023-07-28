@@ -97,8 +97,10 @@ statement(S) -->
 statement_line([]) --> ws, eol.
 statement_line(S) --> ws, statement(S), ws, eol.
 statements(Stmts) --> statement_line(S), { Stmts = [S] }.
-statements(Stmts) --> statement_line(S), statements(Ss), { Stmts = [S|Ss] }.
-% TODO: Remove underscores in statements list from comments.
+statements(Stmts) -->
+  statement_line(S), statements(Ss),
+  % This avoids including empty lists from comments and blank lines.
+  { (S == [] -> Stmts = Ss; Stmts = [S|Ss]) }.
 
 % TODO: Adding math(V) to value(V) introduces left recursion
 % TODO: which results in an endless loop!
