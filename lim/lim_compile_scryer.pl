@@ -74,7 +74,7 @@ operator(/) --> "/".
 
 print(p(V)) --> "print", ws, value2(V).
 
-program(pr(Ss)) --> statements(Ss).
+program(pr(Stmts)) --> statements(Stmts).
 
 return(r(V)) --> "return ", value2(V).
 

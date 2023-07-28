@@ -49,12 +49,10 @@ lookup(m(Operator, LHS, RHS), Result) :-
   ).
 
 % This gets a value from the vtables.
-lookup(Name, Value) :-
-  vtables_get(Name, Value).
+lookup(Name, Value) :- vtables_get(Name, Value).
 
 % This adds a name/value pair to a vtable, creating a new vtable.
-param_assign(Name, Value, VT0, VT1) :-
-  put_assoc(Name, VT0, Value, VT1).
+param_assign(Name, Value, VT0, VT1) :- put_assoc(Name, VT0, Value, VT1).
 
 % This is used by both "eval(c...)" and "lookup(c...)"
 % to process calling a function.
