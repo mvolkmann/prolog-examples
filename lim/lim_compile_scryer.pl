@@ -50,9 +50,9 @@ fn_call(c(Name, Args)) --> id(Name), "(", call_args(Args), ")".
 
 % To use this, enter something like the following:
 % once(phrase(fn_def(F), `fn foo(a, b)\nc = a * b\nprint c\nend`)).
-fn_def(f(Name, Args, Statements)) -->
+fn_def(f(Name, Args, Stmts)) -->
   "fn ", id(Name), "(", def_args(Args), ")", ws, eol,
-  statements(Statements),
+  statements(Stmts),
   ws, "end".
 
 id_([]) --> [].
