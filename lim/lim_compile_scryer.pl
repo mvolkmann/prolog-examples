@@ -33,11 +33,11 @@ lower(C) --> [C], { char_type(C, lower) }.
 upper(C) --> [C], { char_type(C, upper) }.
 letter_or_digit(C) --> letter(C) | digit(C).
 
-assign(assign(I, M)) -->
+assign(a(I, M)) -->
   id(I), ws, "=", ws, math(M),
   { format("assign: I = ~w, M = ~w~n", [I, M]) }.
 
-assign(assign(I, V)) -->
+assign(a(I, V)) -->
   id(I), ws, "=", ws, value(V),
   { format("assign: I = ~w, V = ~w~n", [I, V]) }.
 
@@ -50,20 +50,20 @@ to_eol([C|Cs]) --> not_eol(C), to_eol(Cs).
 to_eol([]) --> [].
 comment([]) --> "#", to_eol(_).
 
-constant(const(V)) --> integer(V).
+constant(k(V)) --> integer(V).
 
 def_args([]) --> ws.
 def_args(Args) --> ws, id(A), ws, { Args = [A] }.
 def_args(Args) -->
   ws, id(A), ws, ",", ws, def_args(As), { Args = [A|As] }.
 
-fn_call(call(Name, Args)) -->
+fn_call(c(Name, Args)) -->
   id(Name), "(", call_args(Args), ")",
   { format("fn_call: Name = ~w, Args = ~w~n", [Name, Args]) }.
 
 % To use this, enter something like the following:
 % once(phrase(fn_def(F), `fn foo(a, b)\nc = a * b\nprint c\nend`)).
-fn_def(fn(Name, Args, Statements)) -->
+fn_def(f(Name, Args, Statements)) -->
   "fn ", id(Name), "(", def_args(Args), ")", ws, eol,
   statements(Statements),
   ws, "end",
@@ -73,7 +73,7 @@ id_([]) --> [].
 id_(I) --> letter_or_digit(C), id_(T), { I = [C|T] }.
 id(I) --> letter(C), id_(T), { atom_chars(I, [C|T]) }.
 
-math(math(Op, V1, V2)) -->
+math(m(Op, V1, V2)) -->
   value(V1), ws, operator(Op), ws, value(V2),
   { format("math: Op = ~w, V1 = ~w, V2 = ~w~n", [Op, V1, V2]) }.
 
@@ -82,16 +82,13 @@ operator(-) --> "-".
 operator(*) --> "*".
 operator(/) --> "/".
 
-print(print(V)) -->
+print(p(V)) -->
   "print", ws, value(V),
   { format("print: V = ~w~n", [V]) }.
 
-% To use this, enter something like the following:
-% once(phrase(program(P), `fn multiply(a, b)\n  c = a * b\n  return c\nend\nmultiply(2, 3)\nprint 6`)).
-% once(phrase_from_file(program(P), "dcg4.txt")).
-program(program(Ss)) --> statements(Ss).
+program(pr(Ss)) --> statements(Ss).
 
-return(return(V)) -->
+return(r(V)) -->
   "return ", value(V),
   { format("return: V = ~w~n", [V]) }.
 
