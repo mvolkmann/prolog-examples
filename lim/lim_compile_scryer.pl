@@ -5,34 +5,6 @@
 :- use_module(library(pio)).
 :- use_module(strings). % my module
 
-compile(InFile, OutFile) :- 
-  once(phrase_from_file(program(P), InFile)),
-  format("P = ~w~n", [P]),
-  % portray_clause adds a period at the end of the term output
-  % which is required to read the term back in.
-  phrase_to_file(portray_clause_(P), OutFile).
-
-% This matches any single digit.
-% The char_type predicate is defined in the charsio library.
-digit(D) --> [D], { char_type(D, decimal_digit) }.
-
-% This matches any non-empty list of digits.
-digits([D|Ds]) --> digit(D), digits_(Ds).
-
-% This matches any list of digits including an empty list.
-digits_([D|Ds]) --> digit(D), digits_(Ds).
-digits_([]) --> [].
-
-% This matches any non-empty list of digits and converts it to an integer.
-integer(I) --> digits(Ds), { number_chars(I, Ds) }.
-
-eol --> "\r\n" | "\n".
-
-letter(C) --> [C], { char_type(C, alpha) }.
-lower(C) --> [C], { char_type(C, lower) }.
-upper(C) --> [C], { char_type(C, upper) }.
-letter_or_digit(C) --> letter(C) | digit(C).
-
 assign(a(I, M)) -->
   id(I), ws, "=", ws, math(M),
   { format("assign: I = ~w, M = ~w~n", [I, M]) }.
@@ -50,12 +22,35 @@ to_eol([C|Cs]) --> not_eol(C), to_eol(Cs).
 to_eol([]) --> [].
 comment([]) --> "#", to_eol(_).
 
+compile(InFile, OutFile) :- 
+  once(phrase_from_file(program(P), InFile)),
+  format("P = ~w~n", [P]),
+  % portray_clause adds a period at the end of the term output
+  % which is required to read the term back in.
+  phrase_to_file(portray_clause_(P), OutFile).
+
 constant(k(V)) --> integer(V).
 
 def_args([]) --> ws.
 def_args(Args) --> ws, id(A), ws, { Args = [A] }.
 def_args(Args) -->
   ws, id(A), ws, ",", ws, def_args(As), { Args = [A|As] }.
+
+% This matches any single digit.
+% The char_type predicate is defined in the charsio library.
+digit(D) --> [D], { char_type(D, decimal_digit) }.
+
+% This matches any non-empty list of digits.
+digits([D|Ds]) --> digit(D), digits_(Ds).
+
+% This matches any list of digits including an empty list.
+digits_([D|Ds]) --> digit(D), digits_(Ds).
+digits_([]) --> [].
+
+% This matches any non-empty list of digits and converts it to an integer.
+integer(I) --> digits(Ds), { number_chars(I, Ds) }.
+
+eol --> "\r\n" | "\n".
 
 fn_call(c(Name, Args)) -->
   id(Name), "(", call_args(Args), ")",
@@ -72,6 +67,11 @@ fn_def(f(Name, Args, Statements)) -->
 id_([]) --> [].
 id_(I) --> letter_or_digit(C), id_(T), { I = [C|T] }.
 id(I) --> letter(C), id_(T), { atom_chars(I, [C|T]) }.
+
+letter(C) --> [C], { char_type(C, alpha) }.
+lower(C) --> [C], { char_type(C, lower) }.
+upper(C) --> [C], { char_type(C, upper) }.
+letter_or_digit(C) --> letter(C) | digit(C).
 
 math(m(Op, V1, V2)) -->
   value(V1), ws, operator(Op), ws, value(V2),
