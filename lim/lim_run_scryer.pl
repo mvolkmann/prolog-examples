@@ -98,9 +98,9 @@ run_file(InFile) :-
 run_program(Program) :-
   format("run_program: Program = ~w~n", [Program]),
   % Create the top-level vtable.
-  empty_assoc(vtable),
-  format("run_program: vtable = ~w~n", [vtable]),
-  bb_set(vtables, [vtable]),
+  empty_assoc(Vtable),
+  format("run_program: vtable = ~w~n", [Vtable]),
+  bb_set(vtables, [Vtable]),
   writeln('run_program: after call to bb_set'),
   eval(Program).
 

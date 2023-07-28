@@ -8,6 +8,8 @@
 compile(InFile, OutFile) :- 
   once(phrase_from_file(program(P), InFile)),
   % format("P = ~w~n", [P]),
+  % portray_clause adds a period at the end of the term output
+  % which is required to read the term back in.
   phrase_to_file(portray_clause_(P), OutFile).
 
 % This matches any single digit.
