@@ -2,30 +2,43 @@
 :- use_module(library(iso_ext)). % for bb_get and bb_put
 :- use_module(strings).
 
+% Skip empty statements from blank lines and comments.
+eval([]).
+
 % This assigns a value to a variable.
 % The value can be a constant, math expression, or a function call.
 eval(assign(Name, Value)) :-
+  format("eval assign: Name = ~w~n", [Name]),
+  format("eval assign: Value = ~w~n", [Value]),
   lookup(Value, V),
+  format("eval assign: V = ~w~n", [V]),
   vtables_put(Name, V).
 
 % This kind of call does not assign its return value to anything.
-eval(call(Name, Args)) :- process_call(Name, Args).
+eval(call(Name, Args)) :-
+  format("eval call: Name = ~w~n", [Name]),
+  process_call(Name, Args).
 
 % This stores a function definition in the current vtable.
 eval(fn(Name, Params, Stmts)) :-
+  format("eval fn: Name = ~w~n", [Name]),
   vtables_put(Name, [Params, Stmts]).
 
 % This evaluates all the statements in a program.
 eval(program(Stmts)) :-
+  format("eval program: Stmts = ~w~n", [Stmts]),
   maplist(eval, Stmts).
 
 % This gets a value (which can be a constant, math expression,
 % or a function call) and prints it to stdout.
-eval(print(Value)) :- lookup(Value, V), writeln(V).
+eval(print(Value)) :-
+  format("eval print: Value = ~w~n", [Value]),
+  lookup(Value, V), writeln(V).
 
 % This stores a value being returned from a function
 % so the caller can find it.  See "lookup(call...) below."
 eval(return(Value)) :-
+  format("eval return: Value = ~w~n", [Value]),
   lookup(Value, V),
   % Store the return value so caller can retrieve it.
   bb_put(return_, V).
@@ -33,8 +46,11 @@ eval(return(Value)) :-
 % This kind of call uses the return value,
 % perhaps in an assignment or as a function argument.
 lookup(call(Name, Args), V) :-
+  format("lookup call: Name = ~w~n", [Name]),
+  format("lookup call: Args = ~w~n", [Args]),
   process_call(Name, Args),
-  bb_get(return_, V).
+  bb_get(return_, V),
+  format("lookup call: V = ~w~n", [V]).
 
 % This gets the value of a constant.
 lookup(const(Value), Value).
@@ -50,7 +66,8 @@ lookup(math(Operator, LHS, RHS), Result) :-
     Operator == (/) -> Result is L / R;
     writeln('lookup math: Operator not matched'),
     fail
-  ).
+  ),
+  format("lookup math: Result = ~w~n", [Result]).
 
 % This gets a value from the vtables.
 lookup(Name, Value) :-
@@ -96,6 +113,7 @@ read_file(InFile, Program) :-
 % that describes a program found in a .lim file.
 run_file(InFile) :-
   read_file(InFile, Program),
+  format("run_file: Program = ~w~n", [Program]),
   run_program(Program).
 
 % This runs a lim program.
