@@ -15,9 +15,9 @@ linked_list(Node, L) :-
   append(L2, [Node.value], L).
 
 :- initialization((
-  N1 = node{value: 'alpha', next: nil},
-  N2 = node{value: 'beta', next: N1},
-  N3 = node{value: 'gamma', next: N2},
+  N1 = node{value: alpha, next: nil},
+  N2 = node{value: beta, next: N1},
+  N3 = node{value: gamma, next: N2},
 
   print_list(N3), % prints gamma then beta then alpha
 

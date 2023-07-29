@@ -16,11 +16,11 @@ test(not_equal) :-
   X =\= Y.
 
 test(alphabetically) :-
-  'dog' @< 'fox',
-  'fox' @> 'dog',
-  'dog' == 'dog',
-  'dog' @=< 'dog',
-  'dog' @>= 'dog'.
+  dog @< fox,
+  fox @> dog,
+  dog == dog,
+  dog @=< dog,
+  dog @>= dog.
 
 test(identical) :-
   x(A, B) == x(A, B). % same functor name and argument variables

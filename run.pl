@@ -1,3 +1,3 @@
-:- writeln('first').
-:- writeln('second').
-:- writeln('third').
+:- writeln(first).
+:- writeln(second).
+:- writeln(third).

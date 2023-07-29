@@ -24,7 +24,7 @@ add_predicates :-
 
 report(Thing) :-
   ( tall(Thing) ->
-    report_(Thing, 'tall')
+    report_(Thing, tall)
   ; report_(Thing, 'not tall'
   ).
 

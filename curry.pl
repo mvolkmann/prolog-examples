@@ -29,7 +29,7 @@ sum3(A1, A2, A3, A4) :-
   P = <, % could be set to a different relational operator
   Term =.. [P, 3, 5], % builds term from list containing functor and arguments
   % call(Term), % evaluates term
-  (call(Term) -> writeln('yes'); writeln('no')), % yes
+  (call(Term) -> writeln(yes); writeln(no)), % yes
 
   halt
 )).

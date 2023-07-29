@@ -112,5 +112,5 @@ member(X, [_|T]):-
   ],
   solve(Init, Goal, Plan),
   writeln(Plan),
-  writeln('finished')
+  writeln(finished)
 )).

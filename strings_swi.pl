@@ -23,18 +23,18 @@ repeat(Char, N, S) :-
 
 write_type(Thing) :-
   ( atom(Thing) ->
-    writeln("atom") % ex. a
+    writeln(atom) % ex. a
   ; is_list(Thing) ->
-    writeln("list") % ex. [a]
+    writeln(list) % ex. [a]
   ; compound(Thing) ->
-    writeln("compound") % ex. a(b)
+    writeln(compound) % ex. a(b)
   ; float(Thing) ->
-    writeln("float") % ex. 3.1
+    writeln(float) % ex. 3.1
   ; integer(Thing) ->
-    writeln("integer") % ex. 3
+    writeln(integer) % ex. 3
   ; string(Thing) ->
-    writeln("string") % ex. "a"
+    writeln(string) % ex. "a"
   ; var(Thing) ->
-    writeln("variable") % ex. A
-  ; writeln("unknown")
+    writeln(variable) % ex. A
+  ; writeln(unknown)
   ).

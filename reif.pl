@@ -15,7 +15,7 @@ report_reif(Name) :-
   % an extra variable argument to receive true or false.
   if_(
     is_dog(Name),
-    writeln('dog'),
+    writeln(dog),
     writeln('not a dog')
   ).
 

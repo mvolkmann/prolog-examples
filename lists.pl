@@ -14,7 +14,7 @@ same_lists :-
   % L2 = L3.
 
 same_characters :-
-  L1 = 'abc',
+  L1 = abc,
   L2 = [a, b, c],
   L1 =:= L2.
 
