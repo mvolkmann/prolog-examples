@@ -40,11 +40,15 @@ lookup(const(Value), Value).
 lookup(math(Operator, LHS, RHS), Result) :-
   lookup(LHS, L),
   lookup(RHS, R),
-  (
-    Operator == '+' -> Result is L + R;
-    Operator == '-' -> Result is L - R;
-    Operator == '*' -> Result is L * R;
-    Operator == '/' -> Result is L / R;
+  ( Operator == '+' ->
+    Result is L + R
+  ; Operator == '-' ->
+    Result is L - R
+  ; Operator == '*' ->
+    Result is L * R
+  ; Operator == '/' ->
+    Result is L / R
+  ;
     fail
   ).
 

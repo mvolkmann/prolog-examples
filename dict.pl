@@ -24,8 +24,8 @@ report(P) :-
   report(P),
   Value = P.get(value, 0),
   (Value > 0 ->
-    format('Value = ~w~n', [Value]);
-    writeln('no value found')
+    format('Value = ~w~n', [Value])
+  ; writeln('no value found')
   ),
   halt
 )).

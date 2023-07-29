@@ -1,3 +1,5 @@
+% The fast_write and fast_read predicates are specific to SWI-Prolog.
+%
 :- initialization((
   File = "demo.pb",
   Data = foo(bar, baz),

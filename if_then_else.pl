@@ -6,9 +6,10 @@ dog(comet).
 writeln(X) :- write(X), nl.
 
 report(Name) :-
-  dog(Name) ->
-    writeln('dog');
-    writeln('not a dog').
+  ( dog(Name) ->
+    writeln('dog')
+  ; writeln('not a dog')
+  ).
 
 is_dog(X, B) :- dog(X) -> B = true; B = false.
 

@@ -53,15 +53,17 @@ prepend(Value, List, Result) :-
 
 sum(List, Sum) :-
   % If the list is empty then the sum is zero.
-  List = [] -> Sum = 0;
+  ( List = [] ->
+    Sum = 0
   % Otherwise ...
-  List =
-    % Get the first number and a list of the remaining numbers.
-    [Head|Tail],
-    % Compute the sum of the remaining numbers.
-    sum(Tail, TailSum),
-    % The result is the first number plus that sum.
-    Sum is TailSum + Head.
+  ; List =
+      % Get the first number and a list of the remaining numbers.
+      [Head|Tail],
+      % Compute the sum of the remaining numbers.
+      sum(Tail, TailSum),
+      % The result is the first number plus that sum.
+      Sum is TailSum + Head
+  ).
 
 % This is a reimplementation of the builtin "append" rule.
 % Appending an empty list to any list gives the second list.

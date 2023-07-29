@@ -39,12 +39,15 @@ lookup(k(Value), Value).
 lookup(m(Operator, LHS, RHS), Result) :-
   lookup(LHS, L),
   lookup(RHS, R),
-  (
-    Operator == (+) -> Result is L + R;
-    Operator == (-) -> Result is L - R;
-    Operator == (*) -> Result is L * R;
-    Operator == (/) -> Result is L / R;
-    writeln('lookup math: Operator not matched'),
+  ( Operator == (+) ->
+    Result is L + R
+  ; Operator == (-) ->
+    Result is L - R
+  ; Operator == (*) ->
+    Result is L * R
+  ; Operator == (/) ->
+    Result is L / R
+  ; writeln('lookup math: Operator not matched'),
     fail
   ).
 

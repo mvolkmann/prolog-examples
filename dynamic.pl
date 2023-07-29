@@ -23,9 +23,10 @@ add_predicates :-
   assertz(sum(X, Y, Z) :- Z is X + Y).
 
 report(Thing) :-
-  tall(Thing) ->
-    report_(Thing, 'tall');
-    report_(Thing, 'not tall').
+  ( tall(Thing) ->
+    report_(Thing, 'tall')
+  ; report_(Thing, 'not tall'
+  ).
 
 % Auxiliary rule names end in an underscore by convention.
 report_(Thing, X) :- format('~w is ~w.~n', [Thing, X]).

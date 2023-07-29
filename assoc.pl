@@ -2,6 +2,16 @@
 :- use_module(library(assoc)).
 :- use_module(library(format)).
 
+demo :-
+  empty_assoc(A0),
+  put_assoc(name, A0, 'Mark', A1),
+  format("A1 = ~w~n", [A1]),
+  get_assoc(name, A1, Name),
+  format("Name = ~w~n", [Name]),
+  % del_assoc(name, A1, 'Mark', A2),
+  del_assoc(name, A1, _, A2),
+  format("A2 = ~w~n", [A2]).
+
 :- initialization((
   % empty_assoc(A),
   Pairs = [a-apple, b-banana, c-cherry],

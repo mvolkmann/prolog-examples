@@ -83,6 +83,8 @@ some(Predicate, [H|T]) :-
 % the last occurrence of a given element.
 tail_after_last(_, [], []) :- !.
 tail_after_last(E, L, A) :-
-  member(E, L) ->
-    [_|T] = L, tail_after_last(E, T, A);
-    A = L.
+  ( member(E, L) ->
+    [_|T] = L,
+    tail_after_last(E, T, A)
+  ; A = L
+  ).
