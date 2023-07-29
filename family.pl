@@ -31,13 +31,13 @@ is_son(X) :-
   male(X), (father(_, X); mother(_, X)).
 
 sibling(X, Y) :-
-  \+ X = Y, % can't be sibling of self
   father(F, X),
   father(F, Y),
   mother(M, X),
-  mother(M, Y).
+  mother(M, Y),
+  \+ X = Y. % can't be sibling of self
 
 sister(X, Y) :-
-  \+ X = Y, % can't be sister of self
   female(X),
-  sibling(X, Y).
+  sibling(X, Y),
+  \+ X = Y. % can't be sister of self
