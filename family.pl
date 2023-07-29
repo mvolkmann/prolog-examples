@@ -21,17 +21,17 @@ mother(tami, jeremy).
 grandfather(X, Y) :-
   male(X),
   father(X, Z),
-  (father(Z, Y); mother(Z, Y)),
-  !.
+  (father(Z, Y); mother(Z, Y)).
 
-is_father(X) :- father(X, _), !.
+is_father(X) :- father(X, _).
 
-is_mother(X) :- mother(X, _), !.
+is_mother(X) :- mother(X, _).
 
 is_son(X) :-
-  (father(_, X); mother(_, X)), !.
+  male(X), (father(_, X); mother(_, X)).
 
 sibling(X, Y) :-
+  \+ X = Y, % can't be sibling of self
   father(F, X),
   father(F, Y),
   mother(M, X),
