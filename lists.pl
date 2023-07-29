@@ -51,19 +51,10 @@ maplist(Predicate, [H1|T1], [H2|T2]) :-
 prepend(Value, List, Result) :-
   Result is [Value | List].
 
-sum(List, Sum) :-
-  % If the list is empty then the sum is zero.
-  ( List = [] ->
-    Sum = 0
-  % Otherwise ...
-  ; List =
-      % Get the first number and a list of the remaining numbers.
-      [Head|Tail],
-      % Compute the sum of the remaining numbers.
-      sum(Tail, TailSum),
-      % The result is the first number plus that sum.
-      Sum is TailSum + Head
-  ).
+sum([], 0).
+sum([H|T], Sum) :-
+  sum(T, Sum0), 
+  Sum is H + Sum0.
 
 % This is a reimplementation of the builtin "append" rule.
 % Appending an empty list to any list gives the second list.
