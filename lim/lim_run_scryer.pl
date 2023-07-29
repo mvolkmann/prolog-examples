@@ -39,20 +39,15 @@ lookup(k(Value), Value).
 lookup(m(Operator, LHS, RHS), Result) :-
   lookup(LHS, L),
   lookup(RHS, R),
-  ( Operator == (+) ->
-    Result is L + R
-  ; Operator == (-) ->
-    Result is L - R
-  ; Operator == (*) ->
-    Result is L * R
-  ; Operator == (/) ->
-    Result is L / R
-  ; writeln('lookup math: Operator not matched'),
-    fail
-  ).
+  math(Operator, L, R, Result).
 
 % This gets a value from the vtables.
 lookup(Name, Value) :- vtables_get(Name, Value).
+
+math(+, L, R, Result) :- Result is L + R.
+math(-, L, R, Result) :- Result is L - R.
+math(*, L, R, Result) :- Result is L * R.
+math(/, L, R, Result) :- Result is L / R.
 
 % This adds a name/value pair to a vtable, creating a new vtable.
 param_assign(Name, Value, VT0, VT1) :- put_assoc(Name, VT0, Value, VT1).
