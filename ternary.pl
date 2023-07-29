@@ -1,9 +1,9 @@
 sign_word(N, Word) :-
   ( N =:= 0 ->
-    Word = 'zero'
+    Word = zero
   ; N > 0 ->
-    Word = 'positive'
-  ; Word = 'negative'
+    Word = positive
+  ; Word = negative
   ).
 
 writeln(X) :- write(X), nl.
@@ -16,11 +16,11 @@ writeln(X) :- write(X), nl.
   sign_word(0, W3),
   writeln(W3),
 
-  writeln('before'),
-  ( W3 == 'zero' ->
+  writeln(before),
+  ( W3 == zero ->
     writeln('got zero')
   ; true
   ),
-  writeln('after'),
+  writeln(after),
   halt
 )).

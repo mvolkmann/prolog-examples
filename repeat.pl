@@ -25,3 +25,10 @@ demo :-
     format("Hello, ~s!~n", [Name]),
   !.
 
+  run :-
+    repeat,
+      read(Term), % include a period at end of each entry
+      ( Term = stop, !
+      ; write(Term),
+        fail
+      ).
