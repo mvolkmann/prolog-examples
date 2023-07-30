@@ -1,4 +1,4 @@
-% This demonstrates using some of the predicates inthe "apply" library.
+% This demonstrates using some of the predicates in the "apply" library.
 
 :- use_module(library(apply)).
 

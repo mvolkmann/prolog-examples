@@ -43,3 +43,8 @@ sister(X, Y) :-
   dif(X, Y), % can't be sister of self
   female(X),
   sibling(X, Y).
+
+wrong :-
+  write(foo),
+  write(bar),
+  write(baz),

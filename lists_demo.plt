@@ -1,7 +1,7 @@
 % To run these tests, enter `swipl lists.plt`
 
-:- consult(lists).
-:- begin_tests(lists).
+:- consult(lists_demo).
+:- begin_tests(lists_demo).
 
 test(list_append) :-
   list_append([], [], []),
@@ -25,6 +25,6 @@ test(list_append_make_third) :-
   X == [a, b, c, d],
   !.
 
-:- end_tests(lists).
+:- end_tests(lists_demo).
 :- run_tests.
 :- halt.
