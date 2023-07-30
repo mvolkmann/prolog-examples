@@ -1,5 +1,6 @@
 :- use_module(library(clpz)).
 
+% This throws if N is less than zero.
 double(N, D) :-
   ( N #>= 0 ->
     D #= N * 2
@@ -24,6 +25,7 @@ demo :-
     % allows it to catch any kind of error.
     % Pass `error(specific_error_type, _)` to only catch a specfic kind.
     error(domain_error(Domain, Value), Context),
+    % error(Kind(Domain, Value), Context),
     % Error,
 
     % The third argument specifies what to do after the error is thrown.
@@ -32,6 +34,7 @@ demo :-
         "~w was passed ~w which is not in the domain ~w.~n",
         [Context, Value, Domain]
       ),
+      % format("Error = ~w~n", [Error]),
       % fail
       D = 0
     )
