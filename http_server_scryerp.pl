@@ -2,6 +2,7 @@
 :- use_module(library(http/http_server)).
 :- initialization(consult(family)).
 
+% All the code from here to END could be moved to a module for reuse.
 tag1(Name, Content) --> "<", Name, ">", Content, "</", Name, ">".
 tag2(Name, Children) --> "<", Name, ">", children(Children), "</", Name, ">".
 
@@ -20,6 +21,10 @@ style(Content) --> tag2("style", Content).
 title(Content) --> tag1("title", Content).
 ul(Content) --> tag2("ul", Content).
 
+not_found_handler(_, Response) :-
+  http_status_code(Response, 404). % not providing an icon
+% END
+
 home_handler(_, Response) :-
   % http_status_code(Response, 200), % default status
   % http_body(Response, text("Welcome to Scryer Prolog!")).
@@ -31,9 +36,6 @@ home_handler(_, Response) :-
     ])
   ), Content),
   http_body(Response, text(Content)).
-
-not_found_handler(_, Response) :-
-  http_status_code(Response, 404). % not providing an icon
 
 person_li(Person, Li) :-
   atom_chars(Person, Cs),
