@@ -2,28 +2,37 @@
 :- use_module(library(http/http_server)).
 :- initialization(consult(family)).
 
-body(Content) --> tag2("body", Content).
+tag1(Name, Content) --> "<", Name, ">", Content, "</", Name, ">".
+tag2(Name, Children) --> "<", Name, ">", children(Children), "</", Name, ">".
+
 children([]) --> [].
 children([H|T]) --> H, children(T).
+
+a(URL, Text) --> "<a href=\"", URL, "\">", Text, "</a>".
+body(Content) --> tag2("body", Content).
 div(Content) --> "<h1>", Content, "</h1>".
 h1(Content) --> tag1("h1", Content).
 h2(Content) --> tag1("h2", Content).
 head(Content) --> tag2("head", Content).
 html(Head, Body) --> "<html>", Head, Body, "</html>".
 li(Content) --> tag1("li", Content).
-% style(Content) --> tag1("style", Content).
 style(Content) --> tag2("style", Content).
 title(Content) --> tag1("title", Content).
 ul(Content) --> tag2("ul", Content).
 
-tag1(Name, Content) --> "<", Name, ">", Content, "</", Name, ">".
-tag2(Name, Children) --> "<", Name, ">", children(Children), "</", Name, ">".
+home_handler(_, Response) :-
+  % http_status_code(Response, 200), % default status
+  % http_body(Response, text("Welcome to Scryer Prolog!")).
+  phrase(html(
+    head([]),
+    body([
+      h1("Welcome to Scryer Prolog!"),
+      a("/grandchildren", "Grandchildren")
+    ])
+  ), Content),
+  http_body(Response, text(Content)).
 
-echo_handler(_, Response) :-
-  http_status_code(Response, 200),
-  http_body(Response, text("Welcome to Scryer Prolog!")).
-
-favicon_handler(_, Response) :-
+not_found_handler(_, Response) :-
   http_status_code(Response, 404). % not providing an icon
 
 person_li(Person, Li) :-
@@ -64,8 +73,7 @@ listen :-
   % See https://github.com/mthom/scryer-prolog/issues/485.
   % As a workaround, run the command `killall scryer-prolog`.
   http_listen(8081, [
-    % GET /echo
-    get(echo, echo_handler),
-    get('favicon.ico', favicon_handler),
+    get('/', home_handler),
+    get('favicon.ico', not_found_handler),
     get(grandchildren, grandchildren_handler)
   ]).
