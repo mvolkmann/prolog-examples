@@ -27,24 +27,22 @@ person_li(Person, Li) :-
   Li = li(Cs).
 
 grandchildren_handler(_, Response) :-
-  % findall gathers all the solutions from the 2nd argument query,
-  % transforms them with the first argument,
-  % and places the resulting list in the 3rd argument.
-  % findall(li(P)), grandfather(richard, P), L),
-  findall(person_li(P), grandfather(richard, P), L),
-  format("L = ~w~n", [L]),
+  findall(P, grandfather(richard, P), Ps),
+  maplist(person_li, Ps, Lis),
 
   Title = "Grandchildren of Richard",
   phrase(html(
     head(title(Title)),
     body([
       h1(Title),
+      ul(Lis),
+
+      h2("Colors"),
       ul([
         li("red"),
         li("green"),
         li("blue")
-      ]),
-      ul(L)
+      ])
     ])
   ), Content),
   http_body(Response, text(Content)). % not providing an icon
