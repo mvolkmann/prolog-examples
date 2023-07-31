@@ -50,6 +50,9 @@ grandchildren_handler(_, Response) :-
   http_body(Response, text(Content)). % not providing an icon
 
 listen :-
+  % This cannot be stopped with ctrl-c.
+  % See https://github.com/mthom/scryer-prolog/issues/485.
+  % As a workaround, run the command `killall scryer-prolog`.
   http_listen(8081, [
     % GET /echo
     get(echo, echo_handler),
