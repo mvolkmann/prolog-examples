@@ -2,25 +2,29 @@
 :- use_module(library(http/http_server)).
 :- initialization(consult(family)).
 
-body(Children) --> "<body>", children(Children), "</body>".
+body(Content) --> tag2("body", Content).
 children([]) --> [].
 children([H|T]) --> H, children(T).
 div(Content) --> "<h1>", Content, "</h1>".
-h1(Content) --> "<h1>", Content, "</h1>".
-h2(Content) --> "<h2>", Content, "</h2>".
-head(Content) --> "<head>", Content, "</head>".
+h1(Content) --> tag1("h1", Content).
+h2(Content) --> tag1("h2", Content).
+head(Content) --> tag2("head", Content).
 html(Head, Body) --> "<html>", Head, Body, "</html>".
-li(Content) --> "<li>", Content, "</li>".
-title(Content) --> "<title>", Content, "</title>".
-ul(Children) --> "<ul>", children(Children), "</ul>".
+li(Content) --> tag1("li", Content).
+% style(Content) --> tag1("style", Content).
+style(Content) --> tag2("style", Content).
+title(Content) --> tag1("title", Content).
+ul(Content) --> tag2("ul", Content).
+
+tag1(Name, Content) --> "<", Name, ">", Content, "</", Name, ">".
+tag2(Name, Children) --> "<", Name, ">", children(Children), "</", Name, ">".
 
 echo_handler(_, Response) :-
   http_status_code(Response, 200),
   http_body(Response, text("Welcome to Scryer Prolog!")).
 
 favicon_handler(_, Response) :-
-  http_status_code(Response, 200),
-  http_body(Response, text("")). % not providing an icon
+  http_status_code(Response, 404). % not providing an icon
 
 person_li(Person, Li) :-
   atom_chars(Person, Cs),
@@ -32,7 +36,15 @@ grandchildren_handler(_, Response) :-
 
   Title = "Grandchildren of Richard",
   phrase(html(
-    head(title(Title)),
+    head([
+      title(Title),
+      style([
+        "body { background-color: linen; }",
+        "h1 { color: red; }",
+        "h2 { color: blue; }",
+        "li { color: purple; }"
+      ])
+    ]),
     body([
       h1(Title),
       ul(Lis),
