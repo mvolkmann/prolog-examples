@@ -10,14 +10,20 @@ add2(A, B, C) :- C #= A + B.
 
 print(X, Y) :- format("X = ~w, Y = ~w~n", [X, Y]).
 
-:- initialization((
+constraints_demo :-
   findall(
     [X, Y],
     (X in 5..10, Y in 7..14, X #> Y, label([X, Y])),
     Results
   ),
   write(Results),
-  nl
+  nl.
 
-  % halt
-)).
+sup_demo :-
+  findall(
+    [Diff],
+    (X in 20..sup, Y in 30..40, Diff #= Y - X, label([Diff])),
+    Results
+  ),
+  write(Results),
+  nl.
