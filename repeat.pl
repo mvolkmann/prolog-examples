@@ -1,6 +1,9 @@
 % :- use_module(library(charsio)).
 :- use_module(library(format)).
 
+% The get_line_to_chars predicate in charsio
+% includes the newline character.
+% The following reimplements it to avoid that.
 get_line_to_chars(Stream, Cs0) :-
   get_line_to_chars_(Stream, Cs0, []).
 
@@ -25,10 +28,10 @@ demo :-
     format("Hello, ~s!~n", [Name]),
   !.
 
-  run :-
-    repeat,
-      read(Term), % include a period at end of each entry
-      ( Term = stop, !
-      ; write(Term),
-        fail
-      ).
+run :-
+  repeat,
+    read(Term), % include a period at end of each entry
+    ( Term = stop, !
+    ; write(Term),
+      fail
+    ).

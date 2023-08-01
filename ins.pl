@@ -1,5 +1,4 @@
 :- use_module(library(clpz)). % for ins, #=, and label
-:- use_module(library(format)).
 
 % Enter demo1(T) to test this.
 demo1(A + B + C = 3) :-
