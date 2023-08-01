@@ -19,6 +19,13 @@ constraints_demo :-
   write(Results),
   nl.
 
+card_demo1 :-
+  Vs = [2, 4, 2, 3, 2, 4],
+  global_cardinality(Vs, [2-3, 3-1, 4-2]).
+
+card_demo2 :-
+  global_cardinality(Vs, [2-3, 3-1, 4-2]).
+
 sup_demo :-
   findall(
     [Diff],

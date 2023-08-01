@@ -32,6 +32,11 @@ reverse_demo(R) :-
   reverse(Numbers, R).
   % R = [3, 2, 1]
 
+select_demo(L) :-
+  Numbers = [1, 2, 3],
+  select(2, Numbers, L).
+  % L = [1, 3]
+
 sum_list_demo(Sum) :-
   Numbers = [1, 2, 3],
   sum_list(Numbers, Sum).
