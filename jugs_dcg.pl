@@ -33,8 +33,10 @@ pours(Jugs0) -->
     % by creating a list that does not contain from jug and
     % then creating another list that does not contain to jug.
     select(jug(From, FromCapacity, FromFill0), Jugs0, Jugs1),
-    select(jug(To, ToCapacity, ToFill0), Jugs1, Jugs),
+    select(jug(To, ToCapacity, ToFill0), Jugs1, Other),
     format("From = ~w, To = ~w, Jugs =  ~w~n", [From, To, Jugs]),
+    % Other is a list containing one jug structure that will
+    % be used as the tail of a new list created below.
 
     % Calculate units that can be moved from From jug to To jug.
     Amount #= min(FromFill0, ToCapacity - ToFill0),
@@ -48,7 +50,7 @@ pours(Jugs0) -->
   % Create new list of three jug structures that represent new state.
   pours([
     jug(From, FromCapacity, FromFill),
-    jug(To, ToCapacity, ToFill) | Jugs
+    jug(To, ToCapacity, ToFill) | Other
   ]).
 
 print_pour(from_to(F, T)) :-
