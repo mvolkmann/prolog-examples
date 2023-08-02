@@ -1,11 +1,5 @@
 % This is based on code from Markus Triska in the SWI-Prolog manual.
 
-/*
-% For SWI-Prolog ...
-:- use_module(library(clpfd)).
-*/
-
-% For Scryer Prolog ...
 :- use_module(library(clpz)).
 :- use_module(library(format)).
 :- use_module(library(lists)).

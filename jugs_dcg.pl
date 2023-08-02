@@ -7,7 +7,7 @@ The goal is to find a sequence of pours
 that result in a jug containing 2 units.
 
 The jug structure arguments are label, capacity, and current level.
-The from_to structure arguments are from jug number and to jug number.
+The from_to structure arguments are from jug label and to jug label.
 The solution is a list of from_to structures.
 */
 
@@ -29,26 +29,23 @@ pours(Jugs0) -->
   % TODO: How does it do this? Must be the Prolog search engine.
   [from_to(From, To)],
   {
-    % format("evaluating pour from ~w to ~w~n", [From, To]),
-    % Find the jug that is not the from or to jug
-    % by creating a list that does not contain the from jug
-    % and then creating a list that does not contain the to jug.
+    % Find jug that is not the from or to jug
+    % by creating a list that does not contain from jug and
+    % then creating another list that does not contain to jug.
     select(jug(From, FromCapacity, FromFill0), Jugs0, Jugs1),
     select(jug(To, ToCapacity, ToFill0), Jugs1, Jugs),
     format("From = ~w, To = ~w, Jugs =  ~w~n", [From, To, Jugs]),
 
-    % Calculate the number of units that can be moved
-    % from the From jug to the To jug.
+    % Calculate units that can be moved from From jug to To jug.
     Amount #= min(FromFill0, ToCapacity - ToFill0),
 
-    % Calculate the new amount in the From jug.
+    % Calculate new amount in From jug.
     FromFill #= FromFill0 - Amount,
 
-    % Calculate the new amount in the To jug.
+    % Calculate new amount in To jug.
     ToFill #= ToFill0 + Amount 
   },
-  % Create a new list of three jug structures
-  % that represent the new state.
+  % Create new list of three jug structures that represent new state.
   pours([
     jug(From, FromCapacity, FromFill),
     jug(To, ToCapacity, ToFill) | Jugs
@@ -60,6 +57,7 @@ print_pour(from_to(F, T)) :-
 :- initialization((
    length(Pours, L), % for iterative deepening
    phrase(pours([jug(a,4,0), jug(b,3,0), jug(c,7,7)]), Pours),
+   format("Pours = ~w~n", [Pours]),
    format("The solution requires ~d moves.~n", [L]),
    maplist(print_pour, Pours),
    halt

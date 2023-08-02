@@ -27,6 +27,11 @@ maplist_demo(Ls) :-
   maplist(length, Fruits, Ls).
   % Ls = [5, 6, 6] 
 
+nth0_demo(E, Es) :-
+  Fruits = [apple, banana, cherry],
+  nth0(0, Fruits, E, Es).
+  % E = apple, Es = [banana,cherry]
+
 reverse_demo(R) :-
   Numbers = [1, 2, 3],
   reverse(Numbers, R).
