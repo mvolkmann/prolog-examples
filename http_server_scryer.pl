@@ -28,12 +28,15 @@ not_found_handler(_, Response) :-
 % END
 
 grandchildren_handler(Request, Response) :-
+  % Get and print all request headers.
   http_headers(Request, Headers),
   maplist(print_pair, Headers),
 
+  % Get and print the request body.
   http_body(Request, text(Body)),
   format("Body = ~w~n", [Body]),
 
+  % Get the "name" query parameter.
   ( http_query(Request, "name", NameChars) ->
     have_name(Response, NameChars)
   ; missing_name(Response)
@@ -70,6 +73,7 @@ have_grandchildren(Response, NameChars, Grandchildren) :-
 
 have_name(Response, NameChars) :-
   atom_chars(NameAtom, NameChars),
+  % Get the grandchildren for the given name.
   findall(P, grandfather(NameAtom, P), Ps),
   length(Ps, Length),
   ( Length > 0 ->
