@@ -1,5 +1,14 @@
-% This requires the libraries list and reif
-% which are included in ~/.scryerrc.
+:- use_module(library(charsio)).
+:- use_module(library(format)).
+:- use_module(library(lists)).
+:- use_module(library(reif)).
+
+chars_capitalized([], []).
+chars_capitalized([H1|T], Atom):-
+  % The to_upper argument gets set to a list,
+  % but we only want the first character.
+  char_type(H1, to_upper([H2|_])),
+  atom_chars(Atom, [H2|T]).
 
 split("", _, []).
 % Delimiter must be a single character atom.

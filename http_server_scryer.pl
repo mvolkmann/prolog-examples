@@ -2,6 +2,7 @@
 :- use_module(library(format)).
 :- use_module(library(http/http_server)).
 :- initialization(consult(family)).
+:- initialization(consult(strings_scryer)).
 
 % All the code from here to END could be moved to a module for reuse.
 tag1(Name, Content) --> "<", Name, ">", Content, "</", Name, ">".
@@ -26,25 +27,6 @@ not_found_handler(_, Response) :-
   http_status_code(Response, 404). % not providing an icon
 % END
 
-home_handler(_, Response) :-
-  % http_status_code(Response, 200), % default status
-  % http_body(Response, text("Welcome to Scryer Prolog!")).
-  phrase(html(
-    head([]),
-    body([
-      h1("Welcome to Scryer Prolog!"),
-      a("/grandchildren", "Grandchildren")
-    ])
-  ), Content),
-  http_body(Response, text(Content)).
-
-person_li(Person, Li) :-
-  atom_chars(Person, Cs),
-  Li = li(Cs).
-
-print_pair(Name-Value) :-
-  format("~s = ~s~n", [Name, Value]).
-
 grandchildren_handler(Request, Response) :-
   http_headers(Request, Headers),
   maplist(print_pair, Headers),
@@ -57,14 +39,11 @@ grandchildren_handler(Request, Response) :-
   ; missing_name(Response)
   ).
 
-have_name(Response, NameChars) :-
-  atom_chars(NameAtom, NameChars),
-  format("NameAtom = ~w~n", [NameAtom]),
+have_grandchildren(Response, NameChars, Grandchildren) :-
+  chars_capitalized(NameChars, Name),
+  phrase(format_("Grandchildren of ~w!", [Name]), Title),
+  maplist(person_li, Grandchildren, Lis),
 
-  findall(P, grandfather(NameAtom, P), Ps),
-  maplist(person_li, Ps, Lis),
-
-  Title = "Grandchildren of Richard",
   phrase(html(
     head([
       title(Title),
@@ -89,9 +68,31 @@ have_name(Response, NameChars) :-
   ), Content),
   http_body(Response, text(Content)). % not providing an icon
 
-missing_name(Response) :-
-  Content = "name query parameter is required",
+have_name(Response, NameChars) :-
+  atom_chars(NameAtom, NameChars),
+  findall(P, grandfather(NameAtom, P), Ps),
+  length(Ps, Length),
+  ( Length > 0 ->
+    have_grandchildren(Response, NameChars, Ps)
+  ; have_no_grandchildren(Response, NameChars)
+  ).
+
+have_no_grandchildren(Response, NameChars) :-
+  chars_capitalized(NameChars, Name),
+  phrase(format_("~w has no grandchildren.", [Name]), Content),
   http_body(Response, text(Content)). % not providing an icon
+
+home_handler(_, Response) :-
+  % http_status_code(Response, 200), % default status
+  % http_body(Response, text("Welcome to Scryer Prolog!")).
+  phrase(html(
+    head([]),
+    body([
+      h1("Welcome to Scryer Prolog!"),
+      a("/grandchildren", "Grandchildren") % hyperlink
+    ])
+  ), Content),
+  http_body(Response, text(Content)).
 
 listen :-
   % This cannot be stopped with ctrl-c.
@@ -102,3 +103,15 @@ listen :-
     get('favicon.ico', not_found_handler),
     get(grandchildren, grandchildren_handler)
   ]).
+
+missing_name(Response) :-
+  Content = "name query parameter is required",
+  http_body(Response, text(Content)). % not providing an icon
+
+person_li(Person, Li) :-
+  atom_chars(Person, Cs),
+  Li = li(Cs).
+
+% For debugging
+print_pair(Name-Value) :-
+  format("~s = ~s~n", [Name, Value]).
