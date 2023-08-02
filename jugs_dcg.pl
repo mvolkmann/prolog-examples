@@ -29,9 +29,9 @@ pours(Jugs0) -->
   % which are a to b, a to c, b to a, b to c, c to a, and c to b.
   [from_to(From, To)],
   {
-    % Find jug that is not the from or to jug
-    % by creating a list that does not contain from jug and
-    % then creating another list that does not contain to jug.
+    % This finds the jug that is not the From or To jug
+    % by creating a list that does not contain From jug and
+    % then creating another list that does not contain To.
     % This is where pours from a jug to itself are filtered out.
     % If From and To are both set to the same jug label then
     % the first select will succeed, but the second will fail.
@@ -50,7 +50,7 @@ pours(Jugs0) -->
     % Calculate new amount in To jug.
     ToFill #= ToFill0 + Amount 
   },
-  % Create new list of three jug structures that represent new state.
+  % Generate a list of more from_to structures starting from this new state.
   pours([
     jug(From, FromCapacity, FromFill),
     jug(To, ToCapacity, ToFill) | Other

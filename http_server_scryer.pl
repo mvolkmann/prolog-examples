@@ -1,4 +1,5 @@
 :- use_module(library(dcgs)).
+:- use_module(library(format)).
 :- use_module(library(http/http_server)).
 :- initialization(consult(family)).
 
@@ -41,8 +42,26 @@ person_li(Person, Li) :-
   atom_chars(Person, Cs),
   Li = li(Cs).
 
-grandchildren_handler(_, Response) :-
-  findall(P, grandfather(richard, P), Ps),
+print_pair(Name-Value) :-
+  format("~s = ~s~n", [Name, Value]).
+
+grandchildren_handler(Request, Response) :-
+  http_headers(Request, Headers),
+  maplist(print_pair, Headers),
+
+  http_body(Request, text(Body)),
+  format("Body = ~w~n", [Body]),
+
+  ( http_query(Request, "name", NameChars) ->
+    have_name(Response, NameChars)
+  ; missing_name(Response)
+  ).
+
+have_name(Response, NameChars) :-
+  atom_chars(NameAtom, NameChars),
+  format("NameAtom = ~w~n", [NameAtom]),
+
+  findall(P, grandfather(NameAtom, P), Ps),
   maplist(person_li, Ps, Lis),
 
   Title = "Grandchildren of Richard",
@@ -68,6 +87,10 @@ grandchildren_handler(_, Response) :-
       ])
     ])
   ), Content),
+  http_body(Response, text(Content)). % not providing an icon
+
+missing_name(Response) :-
+  Content = "name query parameter is required",
   http_body(Response, text(Content)). % not providing an icon
 
 listen :-
