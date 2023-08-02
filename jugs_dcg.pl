@@ -16,25 +16,28 @@ The solution is a list of from_to structures.
 :- use_module(library(format)).
 :- use_module(library(lists)).
 
-% A solution has been found when any jug contains 2 units.
 % Jugs is a list of three jug structures.
+% A solution has been found when any jug contains 2 units.
 pours(Jugs) --> { member(jug(_, _, 2), Jugs) }.
 
-% This generates a list of from_to structures
-% that describe the solution.
 % Jugs0 is a list of three jug structures in no particular order.
+% This generates a list of from_to structures that describe a solution.
 pours(Jugs0) -->
   % This will choose values for From and To
   % which will be one of the labels a, b, or c.
-  % TODO: How does it do this? Must be the Prolog search engine.
+  % The Prolog search engine will try all possible combinations
+  % which are a to b, a to c, b to a, b to c, c to a, and c to b.
   [from_to(From, To)],
   {
     % Find jug that is not the from or to jug
     % by creating a list that does not contain from jug and
     % then creating another list that does not contain to jug.
+    % This is where pours from a jug to itself are filtered out.
+    % If From and To are both set to the same jug label then
+    % the first select will succeed, but the second will fail.
     select(jug(From, FromCapacity, FromFill0), Jugs0, Jugs1),
     select(jug(To, ToCapacity, ToFill0), Jugs1, Other),
-    format("From = ~w, To = ~w, Jugs =  ~w~n", [From, To, Jugs]),
+    % format("Using From = ~w, To = ~w, Other =  ~w~n", [From, To, Other]),
     % Other is a list containing one jug structure that will
     % be used as the tail of a new list created below.
 
@@ -57,10 +60,10 @@ print_pour(from_to(F, T)) :-
   format("Pour from ~w to ~w.~n", [F, T]).
 
 :- initialization((
-   length(Pours, L), % for iterative deepening
+   length(Pours, _), % for iterative deepening
+   % Pours will be set to a list of from_to structures
+   % that describe the shortest possible solution.
    phrase(pours([jug(a,4,0), jug(b,3,0), jug(c,7,7)]), Pours),
-   format("Pours = ~w~n", [Pours]),
-   format("The solution requires ~d moves.~n", [L]),
    maplist(print_pour, Pours),
    halt
  )).
