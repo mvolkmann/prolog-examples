@@ -1,6 +1,7 @@
 :- use_module(library(dcgs)).
 :- use_module(library(format)).
 :- use_module(library(http/http_server)).
+:- use_module(library(serialization/json)).
 :- initialization(consult(family)).
 :- initialization(consult(strings_scryer)).
 
@@ -98,6 +99,22 @@ home_handler(_, Response) :-
   ), Content),
   http_body(Response, text(Content)).
 
+json_demo :-
+  % Value = foo(alpha, bar(beta, baz(gamma))),
+  % Value = [foo-alpha, bar-beta, baz-gamma],
+  Value = "test",
+  format("Value = ~w~n", [Value]),
+  phrase(json_chars(Json), Value),
+  format("Json = ~w~n", [Json]).
+
+json_handler(_, Response) :-
+  Value = foo(alpha, bar(beta, baz(gamma))),
+  format("Value = ~w~n", [Value]),
+  phrase(json:json_chars(Json), Value),
+  format("Json = ~w~n", [Json]),
+  % http_body(Response, text(Json)).
+  http_body(Response, text("hello, json")).
+
 listen :-
   % This cannot be stopped with ctrl-c.
   % See https://github.com/mthom/scryer-prolog/issues/485.
@@ -105,7 +122,8 @@ listen :-
   http_listen(8081, [
     get('/', home_handler),
     get('favicon.ico', not_found_handler),
-    get(grandchildren, grandchildren_handler)
+    get(grandchildren, grandchildren_handler),
+    get(json, json_handler)
   ]).
 
 missing_name(Response) :-
