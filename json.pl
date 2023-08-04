@@ -22,14 +22,13 @@ json(Atom) -->
 % C = "123"
 % TODO: THIS IS BROKEN NOW!
 json(Integer) -->
-  % seq(Chars),
-  [Integer],
   {
     integer_si(Integer),
-    format("json Integer: Integer = ~w~n", [Integer])
-    % number_chars(Integer, Chars),
-    % format("json Integer: Chars = ~w~n", [Chars])
-  }.
+    format("json Integer: Integer = ~w~n", [Integer]),
+    number_chars(Integer, Chars),
+    format("json Integer: Chars = ~w~n", [Chars])
+  },
+  seq(Chars).
   
 % To test this, enter something like the following and see the value of A.
 % V = [foo, bar, baz], phrase(json(V), C), atom_chars(A, C).
@@ -65,7 +64,7 @@ json(Structure) -->
   "{",
   {
     % TODO: Why are all these checks necessary?
-    \+ atom_si(Atom),
+    \+ atom_si(Structure),
     \+ chars_si(Structure), % verifies Structure is not chars
     \+ list_not_chars(Structure),
 
@@ -94,12 +93,6 @@ json(String) -->
     format("json: String = ~w~n", [String])
   }.
   
-json(Other) -->
-  "other",
-  {
-    write('json Other'), nl
-  }.
-
 % Technically a double-quoted string is a list of character atoms,
 % but we want to consider that to be a string.
 % Otherwise we could use the `list_si` predicate.
