@@ -3,27 +3,6 @@
 :- use_module(library(si)).
 :- initialization(consult(strings_scryer)).
 
-% Technically a double-quoted string is a list of character atoms,
-% but we want to consider that to be a string.
-% Otherwise we could use the `list_si` predicate.
-list_not_chars(X) :-
-  list_si(X),
-  ( X = [] ->
-    true
-  ; \+ chars_si(X)
-  ).
-
-% This relates a structure to its functor.
-% For example, `structure_functor(a(b, c), F)`
-% will set F to "a/2".
-structure_functor(Structure, Functor) :-
-  functor(Structure, Name, Arity),
-  format("structure_functor: calling atom_chars with Name = ~w~n", [Name]),
-  atom_chars(Name, NameC),
-  number_chars(Arity, ArityC),
-  append(NameC, "/", Functor0),
-  append(Functor0, ArityC, Functor).
-
 % To test this, enter something like the following and see the value of A.
 % V = foo, phrase(json(V), C), atom_chars(A, C).
 % A = '"foo"'
@@ -41,12 +20,16 @@ json(Atom) -->
 % To test this, enter something like the following and see the value of C.
 % V = 123, phrase(json(V), C).
 % C = "123"
+% TODO: THIS IS BROKEN NOW!
 json(Integer) -->
+  % seq(Chars),
+  [Integer],
   {
     integer_si(Integer),
-    number_chars(Integer, Chars)
-  },
-  seq(Chars).
+    format("json Integer: Integer = ~w~n", [Integer])
+    % number_chars(Integer, Chars),
+    % format("json Integer: Chars = ~w~n", [Chars])
+  }.
   
 % To test this, enter something like the following and see the value of A.
 % V = [foo, bar, baz], phrase(json(V), C), atom_chars(A, C).
@@ -62,6 +45,7 @@ json(List) -->
   seq(Json),
   "]".
   
+/*
 % For pairs
 % TODO: This is not working yet!
 % To test this, enter something like the following and see the value of A.
@@ -72,14 +56,19 @@ json(Key-Value) -->
     % TODO: Add check for pair type here and maybe in json(Structure).
     value_json(Value, Json)
   }.
-  
+*/
+
 % To test this, enter something like the following and see the value of A.
 % V = a(b,c), phrase(json(V), C), atom_chars(A, C).
 % A = '{"_functor": "a/2", "_args": ["b","c"]}'
 json(Structure) -->
   "{",
   {
+    % TODO: Why are all these checks necessary?
+    \+ atom_si(Atom),
     \+ chars_si(Structure), % verifies Structure is not chars
+    \+ list_not_chars(Structure),
+
     format("json: Structure = ~w~n", [Structure]),
     Structure =.. [_|Args],
     length(Args, L),
@@ -105,19 +94,21 @@ json(String) -->
     format("json: String = ~w~n", [String])
   }.
   
-value_json(Value, Json) :-
-  format("value_json: Value = ~w~n", [Value]),
-  once(phrase(json(Value), Json)),
-  format("value_json: Json = ~w~n", [Json]).
+json(Other) -->
+  "other",
+  {
+    write('json Other'), nl
+  }.
 
-values_json(Values, Json) :-
-  format("values_json: Values = ~w~n", [Values]),
-  % Convert Values list to JSON list.
-  maplist(value_json, Values, Jsons),
-  format("values_json: Jsons = ~w~n", [Jsons]),
-  % Create string that is a comma-separated list of the JSON values.
-  string_list(Json, ',', Jsons),
-  format("values_json: Json = ~w~n", [Json]).
+% Technically a double-quoted string is a list of character atoms,
+% but we want to consider that to be a string.
+% Otherwise we could use the `list_si` predicate.
+list_not_chars(X) :-
+  list_si(X),
+  ( X = [] ->
+    true
+  ; \+ chars_si(X)
+  ).
 
 % For debugging
 report(Structure) :-
@@ -128,3 +119,30 @@ report(Structure) :-
   format("First Arg = ~w~n", [Arg]),
   Structure =.. List,
   format("List = ~w~n", [List]).
+
+% This relates a structure to its functor.
+% For example, `structure_functor(a(b, c), F)`
+% will set F to "a/2".
+structure_functor(Structure, Functor) :-
+  functor(Structure, Name, Arity),
+  format("structure_functor: calling atom_chars with Name = ~w~n", [Name]),
+  atom_chars(Name, NameC),
+  number_chars(Arity, ArityC),
+  append(NameC, "/", Functor0),
+  append(Functor0, ArityC, Functor).
+
+value_json(Value, Json) :-
+  format("value_json: Value = ~w~n", [Value]),
+  % TODO: Want this once?
+  % once(phrase(json(Value), Json)),
+  phrase(json(Value), Json),
+  format("value_json: Json = ~w~n", [Json]).
+
+values_json(Values, Json) :-
+  format("values_json: Values = ~w~n", [Values]),
+  % Convert Values list to JSON list.
+  maplist(value_json, Values, Jsons),
+  format("values_json: Jsons = ~w~n", [Jsons]),
+  % Create string that is a comma-separated list of the JSON values.
+  string_list(Json, ',', Jsons),
+  format("values_json: Json = ~w~n", [Json]).
