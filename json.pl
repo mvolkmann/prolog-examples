@@ -25,17 +25,27 @@ structure_functor(Structure, Functor) :-
   append(NameC, "/", Functor0),
   append(Functor0, ArityC, Functor).
 
-arg_json(Arg, ArgJson) :-
-  % phrase(json(Arg), ArgJson).
-  ArgJson = "foo".
+arg_json(Arg, Json) :-
+  format("arg_json: Arg = ~w~n", [Arg]),
+  phrase(json(Arg), Json),
+  format("arg_json: Json = ~w~n", [Json]).
 
 args_json(Args, Json) :-
   format("args_json: Args = ~w~n", [Args]),
   maplist(arg_json, Args, JsonArgs),
   format("args_json: JsonArgs = ~w~n", [JsonArgs]),
-  string_list(JsonArgs, ',', Json),
+  string_list(Json, ',', JsonArgs),
   format("args_json: Json = ~w~n", [Json]).
 
+json(Atom) -->
+  ["], seq(Chars), ["],
+  {
+    atom_si(Atom),
+    format("json atom: Atom = ~w~n", [Atom]),
+    atom_chars(Atom, Chars),
+    format("json atom: Chars = ~w~n", [Chars])
+  }.
+  
 % To test this, enter something like the following and see the value of A.
 % S = a(b,c), phrase(json(S), C), atom_chars(A, C).
 json(Structure) -->
@@ -51,9 +61,7 @@ json(Structure) -->
   seq(Functor),
   "\", \"_args\": [",
   seq(ArgsJson),
-  "]",  
-  "}".
-% atom_chars(Functor, FunctorC),
+  "]}".  
   
 json(Integer) -->
   [Integer],
