@@ -2,33 +2,12 @@
 :- use_module(library(format)).
 :- use_module(library(http/http_server)).
 :- use_module(library(serialization/json)).
+
+:- use_module(html_gen).
 :- use_module(json).
 :- use_module(strings).
+
 :- initialization(consult(family)).
-:- initialization(consult(strings_scryer)).
-
-% All the code from here to END could be moved to a module for reuse.
-tag1(Name, Content) --> "<", Name, ">", Content, "</", Name, ">".
-tag2(Name, Children) --> "<", Name, ">", children(Children), "</", Name, ">".
-
-children([]) --> [].
-children([H|T]) --> H, children(T).
-
-a(URL, Text) --> "<a href=\"", URL, "\">", Text, "</a>".
-body(Content) --> tag2("body", Content).
-div(Content) --> "<h1>", Content, "</h1>".
-h1(Content) --> tag1("h1", Content).
-h2(Content) --> tag1("h2", Content).
-head(Content) --> tag2("head", Content).
-html(Head, Body) --> "<html>", Head, Body, "</html>".
-li(Content) --> tag1("li", Content).
-style(Content) --> tag2("style", Content).
-title(Content) --> tag1("title", Content).
-ul(Content) --> tag2("ul", Content).
-
-not_found_handler(_, Response) :-
-  http_status_code(Response, 404). % not providing an icon
-% END
 
 grandchildren_handler(Request, Response) :-
   % Get and print all request headers.
@@ -91,7 +70,6 @@ have_no_grandchildren(Response, NameChars) :-
 
 home_handler(_, Response) :-
   % http_status_code(Response, 200), % default status
-  % http_body(Response, text("Welcome to Scryer Prolog!")).
   phrase(html(
     head([]),
     body([
@@ -100,14 +78,6 @@ home_handler(_, Response) :-
     ])
   ), Content),
   http_body(Response, text(Content)).
-
-json_demo :-
-  % Value = foo(alpha, bar(beta, baz(gamma))),
-  % Value = [foo-alpha, bar-beta, baz-gamma],
-  Value = "test",
-  format("Value = ~w~n", [Value]),
-  phrase(json_chars(Json), Value),
-  format("Json = ~w~n", [Json]).
 
 json_handler(_, Response) :-
   Value = foo(alpha, bar(beta, baz(gamma))),
@@ -131,6 +101,9 @@ listen :-
 missing_name(Response) :-
   Content = "name query parameter is required",
   http_body(Response, text(Content)). % not providing an icon
+
+not_found_handler(_, Response) :-
+  http_status_code(Response, 404). % not providing an icon
 
 person_li(Person, Li) :-
   atom_chars(Person, Cs),

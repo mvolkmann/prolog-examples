@@ -1,9 +1,9 @@
 :- module(strings, [
-  chars_capitalized/2,
-  filename_extension/3,
-  split/4,
-  string_list/3
-]).
+    chars_capitalized/2,
+    filename_extension/3,
+    split/4,
+    string_list/3
+  ]).
 
 :- use_module(library(charsio)).
 :- use_module(library(format)).

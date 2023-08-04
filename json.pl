@@ -52,6 +52,7 @@ json(List) -->
   seq(Json),
   "]".
   
+/*
 % For pairs
 % TODO: This is not working yet!
 % To test this, enter something like the following and see the value of A.
@@ -62,6 +63,7 @@ json(Key-Value) -->
     % TODO: Add check for pair type here and maybe in json(Structure).
     value_json(Value, Json)
   }.
+*/
 
 % To test this, enter something like the following and see the value of A.
 % V = a(b,c), phrase(json(V), C), atom_chars(A, C).
