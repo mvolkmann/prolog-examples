@@ -18,6 +18,7 @@ list_not_chars(X) :-
 % will set F to "a/2".
 structure_functor(Structure, Functor) :-
   functor(Structure, Name, Arity),
+  format("structure_functor: calling atom_chars with Name = ~w~n", [Name]),
   atom_chars(Name, NameC),
   number_chars(Arity, ArityC),
   append(NameC, "/", Functor0),
@@ -57,6 +58,7 @@ json(List) -->
 json(Structure) -->
   "{",
   {
+    \+ chars_si(Structure), % verifies Structure is not chars
     format("json: Structure = ~w~n", [Structure]),
     Structure =.. [_|Args],
     length(Args, L),
@@ -74,6 +76,7 @@ json(Structure) -->
 json(String) -->
   "\"", String, "\"",
   {
+    format("json String: String = ~w~n", [String]),
     chars_si(String),
     format("json: String = ~w~n", [String])
   }.
