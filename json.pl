@@ -1,4 +1,10 @@
-:- module(json, [json/3]).
+:- module(json, [
+  is_list_not_chars/1,
+  is_pair/1,
+  json/3,
+  report/1,
+  structure_functor/2
+]).
 
 :- use_module(library(dcgs)).
 :- use_module(library(format)).
@@ -7,9 +13,26 @@
 :- use_module(strings).
 
 % Use this line to suppress logging.
-log(_, _).
+% log(_, _).
 % Use this line to enable logging.
-% log(Format, Arguments) :- format(Format, Arguments).
+log(Format, Arguments) :- format(Format, Arguments).
+
+% Technically a double-quoted string is a list of character atoms,
+% but we want to consider that to be a string.
+% Otherwise we could use the `list_si` predicate.
+is_list_not_chars(X) :-
+  list_si(X),
+  ( X = [] ->
+    true
+  ; \+ chars_si(X)
+  ).
+
+is_pair(X) :-
+  functor(X, Name, Arity),
+  ( Name == (-), Arity == 2 ->
+    true
+  ; false
+  ).
 
 % To test this, enter something like the following and see the value of A.
 % V = foo, phrase(json(V), C), atom_chars(A, C).
@@ -43,7 +66,8 @@ json(Integer) -->
 json(List) -->
   "[",
   {
-    list_not_chars(List),
+    is_list_not_chars(List),
+
     log("json List: List = ~w~n", [List]),
     values_json(List, Json),
     log("json List: Json = ~w~n", [Json])
@@ -55,12 +79,17 @@ json(List) -->
 % TODO: This is not working yet!
 % To test this, enter something like the following and see the value of A.
 % V = key-value, phrase(json(V), C), atom_chars(A, C).
-json(Key-Value) -->
-  "\"", seq(Key), "\": ", seq(Json),
+json(Pair) -->
   {
-    % TODO: Add check for pair type here and maybe in json(Structure).
-    value_json(Value, Json)
-  }.
+    is_pair(Pair),
+    format("json Pair: Pair = ~w~n", [Pair]),
+    Key-Value = Pair,
+    format("json Pair: Key = ~w~n", [Key]),
+    format("json Pair: Value = ~w~n", [Value]),
+    Json = "testing"
+    % value_json(Value, Json)
+  },
+  "\"", seq(Key), "\": ", seq(Json).
 
 % To test this, enter something like the following and see the value of A.
 % V = a(b,c), phrase(json(V), C), atom_chars(A, C).
@@ -71,7 +100,8 @@ json(Structure) -->
     % TODO: Why are all these checks necessary?
     \+ atom_si(Structure),
     \+ chars_si(Structure), % verifies Structure is not chars
-    \+ list_not_chars(Structure),
+    \+ is_list_not_chars(Structure),
+    \+ is_pair(Structure),
 
     log("json: Structure = ~w~n", [Structure]),
     Structure =.. [_|Args],
@@ -98,16 +128,6 @@ json(String) -->
     log("json: String = ~w~n", [String])
   }.
   
-% Technically a double-quoted string is a list of character atoms,
-% but we want to consider that to be a string.
-% Otherwise we could use the `list_si` predicate.
-list_not_chars(X) :-
-  list_si(X),
-  ( X = [] ->
-    true
-  ; \+ chars_si(X)
-  ).
-
 % For debugging
 report(Structure) :-
   functor(Structure, Name, Arity),
