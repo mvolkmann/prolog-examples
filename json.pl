@@ -3,8 +3,6 @@
 :- use_module(library(si)).
 :- initialization(consult(strings_scryer)).
 
-% has_args(X, Args) :- X =.. [_|Args].
-
 % Technically a double-quoted string is a list of character atoms,
 % but we want to consider that to be a string.
 % Otherwise we could use the `list_si` predicate.
@@ -36,13 +34,6 @@ json(Atom) -->
   seq(Chars),
   "\"".
   
-json(Integer) -->
-  [Integer],
-  {
-    integer_si(Integer),
-    format("json: Integer = ~w~n", [Integer])
-  }.
-  
 json(List) -->
   "[",
   {
@@ -54,11 +45,11 @@ json(List) -->
   seq(Json),
   "]".
   
-json(String) -->
-  "\"", String, "\"",
+json(Integer) -->
+  [Integer],
   {
-    chars_si(String),
-    format("json: String = ~w~n", [String])
+    integer_si(Integer),
+    format("json: Integer = ~w~n", [Integer])
   }.
   
 % To test this, enter something like the following and see the value of A.
@@ -78,6 +69,13 @@ json(Structure) -->
   "\", \"_args\": [",
   seq(ArgsJson),
   "]}".  
+  
+json(String) -->
+  "\"", String, "\"",
+  {
+    chars_si(String),
+    format("json: String = ~w~n", [String])
+  }.
   
 value_json(Value, Json) :-
   format("value_json: Value = ~w~n", [Value]),
