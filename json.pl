@@ -24,6 +24,9 @@ structure_functor(Structure, Functor) :-
   append(NameC, "/", Functor0),
   append(Functor0, ArityC, Functor).
 
+% To test this, enter something like the following and see the value of A.
+% V = foo, phrase(json(V), C), atom_chars(A, C).
+% A = '"foo"'
 json(Atom) -->
   "\"",
   {
@@ -35,13 +38,19 @@ json(Atom) -->
   seq(Chars),
   "\"".
   
+% To test this, enter something like the following and see the value of C.
+% V = 123, phrase(json(V), C).
+% C = "123"
 json(Integer) -->
-  [Integer],
   {
     integer_si(Integer),
-    format("json: Integer = ~w~n", [Integer])
-  }.
+    number_chars(Integer, Chars)
+  },
+  seq(Chars).
   
+% To test this, enter something like the following and see the value of A.
+% V = [foo, bar, baz], phrase(json(V), C), atom_chars(A, C).
+% A = '["foo","bar","baz"]'
 json(List) -->
   "[",
   {
@@ -53,8 +62,19 @@ json(List) -->
   seq(Json),
   "]".
   
+% For pairs
 % To test this, enter something like the following and see the value of A.
-% S = a(b,c), phrase(json(S), C), atom_chars(A, C).
+% V = key-value, phrase(json(V), C), atom_chars(A, C).
+json(Key-Value) -->
+  "\"", seq(Key), "\": ", seq(Json),
+  {
+    % TODO: Add check for pair type here and maybe in json(Structure).
+    value_json(Value, Json)
+  }.
+  
+% To test this, enter something like the following and see the value of A.
+% V = a(b,c), phrase(json(V), C), atom_chars(A, C).
+% A = '{"_functor": "a/2", "_args": ["b","c"]}'
 json(Structure) -->
   "{",
   {
@@ -73,6 +93,9 @@ json(Structure) -->
   "]}".  
   
 % This must appear after json(Structure), but I don't know why.
+% To test this, enter something like the following and see the value of A.
+% V = "some text", phrase(json(V), C), atom_chars(A, C).
+% A = '"some text"'
 json(String) -->
   "\"", String, "\"",
   {
