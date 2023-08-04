@@ -28,7 +28,6 @@ json(Atom) -->
 % To test this, enter something like the following and see the value of C.
 % V = 123, phrase(json(V), C).
 % C = "123"
-% TODO: THIS IS BROKEN NOW!
 json(Integer) -->
   {
     integer_si(Integer),
@@ -52,7 +51,6 @@ json(List) -->
   seq(Json),
   "]".
   
-/*
 % For pairs
 % TODO: This is not working yet!
 % To test this, enter something like the following and see the value of A.
@@ -63,7 +61,6 @@ json(Key-Value) -->
     % TODO: Add check for pair type here and maybe in json(Structure).
     value_json(Value, Json)
   }.
-*/
 
 % To test this, enter something like the following and see the value of A.
 % V = a(b,c), phrase(json(V), C), atom_chars(A, C).
@@ -134,9 +131,7 @@ structure_functor(Structure, Functor) :-
 
 value_json(Value, Json) :-
   log("value_json: Value = ~w~n", [Value]),
-  % TODO: Want this once?
-  % once(phrase(json(Value), Json)),
-  phrase(json(Value), Json),
+  once(phrase(json(Value), Json)),
   log("value_json: Json = ~w~n", [Json]).
 
 values_json(Values, Json) :-

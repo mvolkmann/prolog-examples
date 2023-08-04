@@ -23,6 +23,12 @@ test_list(Expected, Actual) :-
   phrase(json(V), Chars),
   atom_chars(Actual, Chars).
 
+test_pairs(Expected, Actual) :-
+  Expected = '{ "red": "stop", "green": "go", "yellow": "yield" }',
+  V = [red-stop, green-go, yellow-yield],
+  phrase(json(V), Chars),
+  atom_chars(Actual, Chars).
+
 test_string(Expected, Actual) :-
   Expected = '"some text"',
   V = "some text",
@@ -37,7 +43,8 @@ test_structure(Expected, Actual) :-
 
 :- initialization((
   run_tests([
-    test_atom, test_integer, test_list, test_string, test_structure
+    test_atom, test_integer, test_list, test_pairs,
+    test_string, test_structure
   ]),
   halt
 )).
