@@ -2,6 +2,8 @@
 :- use_module(library(format)).
 :- use_module(library(http/http_server)).
 :- use_module(library(serialization/json)).
+:- use_module(json).
+:- use_module(strings).
 :- initialization(consult(family)).
 :- initialization(consult(strings_scryer)).
 

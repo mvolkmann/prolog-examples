@@ -2,6 +2,7 @@
 
 :- use_module(library(clpz)).
 :- use_module(library(format)).
+:- use_module(library(lists)). % for foldl
 % :- use_module(unit_test).
 :- initialization(consult(json)).
 
