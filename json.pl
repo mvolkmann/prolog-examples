@@ -63,6 +63,7 @@ json(List) -->
   "]".
   
 % For pairs
+% TODO: This is not working yet!
 % To test this, enter something like the following and see the value of A.
 % V = key-value, phrase(json(V), C), atom_chars(A, C).
 json(Key-Value) -->
