@@ -34,6 +34,13 @@ json(Atom) -->
   seq(Chars),
   "\"".
   
+json(Integer) -->
+  [Integer],
+  {
+    integer_si(Integer),
+    format("json: Integer = ~w~n", [Integer])
+  }.
+  
 json(List) -->
   "[",
   {
@@ -44,13 +51,6 @@ json(List) -->
   },
   seq(Json),
   "]".
-  
-json(Integer) -->
-  [Integer],
-  {
-    integer_si(Integer),
-    format("json: Integer = ~w~n", [Integer])
-  }.
   
 % To test this, enter something like the following and see the value of A.
 % S = a(b,c), phrase(json(S), C), atom_chars(A, C).
@@ -70,6 +70,7 @@ json(Structure) -->
   seq(ArgsJson),
   "]}".  
   
+% This must appear after json(Structure), but I don't know why.
 json(String) -->
   "\"", String, "\"",
   {
