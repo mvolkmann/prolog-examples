@@ -4,69 +4,57 @@
 :- use_module(library(format)).
 :- initialization(consult(json)).
 
-test_atom :-
-  V = foo,
-  phrase(json(V), C),
-  atom_chars(Actual, C),
-  Expected = '"foo"',
+message(Name, Expected, Actual, Msg) :-
   ( Actual == Expected ->
-    true
-  ; format("test_atom expected ~w but was ~w~n", [Expected, Actual]),
-    fail
+    Msg = ""
+  ; phrase(format_(
+      "~w expected ~w but was ~w",
+      [Name, Expected, Actual]
+    ), Msg)
   ).
 
-test_integer :-
+test_atom(Expected, Actual) :-
+  V = foo,
+  phrase(json(V), Chars),
+  atom_chars(Actual, Chars),
+  Expected = '"foo"'.
+
+test_integer(Expected, Actual) :-
   V = 123,
   phrase(json(V), Actual),
-  Expected = "123",
-  ( Actual == Expected ->
-    true
-  ; format("test_integer expected ~w but was ~w~n", [Expected, Actual]),
-    fail
-  ).
+  Expected = "123".
 
-test_list :-
+test_list(Expected, Actual) :-
   V = [foo, bar, baz],
-  phrase(json(V), C),
-  atom_chars(Actual, C),
-  Expected = '["foo","bar","baz"]',
-  ( Actual == Expected ->
-    true
-  ; format("test_list expected ~w but was ~w~n", [Expected, Actual]),
-    fail
-  ).
+  phrase(json(V), Chars),
+  atom_chars(Actual, Chars),
+  Expected = '["foo","bar","baz"]'.
 
-test_string :-
+test_string(Expected, Actual) :-
   V = "some text",
-  phrase(json(V), C),
-  atom_chars(Actual, C),
-  Expected = '"some text"',
-  ( Actual == Expected ->
-    true
-  ; format("test_string expected ~w but was ~w~n", [Expected, Actual]),
-    fail
-  ).
+  phrase(json(V), Chars),
+  atom_chars(Actual, Chars),
+  Expected = '"some text"'.
 
-test_structure :-
+test_structure(Expected, Actual) :-
   V = a(b, c),
-  phrase(json(V), C),
-  atom_chars(Actual, C),
-  Expected = '{"_functor": "a/2", "_args": ["b","c"]}',
-  ( Actual == Expected ->
-    true
-  ; format("test_structure expected ~w but was ~w~n", [Expected, Actual]),
-    fail
-  ).
+  phrase(json(V), Chars),
+  atom_chars(Actual, Chars),
+  Expected = '{"_functor": "a/2", "_args": ["b","c"]}'.
 
 report_count(Prefix, Count, Word) :-
   (Count #= 1 -> Noun = "test"; Noun = "tests"),
   format("~s~d ~s ~s~n", [Prefix, Count, Noun, Word]).
 
 run_test(Test, Passed0, Passed) :-
-  % format("run_test: Test = ~w~n", [Test]),
-  ( call(Test) ->
+  Goal =.. [Test, Expected, Actual],
+  call(Goal),
+  message(test_atom, Expected, Actual, Msg),
+  length(Msg, Length),
+  (Length #= 0 ->
     Passed #= Passed0 + 1
-  ; Passed #= Passed0
+  ; format("~s~n", [Msg]),
+    Passed #= Passed0
   ).
 
 run_tests(Tests) :-
