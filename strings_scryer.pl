@@ -1,7 +1,7 @@
 :- use_module(library(charsio)).
 :- use_module(library(format)).
 :- use_module(library(lists)).
-:- use_module(library(reif)).
+:- use_module(library(reif)). % for if_ and memberd_t
 
 chars_capitalized([], []).
 chars_capitalized([H1|T], Atom):-
@@ -10,29 +10,24 @@ chars_capitalized([H1|T], Atom):-
   char_type(H1, to_upper([H2|_])),
   atom_chars(Atom, [H2|T]).
 
-% This can be used to create a string by joining a list of
-% other strings with a delimiter between each.
-% For example: list_joined(["foo","bar","baz"], ',', S).
-% This gives S = "foo,bar,baz"
-list_joined([], _, "").
-list_joined([H], _, H).
-list_joined([H|T], Delimiter, Joined) :-
-  list_joined(T, Delimiter, Joined0),
-  append([H, [Delimiter], Joined0], Joined).
-
-% This can be used to create a list by splitting a string on a delimiter.
-% For example: string_list("foo,bar,baz", ',', L).
-% This gives L = ["foo","bar","baz"].
-string_list("", _, []).
-% Delimiter must be a single character atom.
+% This relates a string to list of string parts
+% obtained by splitting on a given delimiter
+% which is a single character atom.
+% For example:
+% string_list("foo,bar,baz", ',', L) gives L = ["foo","bar","baz"].
+% and
+% string_list(S, ',', ["foo","bar","baz"]) gives S = "foo,bar,baz".
 string_list(String, Delimiter, Parts) :-
+  once(string_list_(String, Delimiter, Parts)).
+string_list_("", _, []).
+string_list_(String, Delimiter, Parts) :-
   if_(
     memberd_t(Delimiter, String),
     % then part
     (
-      [First|Rest1] = Parts,
-      once(append(First, [Delimiter|Rest2], String)),
-      string_list(Rest2, Delimiter, Rest1)
+      [First|Rest0] = Parts,
+      once(append(First, [Delimiter|Rest1], String)),
+      string_list_(Rest1, Delimiter, Rest0)
     ),
     % else part
     Parts = [String]
