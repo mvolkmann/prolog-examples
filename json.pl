@@ -25,31 +25,53 @@ structure_functor(Structure, Functor) :-
   append(NameC, "/", Functor0),
   append(Functor0, ArityC, Functor).
 
-arg_json(Arg, Json) :- phrase(json(Arg), Json).
-
-args_json(Args, Json) :-
-  maplist(arg_json, Args, JsonArgs),
-  string_list(Json, ',', JsonArgs).
-
 json(Atom) -->
   "\"",
   {
     atom_si(Atom),
-    atom_chars(Atom, Chars)
+    format("json Atom: Atom = ~w~n", [Atom]),
+    atom_chars(Atom, Chars),
+    format("json Atom: Chars = ~w~n", [Chars])
   },
   seq(Chars),
   "\"".
+  
+json(Integer) -->
+  [Integer],
+  {
+    integer_si(Integer),
+    format("json: Integer = ~w~n", [Integer])
+  }.
+  
+json(List) -->
+  "[",
+  {
+    list_not_chars(List),
+    format("json List: List = ~w~n", [List]),
+    values_json(List, Json),
+    format("json List: Json = ~w~n", [Json])
+  },
+  seq(Json),
+  "]".
+  
+json(String) -->
+  "\"", String, "\"",
+  {
+    chars_si(String),
+    format("json: String = ~w~n", [String])
+  }.
   
 % To test this, enter something like the following and see the value of A.
 % S = a(b,c), phrase(json(S), C), atom_chars(A, C).
 json(Structure) -->
   "{",
   {
+    format("json: Structure = ~w~n", [Structure]),
     Structure =.. [_|Args],
     length(Args, L),
     L > 0,
     structure_functor(Structure, Functor),
-    args_json(Args, ArgsJson)
+    values_json(Args, ArgsJson)
   },
   "\"_functor\": \"",
   seq(Functor),
@@ -57,22 +79,21 @@ json(Structure) -->
   seq(ArgsJson),
   "]}".  
   
-json(Integer) -->
-  [Integer],
-  { integer_si(Integer) }.
-  
-json(List) -->
-  List,
-  { list_not_chars(List) }.
-  
-json(String) -->
-  ["], String, ["],
-  { chars_si(String) }.
-  
-demo :-
-  phrase(json(19), J),
-  write(J), nl.
+value_json(Value, Json) :-
+  format("value_json: Value = ~w~n", [Value]),
+  once(phrase(json(Value), Json)),
+  format("value_json: Json = ~w~n", [Json]).
 
+values_json(Values, Json) :-
+  format("values_json: Values = ~w~n", [Values]),
+  % Convert Values list to JSON list.
+  maplist(value_json, Values, Jsons),
+  format("values_json: Jsons = ~w~n", [Jsons]),
+  % Create string that is a comma-separated list of the JSON values.
+  string_list(Json, ',', Jsons),
+  format("values_json: Json = ~w~n", [Json]).
+
+% For debugging
 report(Structure) :-
   functor(Structure, Name, Arity),
   format("Name = ~w~n", [Name]),
