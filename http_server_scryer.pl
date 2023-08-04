@@ -82,10 +82,9 @@ home_handler(_, Response) :-
 json_handler(_, Response) :-
   Value = foo(alpha, bar(beta, baz(gamma))),
   format("Value = ~w~n", [Value]),
-  phrase(json:json_chars(Json), Value),
-  format("Json = ~w~n", [Json]),
-  % http_body(Response, text(Json)).
-  http_body(Response, text("hello, json")).
+  phrase(json:json(Value), Chars),
+  format("Chars = ~s~n", [Chars]),
+  http_body(Response, text(Chars)).
 
 listen :-
   % This cannot be stopped with ctrl-c.
