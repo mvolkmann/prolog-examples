@@ -2,8 +2,48 @@
 
 :- use_module(library(clpz)).
 :- use_module(library(format)).
+% :- use_module(unit_test).
 :- initialization(consult(json)).
 
+test_atom(Expected, Actual) :-
+  Expected = '"foo"',
+  V = foo,
+  phrase(json(V), Chars),
+  atom_chars(Actual, Chars).
+
+test_integer(Expected, Actual) :-
+  Expected = "123",
+  V = 123,
+  phrase(json(V), Actual).
+
+test_list(Expected, Actual) :-
+  Expected = '["foo","bar","baz"]',
+  V = [foo, bar, baz],
+  phrase(json(V), Chars),
+  atom_chars(Actual, Chars).
+
+test_string(Expected, Actual) :-
+  Expected = '"some text"',
+  V = "some text",
+  phrase(json(V), Chars),
+  atom_chars(Actual, Chars).
+
+test_structure(Expected, Actual) :-
+  Expected = '{"_functor": "a/2", "_args": ["b","c"]}',
+  V = a(b, c),
+  phrase(json(V), Chars),
+  atom_chars(Actual, Chars).
+
+:- initialization((
+  run_tests([
+    test_atom, test_integer, test_list, test_string, test_structure
+  ]),
+  halt
+)).
+
+% TODO: The remaining predicates should be defined in unit_test.pl,
+% TODO: but code doesn't work if I do that.
+% TODO: See https://github.com/mthom/scryer-prolog/discussions/1951
 message(Name, Expected, Actual, Msg) :-
   ( Actual == Expected ->
     Msg = ""
@@ -13,35 +53,6 @@ message(Name, Expected, Actual, Msg) :-
     ), Msg)
   ).
 
-test_atom(Expected, Actual) :-
-  V = foo,
-  phrase(json(V), Chars),
-  atom_chars(Actual, Chars),
-  Expected = '"foo"'.
-
-test_integer(Expected, Actual) :-
-  V = 123,
-  phrase(json(V), Actual),
-  Expected = "123".
-
-test_list(Expected, Actual) :-
-  V = [foo, bar, baz],
-  phrase(json(V), Chars),
-  atom_chars(Actual, Chars),
-  Expected = '["foo","bar","baz"]'.
-
-test_string(Expected, Actual) :-
-  V = "some text",
-  phrase(json(V), Chars),
-  atom_chars(Actual, Chars),
-  Expected = '"some text"'.
-
-test_structure(Expected, Actual) :-
-  V = a(b, c),
-  phrase(json(V), Chars),
-  atom_chars(Actual, Chars),
-  Expected = '{"_functor": "a/2", "_args": ["b","c"]}'.
-
 report_count(Prefix, Count, Word) :-
   (Count #= 1 -> Noun = "test"; Noun = "tests"),
   format("~s~d ~s ~s~n", [Prefix, Count, Noun, Word]).
@@ -49,7 +60,7 @@ report_count(Prefix, Count, Word) :-
 run_test(Test, Passed0, Passed) :-
   Goal =.. [Test, Expected, Actual],
   call(Goal),
-  message(test_atom, Expected, Actual, Msg),
+  message(Test, Expected, Actual, Msg),
   length(Msg, Length),
   (Length #= 0 ->
     Passed #= Passed0 + 1
@@ -68,9 +79,3 @@ run_tests(Tests) :-
   ; report_count("", Failed, "failed")
   ).
 
-:- initialization((
-  run_tests([
-    test_atom, test_integer, test_list, test_string, test_structure
-  ]),
-  halt
-)).
