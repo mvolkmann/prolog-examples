@@ -25,9 +25,11 @@ string_list_(String, Delimiter, Parts) :-
     memberd_t(Delimiter, String),
     % then part
     (
-      [First|Rest0] = Parts,
-      once(append(First, [Delimiter|Rest1], String)),
-      string_list_(Rest1, Delimiter, Rest0)
+      Parts = [Before|Parts0], % must be first to terminate
+      % Get parts of String before and after Delimiter.
+      once(append(Before, [Delimiter|After], String)),
+      % Recursively process After.
+      string_list_(After, Delimiter, Parts0)
     ),
     % else part
     Parts = [String]

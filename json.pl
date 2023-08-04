@@ -1,6 +1,7 @@
 :- use_module(library(dcgs)).
 :- use_module(library(format)).
 :- use_module(library(si)).
+:- initialization(consult(strings_scryer)).
 
 % has_args(X, Args) :- X =.. [_|Args].
 
@@ -19,21 +20,21 @@ list_not_chars(X) :-
 % will set F to "a/2".
 structure_functor(Structure, Functor) :-
   functor(Structure, Name, Arity),
-  write('Name ='), write(Name), nl,
   atom_chars(Name, NameC),
-  write('NameC ='), write(NameC), nl,
   number_chars(Arity, ArityC),
   append(NameC, "/", Functor0),
-  append(Functor0, ArityC, Functor),
-  format("structure_functor: Functor = ~w~n", [Functor]).
+  append(Functor0, ArityC, Functor).
 
 arg_json(Arg, ArgJson) :-
   % phrase(json(Arg), ArgJson).
   ArgJson = "foo".
 
-args_json(Args, ArgList) :-
+args_json(Args, Json) :-
+  format("args_json: Args = ~w~n", [Args]),
   maplist(arg_json, Args, JsonArgs),
-  append(JsonArgs, ArgList).
+  format("args_json: JsonArgs = ~w~n", [JsonArgs]),
+  string_list(JsonArgs, ',', Json),
+  format("args_json: Json = ~w~n", [Json]).
 
 % To test this, enter something like the following and see the value of A.
 % S = a(b,c), phrase(json(S), C), atom_chars(A, C).
