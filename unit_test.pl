@@ -1,4 +1,5 @@
 :- module(unit_test, [run_tests/1]).
+:- use_module(library(format)).
 :- use_module(library(lists)).
 
 message(Name, Expected, Actual, Msg) :-
@@ -15,8 +16,7 @@ report_count(Prefix, Count, Word) :-
   format("~s~d ~s ~s~n", [Prefix, Count, Noun, Word]).
 
 run_test(Test, Passed0, Passed) :-
-  Goal =.. [Test, Expected, Actual],
-  call(Goal),
+  call(Test, Expected, Actual),
   message(Test, Expected, Actual, Msg),
   length(Msg, Length),
   (Length #= 0 ->
