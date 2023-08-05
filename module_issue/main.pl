@@ -7,10 +7,12 @@
 predicate_goal(G, G).
 
 first(Expected, Actual) :-
-  format("first: ~w ~w~n", [Expected, Actual]).
+  Expected = 1,
+  Actual = 10.
 
 second(Expected, Actual) :-
-  format("second: ~w ~w~n", [Expected, Actual]).
+  Expected = 2,
+  Actual = 20.
 
 demo :-
   predicate_goal(first, G1),

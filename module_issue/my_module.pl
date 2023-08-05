@@ -3,8 +3,8 @@
 :- use_module(library(lists)). % for maplist
 
 call_goal(G) :-
-  format("calling ~w~n", [G]),
-  call(G, alpha, beta).
+  call(G, Expected, Actual),
+  format("called ~w and got ~w, ~w~n", [G, Expected, Actual]).
 
 call_goals(Gs) :- maplist(call_goal, Gs).
 
