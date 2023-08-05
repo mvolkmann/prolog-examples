@@ -24,6 +24,10 @@ run :-
   report_reif(mark), % not a dog
 
   Beings = [mark, comet, tami, maisey, ramsay, oscar],
+
+  tfilter(is_dog, Beings, JustDogs),
+  format("JustDogs = ~w~n", [JustDogs]), % [comet,maisey,ramsay,oscar]
+
   tpartition(is_dog, Beings, Dogs, NonDogs),
   format("dogs include ~w~n", [Dogs]), % [comet,maisey,ramsay,oscar]
   format("non-dogs include ~w~n", [NonDogs]). % [mark,tami]
