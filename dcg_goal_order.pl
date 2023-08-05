@@ -2,10 +2,12 @@
 
 % phrase(sample(S), X).
 sample(S) -->
-  seq(First),
+  % This grammar rule should appear BEFORE any
+  % non-terminals that use the variables it sets.
   {
     First = "one",
     Second = "two",
     S = "three"
   },
+  seq(First),
   seq(Second).
