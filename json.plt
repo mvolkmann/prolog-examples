@@ -49,6 +49,12 @@ test_structure(Expected, Actual) :-
 
 % :- initialization((
 run :-
+  /* This approach does not work. The elements in Goals will not be namespaced.
+  Tests = [test_atom, test_integer, test_list, test_string, test_structure],
+  maplist(predicate_goal, Tests, Goals),
+  format("Goals = ~w~n", [Goals]),
+  run_tests(Goals),
+  */
   predicate_goal(test_atom, G1),
   predicate_goal(test_integer, G2),
   predicate_goal(test_list, G3),
