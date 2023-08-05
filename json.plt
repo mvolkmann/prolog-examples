@@ -3,8 +3,13 @@
 :- use_module(library(clpz)).
 :- use_module(library(format)).
 :- use_module(library(lists)). % for foldl
-% :- use_module(unit_test).
+:- use_module(unit_test).
 :- initialization(consult(json)).
+
+% This converts a predicate that takes one argument
+% to a namespaced goal that can be passed to call_goals.
+:- meta_predicate(predicate_goal(1, -)).
+predicate_goal(G, G).
 
 test_atom(Expected, Actual) :-
   Expected = '"foo"',
@@ -42,14 +47,16 @@ test_structure(Expected, Actual) :-
   atom_chars(Actual, Chars).
 
 :- initialization((
-  run_tests([
-    test_atom, test_integer, test_list,
-    % test_pairs,
-    test_string, test_structure
-  ]),
+  predicate_goal(test_atom, G1),
+  predicate_goal(test_integer, G2),
+  predicate_goal(test_list, G3),
+  predicate_goal(test_string, G4),
+  predicate_goal(test_structure, G5),
+  run_tests([G1, G2, G3, G4, G5]),
   halt
 )).
 
+/*
 % TODO: The remaining predicates should be defined in unit_test.pl,
 % TODO: but code doesn't work if I do that.
 % TODO: See https://github.com/mthom/scryer-prolog/discussions/1951
@@ -87,4 +94,4 @@ run_tests(Tests) :-
     true
   ; report_count("", Failed, "failed")
   ).
-
+*/

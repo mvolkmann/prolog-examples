@@ -13,9 +13,9 @@
 :- use_module(strings).
 
 % Use this line to suppress logging.
-% log(_, _).
+log(_, _).
 % Use this line to enable logging.
-log(Format, Arguments) :- format(Format, Arguments).
+% log(Format, Arguments) :- format(Format, Arguments).
 
 % Technically a double-quoted string is a list of character atoms,
 % but we want to consider that to be a string.

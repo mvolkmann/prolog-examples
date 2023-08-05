@@ -1,4 +1,4 @@
-:- module(unit_test, [run_test/3, run_tests/1]).
+:- module(unit_test, [run_tests/1]).
 :- use_module(library(lists)).
 
 message(Name, Expected, Actual, Msg) :-

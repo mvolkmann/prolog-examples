@@ -1,13 +1,18 @@
+:- use_module(library(format)).
 :- use_module(my_module).
 
-:- meta_predicate(predicate0_goal(0, -)).
-predicate0_goal(G, G).
+% This converts a predicate that takes one argument
+% to a namespaced goal that can be passed to call_goals.
+:- meta_predicate(predicate_goal(1, -)).
+predicate_goal(G, G).
 
-first :- write('in first'), nl.
+first(Expected, Actual) :-
+  format("first: ~w ~w~n", [Expected, Actual]).
 
-second :- write('in second'), nl.
+second(Expected, Actual) :-
+  format("second: ~w ~w~n", [Expected, Actual]).
 
 demo :-
-  predicate0_goal(first, G1),
-  predicate0_goal(second, G2),
+  predicate_goal(first, G1),
+  predicate_goal(second, G2),
   call_goals([G1, G2]).
