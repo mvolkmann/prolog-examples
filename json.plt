@@ -1,4 +1,5 @@
 % These tests can be run in Scryer Prolog and use my own testing framework.
+% To run this, enter `scry -g run json.plt`
 
 :- use_module(library(clpz)).
 :- use_module(library(format)).
