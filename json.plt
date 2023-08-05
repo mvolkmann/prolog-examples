@@ -1,16 +1,10 @@
-% These tests can be run in Scryer Prolog and use my own testing framework.
-% To run this, enter `scry -g run json.plt`
+% These tests can be run in Scryer Prolog
+% and use my own very small unit test library.
+% To run this, enter `scry -g test json.plt`
+% where `scry` is your alias for `scryer-prolog`.
 
-:- use_module(library(clpz)).
-:- use_module(library(format)).
-:- use_module(library(lists)). % for foldl
 :- use_module(unit_test).
 :- initialization(consult(json)).
-
-% This converts a predicate to a namespaced goal
-% that can be passed to call_goals.
-:- meta_predicate(predicate_goal(1, -)).
-predicate_goal(G, G).
 
 test_atom(Expected, Actual) :-
   Expected = '"foo"',
@@ -47,19 +41,12 @@ test_structure(Expected, Actual) :-
   phrase(json(V), Chars),
   atom_chars(Actual, Chars).
 
-% :- initialization((
-run :-
-  /* This approach does not work. The elements in Goals will not be namespaced.
-  Tests = [test_atom, test_integer, test_list, test_string, test_structure],
-  maplist(predicate_goal, Tests, Goals),
-  format("Goals = ~w~n", [Goals]),
-  run_tests(Goals),
-  */
-  predicate_goal(test_atom, G1),
-  predicate_goal(test_integer, G2),
-  predicate_goal(test_list, G3),
-  predicate_goal(test_string, G4),
-  predicate_goal(test_structure, G5),
-  run_tests([G1, G2, G3, G4, G5]),
+test :-
+  run_tests([
+    user:test_atom,
+    user:test_integer,
+    user:test_list,
+    user:test_string,
+    user:test_structure
+  ]),
   halt.
-% )).

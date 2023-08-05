@@ -1,4 +1,5 @@
 :- module(unit_test, [run_tests/1]).
+:- use_module(library(clpz)).
 :- use_module(library(format)).
 :- use_module(library(lists)).
 
