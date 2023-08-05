@@ -6,39 +6,31 @@
 :- use_module(unit_test).
 :- initialization(consult(list_util)).
 
+goal_bool(List, B) :-
+  Goal =.. List,
+  (call(Goal) -> B = true; B = false).
+
 is_even(N) :- mod(N, 2) =:= 0.
 
 test_every1(Expected, Actual) :-
   Expected = true,
   L = [2, 6, 8],
-  ( every(user:is_even, L) ->
-    Actual = true
-  ; Actual = false
-  ).
+  goal_bool([every, user:is_even, L], Actual).
 
 test_every2(Expected, Actual) :-
   Expected = false,
   L = [2, 5, 8],
-  ( every(user:is_even, L) ->
-    Actual = true
-  ; Actual = false
-  ).
+  goal_bool([every, user:is_even, L], Actual).
 
 test_some1(Expected, Actual) :-
   Expected = true,
   L = [3, 6, 9],
-  ( some(user:is_even, L) ->
-    Actual = true
-  ; Actual = false
-  ).
+  goal_bool([some, user:is_even, L], Actual).
 
 test_some2(Expected, Actual) :-
   Expected = false,
   L = [3, 5, 9],
-  ( some(user:is_even, L) ->
-    Actual = true
-  ; Actual = false
-  ).
+  goal_bool([some, user:is_even, L], Actual).
 
 test_list_without1(Expected, Actual) :-
   Expected = [foo, baz],
