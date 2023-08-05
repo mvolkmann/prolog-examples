@@ -1,6 +1,18 @@
-:- module(list_util, [list_without/3]).
+:- module(list_util, [every/2, list_without/3, some/2]).
 
+:- use_module(library(lists)).
 :- use_module(library(reif)). % for if_ and tfilter
+
+every(Predicate, List) :- maplist(Predicate, List).
+
+% This succeeds if at least one element in List satisfies Predicate
+% and fails otherwise.
+some(_, []) :- fail.
+some(Predicate, [H|T]) :-
+  (call(Predicate, H) ->
+    true
+  ; some(Predicate, T)
+  ).
 
 /*
 % Removing anything from an empty list matches an empty list.

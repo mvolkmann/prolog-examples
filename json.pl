@@ -87,8 +87,9 @@ json(Pair) -->
     Key-Value = Pair,
     format("json Pair: Key = ~w~n", [Key]),
     format("json Pair: Value = ~w~n", [Value]),
-    Json = "testing"
     % value_json(Value, Json)
+    % once(phrase(json(Value), Json))
+    Json = '"barking"'
   },
   "\"", seq(Key), "\": ", seq(Json).
 
