@@ -1,7 +1,10 @@
-:- module(unit_test, [run_tests/1]).
+:- module(unit_test, [goal_bool/2, run_tests/1]).
 :- use_module(library(clpz)).
 :- use_module(library(format)).
 :- use_module(library(lists)).
+
+:- meta_predicate goal_bool(0).
+goal_bool(Goal, B) :- call(Goal) -> B = true; B = false.
 
 message(Name, Expected, Actual, Msg) :-
   ( Actual == Expected ->

@@ -3,8 +3,10 @@
 :- use_module(library(lists)).
 :- use_module(library(reif)). % for if_ and tfilter
 
+:- meta_predicate every(1, ?).
 every(Predicate, List) :- maplist(Predicate, List).
 
+:- meta_predicate some(1, ?).
 % This succeeds if at least one element in List satisfies Predicate
 % and fails otherwise.
 some(_, []) :- fail.
