@@ -3,7 +3,7 @@
 :- use_module(library(format)).
 :- use_module(library(lists)).
 
-:- meta_predicate goal_bool(0).
+:- meta_predicate goal_bool(0). % no arguments will be passed to Goal
 goal_bool(Goal, B) :- call(Goal) -> B = true; B = false.
 
 message(Name, Expected, Actual, Msg) :-

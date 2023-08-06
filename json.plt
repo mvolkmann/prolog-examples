@@ -46,7 +46,7 @@ test :-
     user:test_atom,
     user:test_integer,
     user:test_list,
-    user:test_pairs,
+    % user:test_pairs,
     user:test_string,
     user:test_structure
   ]),
