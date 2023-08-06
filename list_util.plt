@@ -8,13 +8,6 @@
 :- initialization(consult(list_util)).
 
 is_even(N) :- mod(N, 2) =:= 0.
-% is_even(N) :- R is N mod 2, R =:= 0.
-% is_even(N, B) :- if_(mod(N, 2) =:= 0, B = true, B = false).
-/*
-is_even(N, B) :-
-  R is N mod 2,
-  (R #= 0 -> B = true; B = false).
-*/
 
 every1(Expected, Actual) :-
   Expected = true,
