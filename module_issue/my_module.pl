@@ -4,7 +4,7 @@
 
 call_goal(G) :-
   call(G, Expected, Actual),
-  format("called ~w and got ~w, ~w~n", [G, Expected, Actual]).
+  format("called ~w and got ~s, ~s~n", [G, Expected, Actual]).
 
 call_goals(Gs) :- maplist(call_goal, Gs).
 
