@@ -21,7 +21,7 @@ grandchildren_handler(Request, Response) :-
   % Get the "name" query parameter.
   ( http_query(Request, "name", NameChars) ->
     have_name(Response, NameChars)
-  ; missing_name(Response)
+  ; missing_query_parameter(Response, "name")
   ).
 
 grandchildren_json_handler(Request, Response) :-
@@ -32,7 +32,7 @@ grandchildren_json_handler(Request, Response) :-
     phrase(json(Ps), Json),
     http_headers(Response, ["Content-Type"-"application/json"]),
     http_body(Response, text(Json))
-  ; missing_name(Response)
+  ; missing_query_parameter(Response, "name")
   ).
 
 have_grandchildren(Response, NameChars, Grandchildren) :-
@@ -79,6 +79,15 @@ have_no_grandchildren(Response, NameChars) :-
   phrase(format_("~w has no grandchildren.", [Name]), Content),
   http_body(Response, text(Content)). % not providing an icon
 
+have_query(Response, QueryChars) :-
+  format("have_query: Query = ~w~n", [QueryChars]),
+  % atom_chars(QueryAtom, QueryChars),
+  % findall(P, QueryAtom(P), Result),
+  Result = foo(bar, baz),
+  phrase(json(Result), Json),
+  http_headers(Response, ["Content-Type"-"application/json"]),
+  http_body(Response, text(Json)).
+
 home_handler(_, Response) :-
   % http_status_code(Response, 200), % default status
   phrase(html(
@@ -106,11 +115,12 @@ listen :-
     get('favicon.ico', not_found_handler),
     get(grandchildren, grandchildren_handler),
     get('grandchildren.json', grandchildren_json_handler),
-    get(json, json_handler)
+    get(json, json_handler),
+    get('query', query_handler)
   ]).
 
-missing_name(Response) :-
-  Content = "name query parameter is required",
+missing_query_parameter(Response, Name) :-
+  phrase(format_("query parameter \"~s\" is missing", [Name]), Content),
   http_status_code(Response, 400),
   http_body(Response, text(Content)). % not providing an icon
 
@@ -124,3 +134,10 @@ person_li(Person, Li) :-
 % For debugging
 print_pair(Name-Value) :-
   format("~s = ~s~n", [Name, Value]).
+
+query_handler(Request, Response) :-
+  ( http_query(Request, "q", Query) ->
+    have_query(Response, Query)
+  ; missing_query_parameter(Response, "q")
+  ).
+
