@@ -4,8 +4,8 @@
 :- use_module(library(serialization/json)).
 
 :- use_module(html_gen).
-:- use_module(json).
-:- use_module(strings).
+:- use_module('lib/json.pl').
+:- use_module('lib/strings.pl').
 
 :- initialization(consult(family)).
 
@@ -24,9 +24,20 @@ grandchildren_handler(Request, Response) :-
   ; missing_name(Response)
   ).
 
+grandchildren_json_handler(Request, Response) :-
+  ( http_query(Request, "name", NameChars) ->
+    % Get the grandchildren for the given name.
+    atom_chars(NameAtom, NameChars),
+    findall(P, grandfather(NameAtom, P), Ps),
+    phrase(json(Ps), Json),
+    http_headers(Response, ["Content-Type"-"application/json"]),
+    http_body(Response, text(Json))
+  ; missing_name(Response)
+  ).
+
 have_grandchildren(Response, NameChars, Grandchildren) :-
   chars_capitalized(NameChars, Name),
-  phrase(format_("Grandchildren of ~w!", [Name]), Title),
+  phrase(format_("Grandchildren of ~s!", [Name]), Title),
   maplist(person_li, Grandchildren, Lis),
 
   phrase(html(
@@ -94,11 +105,13 @@ listen :-
     get('/', home_handler),
     get('favicon.ico', not_found_handler),
     get(grandchildren, grandchildren_handler),
+    get('grandchildren.json', grandchildren_json_handler),
     get(json, json_handler)
   ]).
 
 missing_name(Response) :-
   Content = "name query parameter is required",
+  http_status_code(Response, 400),
   http_body(Response, text(Content)). % not providing an icon
 
 not_found_handler(_, Response) :-
