@@ -30,7 +30,7 @@ grandchildren_json_handler(Request, Response) :-
   ( http_query(Request, "name", NameChars) ->
     % Get the grandchildren for the given name.
     atom_chars(NameAtom, NameChars),
-    findall(P, grandfather(NameAtom, P), Ps),
+    setof(P, grandfather(NameAtom, P), Ps),
     phrase(json(Ps), Json),
     http_headers(Response, ["Content-Type"-"application/json"]),
     http_body(Response, text(Json))
@@ -69,7 +69,7 @@ have_grandchildren(Response, NameChars, Grandchildren) :-
 have_name(Response, NameChars) :-
   atom_chars(NameAtom, NameChars),
   % Get the grandchildren for the given name.
-  findall(P, grandfather(NameAtom, P), Ps),
+  setof(P, grandfather(NameAtom, P), Ps),
   length(Ps, Length),
   ( Length > 0 ->
     have_grandchildren(Response, NameChars, Ps)
@@ -92,11 +92,10 @@ have_query(Response, QueryChars) :-
     ( call(Goal) -> Results = true; Results = false )
   ; Count == 1 ->
     [Variable|_] = Variables,
-    findall(Variable, call(Goal), Results)
-  ; findall(Variables, call(Goal), Results)
+    setof(Variable, call(Goal), Results)
+  ; setof(Variables, call(Goal), Results)
   ),
 
-  format("have_query: Results = ~w~n", [Results]),
   phrase(json(Results), Json),
   http_headers(Response, ["Content-Type"-"application/json"]),
   http_body(Response, text(Json)).
