@@ -1,4 +1,12 @@
-:- module(list_util, [every/2, fill/3, list_without/3, replace/4, some/2]).
+:- module(list_util, [
+  every/2,
+  fill/3,
+  list_last/2,
+  list_pred_first/3,
+  list_without/3,
+  replace/4,
+  some/2
+]).
 
 :- use_module(library(lists)).
 :- use_module(library(reif)). % for if_ and tfilter
@@ -11,6 +19,21 @@ every(Predicate, List) :- maplist(Predicate, List).
 % (from Discord by @adamcrussell).
 clone(X, X).
 fill(N, E, L) :- length(L, N), maplist(clone(E), L).
+
+% This relates a list and a predicate to the
+% first element in the list that satisfies the predicate.
+list_pred_first([], _, []).
+list_pred_first([H|T], Pred, Element) :-
+  Goal =.. [Pred, H],
+  ( call(Goal) ->
+    Element = H
+  ; list_pred_first(T, Pred, Element)
+  ).
+
+list_last([], []).
+list_last(List, Last) :-
+  length(List, Length),
+  nth1(Length, List, Last).
 
 % This relates the list Ls0 to the list Ls
 % which does not contain any elements matching E.

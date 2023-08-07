@@ -9,7 +9,7 @@
 % :- meta_predicate(predicate_goal(2, -, -)). % - is for output arguments
 
 % TODO: Do you object to the name "predicate_goal"?
-predicate_goal(G_1, G_1).
+predicate_goal(G_2, G_2).
 
 first(Expected, Actual) :-
   Expected = "one",
@@ -20,6 +20,6 @@ second(Expected, Actual) :-
   Actual = "2".
 
 demo :-
-  predicate_goal(first, G_1),
-  predicate_goal(second, G_2),
-  call_goals([G_1, G_2]).
+  predicate_goal(first, First_2),
+  predicate_goal(second, Second_2),
+  call_goals([First_2, Second_2]).

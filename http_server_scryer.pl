@@ -1,3 +1,4 @@
+:- use_module(library(charsio)).
 :- use_module(library(dcgs)).
 :- use_module(library(format)).
 :- use_module(library(http/http_server)).
@@ -5,6 +6,7 @@
 
 :- use_module(html_gen).
 :- use_module('lib/json.pl').
+:- use_module('lib/list_util.pl').
 :- use_module('lib/strings.pl').
 
 :- initialization(consult(family)).
@@ -80,11 +82,14 @@ have_no_grandchildren(Response, NameChars) :-
   http_body(Response, text(Content)). % not providing an icon
 
 have_query(Response, QueryChars) :-
-  format("have_query: Query = ~w~n", [QueryChars]),
-  % atom_chars(QueryAtom, QueryChars),
-  % findall(P, QueryAtom(P), Result),
-  Result = foo(bar, baz),
-  phrase(json(Result), Json),
+  string_list(QueryChars, ',', Words),
+  maplist(string_term, Words, Terms),
+  Goal =.. Terms,
+  format("have_query: Goal = ~w~n", [Goal]),
+  list_pred_first(Terms, var, Variable),
+  findall(Variable, call(Goal), Results),
+  format("have_query: Results = ~w~n", [Results]),
+  phrase(json(Results), Json),
   http_headers(Response, ["Content-Type"-"application/json"]),
   http_body(Response, text(Json)).
 
@@ -99,13 +104,6 @@ home_handler(_, Response) :-
   ), Content),
   http_body(Response, text(Content)).
 
-json_handler(_, Response) :-
-  Value = foo(alpha, bar(beta, baz(gamma))),
-  format("Value = ~w~n", [Value]),
-  phrase(json:json(Value), Chars),
-  format("Chars = ~s~n", [Chars]),
-  http_body(Response, text(Chars)).
-
 listen :-
   % This cannot be stopped with ctrl-c.
   % See https://github.com/mthom/scryer-prolog/issues/485.
@@ -115,7 +113,6 @@ listen :-
     get('favicon.ico', not_found_handler),
     get(grandchildren, grandchildren_handler),
     get('grandchildren.json', grandchildren_json_handler),
-    get(json, json_handler),
     get('query', query_handler)
   ]).
 
@@ -141,3 +138,6 @@ query_handler(Request, Response) :-
   ; missing_query_parameter(Response, "q")
   ).
 
+string_term(String, Term) :-
+  append(String, [.], S), % append period to terminate
+  read_from_chars(S, Term).
