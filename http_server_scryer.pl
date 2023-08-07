@@ -85,9 +85,17 @@ have_query(Response, QueryChars) :-
   string_list(QueryChars, ',', Words),
   maplist(string_term, Words, Terms),
   Goal =.. Terms,
-  format("have_query: Goal = ~w~n", [Goal]),
-  list_pred_first(Terms, var, Variable),
-  findall(Variable, call(Goal), Results),
+
+  list_matching(Terms, var, Variables),
+  length(Variables, Count),
+  ( Count == 0 ->
+    ( call(Goal) -> Results = true; Results = false )
+  ; Count == 1 ->
+    [Variable|_] = Variables,
+    findall(Variable, call(Goal), Results)
+  ; findall(Variables, call(Goal), Results)
+  ),
+
   format("have_query: Results = ~w~n", [Results]),
   phrase(json(Results), Json),
   http_headers(Response, ["Content-Type"-"application/json"]),
