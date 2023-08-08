@@ -1,18 +1,17 @@
 :- use_module(library(reif)).
-:- use_module('lib/list_util').
 
-has_length(List, Length) :-
-  length(List, Len),
-  Len >= Length.
+% Greater or equal
+ge(=, true).
+ge(>, true).
+ge(<, false).
 
-is_long(List, Bool) :-
-  length(List, Len),
-  goal_bool(Len > 5, Bool).
-  % This doesn't work as an alternative to the previous two lines.
-  % goal_bool(has_length(List, 6), Bool).
+has_length(List, Bool) :-
+  length(List, Length),
+  zcompare(Compare, Length, 6),
+  ge(Compare, Bool).
 
 demo :-
   L0 = ["apple", "banana", "cherry", "date"],
-  tfilter(is_long, L0, L1),
+  tfilter(has_length, L0, L1),
   write(L1), nl. % ["banana", "cherry"]
 
