@@ -14,8 +14,12 @@ sign_word2(N, Word) :-
   ; Word = negative
   ).
 
-is_zero(N, B) :- N =:= 0 -> B = true; B = false.
-is_positive(N, B) :- N > 0 -> B = true; B = false.
+is_zero(N, true) :- N =:= 0.
+is_zero(N, false) :- N =\= 0.
+
+is_positive(N, true) :- N > 0.
+is_positive(N, false) :- N =< 0.
+
 sign_word3(N, Word) :-
   if_(
     is_zero(N),
