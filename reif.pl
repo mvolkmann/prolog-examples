@@ -6,11 +6,8 @@ dog(maisey).
 dog(oscar).
 dog(ramsay).
 
-writeln(X) :- write(X), nl.
-
-goal_bool(Goal, Bool) :- Goal -> Bool = true; Bool = false.
-
-is_dog(X, B) :- goal_bool(dog(X), B).
+is_dog(X, true) :- dog(X).
+is_dog(X, false) :- \+ dog(X).
 
 report_reif(Name) :-
   % The first argument must be a predicate that accepts
@@ -20,6 +17,8 @@ report_reif(Name) :-
     writeln(dog),
     writeln('not a dog')
   ).
+
+writeln(X) :- write(X), nl.
 
 demo :-
   report_reif(comet), % dog
