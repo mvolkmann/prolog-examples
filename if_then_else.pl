@@ -11,7 +11,8 @@ report(Name) :-
   ; writeln('not a dog')
   ).
 
-is_dog(X, B) :- dog(X) -> B = true; B = false.
+is_dog(X, true) :- dog(X).
+is_dog(X, false) :- \+ dog(X).
 
 report_reif(Name) :-
   % The first argument must be a predicate that accepts
@@ -22,7 +23,7 @@ report_reif(Name) :-
     writeln('not a dog')
   ).
 
-run :-
+demo :-
   report(comet), % dog
   report(mark), % not a dog
   report_reif(comet), % dog
