@@ -2,9 +2,8 @@
 :- use_module(library(dcgs)).
 :- use_module(library(format)).
 :- use_module(library(http/http_server)).
-:- use_module(library(serialization/json)).
 
-:- use_module(html_gen).
+:- use_module('lib/html_gen.pl').
 :- use_module('lib/json.pl').
 :- use_module('lib/list_util.pl').
 :- use_module('lib/strings.pl').
@@ -86,7 +85,7 @@ have_query(Response, QueryChars) :-
   maplist(string_term, Words, Terms),
   Goal =.. Terms,
 
-  list_matching(Terms, var, Variables),
+  tfilter(is_var, Terms, Variables),
   length(Variables, Count),
   ( Count == 0 ->
     ( call(Goal) -> Results = true; Results = false )
@@ -110,6 +109,9 @@ home_handler(_, Response) :-
     ])
   ), Content),
   http_body(Response, text(Content)).
+
+is_var(Term, false) :- \+ var(Term).
+is_var(Term, true) :- var(Term).
 
 listen :-
   % This cannot be stopped with ctrl-c.
