@@ -87,6 +87,7 @@ have_query(Response, QueryChars) :-
 
   tfilter(is_var, Terms, Variables),
   length(Variables, Count),
+  % When a query does not contain any variables, we want a Boolean result.
   ( Count == 0 ->
     ( call(Goal) -> Results = true; Results = false )
   ; Count == 1 ->
